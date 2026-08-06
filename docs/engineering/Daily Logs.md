@@ -87,3 +87,23 @@ Resultado final:
 ```text
 10 tests passed
 23 assertions
+```
+### Git branches integrated into develop
+
+- feature/auth-domain-models
+- feature/auth-rbac-relationship-tests
+- feature/auth-rbac-authorization-helpers
+- feature/auth-database-seeders
+- feature/auth-seeder-tests
+
+### Current status
+
+Enterprise Auth Service cuenta con una base funcional de RBAC, datos iniciales mediante seeders y pruebas automatizadas que validan el comportamiento principal.
+
+### Next steps
+
+- Crear autenticación API real.
+- Evaluar JWT / token authentication strategy.
+- Crear endpoints iniciales de login/logout.
+- Crear pruebas para flujo de autenticación.
+- Documentar contratos API.
