@@ -69,4 +69,70 @@ class RbacRelationshipsTest extends TestCase
                 ->exists()
         );
     }
+
+    public function test_user_can_check_if_has_role(): void
+    {
+        $user = User::factory()->create();
+
+        $role = Role::create([
+            'name' => 'Administrator',
+            'slug' => 'administrator',
+            'description' => 'System administrator role',
+            'is_active' => true,
+        ]);
+
+        $user->roles()->attach($role);
+
+        $this->assertTrue($user->hasRole('administrator'));
+        $this->assertFalse($user->hasRole('operator'));
+    }
+
+    public function test_role_can_check_if_has_permission(): void
+    {
+        $role = Role::create([
+            'name' => 'Administrator',
+            'slug' => 'administrator',
+            'description' => 'System administrator role',
+            'is_active' => true,
+        ]);
+
+        $permission = Permission::create([
+            'name' => 'Manage Users',
+            'slug' => 'manage-users',
+            'module' => 'auth',
+            'description' => 'Allows managing users',
+            'is_active' => true,
+        ]);
+
+        $role->permissions()->attach($permission);
+
+        $this->assertTrue($role->hasPermission('manage-users'));
+        $this->assertFalse($role->hasPermission('delete-company'));
+    }
+
+    public function test_user_can_check_if_has_permission_through_roles(): void
+    {
+        $user = User::factory()->create();
+
+        $role = Role::create([
+            'name' => 'Administrator',
+            'slug' => 'administrator',
+            'description' => 'System administrator role',
+            'is_active' => true,
+        ]);
+
+        $permission = Permission::create([
+            'name' => 'Manage Users',
+            'slug' => 'manage-users',
+            'module' => 'auth',
+            'description' => 'Allows managing users',
+            'is_active' => true,
+        ]);
+
+        $role->permissions()->attach($permission);
+        $user->roles()->attach($role);
+
+        $this->assertTrue($user->hasPermission('manage-users'));
+        $this->assertFalse($user->hasPermission('delete-company'));
+    }
 }

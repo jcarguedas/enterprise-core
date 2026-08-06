@@ -29,6 +29,22 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function hasRole(string $roleSlug): bool
+    {
+        return $this->roles()
+            ->where('slug', $roleSlug)
+            ->exists();
+    }
+
+    public function hasPermission(string $permissionSlug): bool
+    {
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($permissionSlug) {
+                $query->where('slug', $permissionSlug);
+            })
+            ->exists();
+    }
+
     protected function casts(): array
     {
         return [
