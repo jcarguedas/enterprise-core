@@ -35,3 +35,55 @@ Modernizar completamente el entorno de desarrollo.
 - Composer depende del PHP activo.
 - Administración de versiones de Node mediante NVM.
 - Instalación y configuración de PostgreSQL.
+
+## 2026-08-06
+
+### Summary
+
+Se avanzó significativamente en Enterprise Auth Service, estableciendo la base inicial del modelo de autorización RBAC dentro de Enterprise Core.
+
+### Completed
+
+- Configuración de GitHub remoto para el repositorio enterprise-core.
+- Publicación de ramas principales:
+  - main
+  - develop
+  - feature/auth-service-bootstrap
+- Configuración de Git Credential Manager para evitar ingresar usuario/token en cada push.
+- Creación de modelos de dominio:
+  - User
+  - Role
+  - Permission
+- Creación de migraciones:
+  - roles
+  - permissions
+  - role_user
+  - permission_role
+- Ejecución exitosa de migraciones en PostgreSQL.
+- Implementación de relaciones RBAC:
+  - User belongsToMany Role
+  - Role belongsToMany User
+  - Role belongsToMany Permission
+  - Permission belongsToMany Role
+- Implementación de helpers de autorización:
+  - User::hasRole()
+  - User::hasPermission()
+  - Role::hasPermission()
+- Creación de seeders iniciales:
+  - RoleSeeder
+  - PermissionSeeder
+- Actualización de DatabaseSeeder.
+- Creación de pruebas para:
+  - relaciones RBAC
+  - helpers de autorización
+  - seeders iniciales
+  - idempotencia de seeders
+- Integración de múltiples feature branches hacia develop usando merge commits.
+
+### Tests
+
+Resultado final:
+
+```text
+10 tests passed
+23 assertions
