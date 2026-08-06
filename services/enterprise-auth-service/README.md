@@ -50,6 +50,14 @@ Este servicio NO administra:
 Estos procesos pertenecen a otros servicios del ecosistema Enterprise Core.
 
 ---
+## Service Boundaries
+
+Enterprise Auth Service administra únicamente identidad, autenticación y autorización.
+
+La información organizacional (empresas, sucursales y configuración empresarial) será administrada por Enterprise Company Service.
+
+La comunicación entre ambos servicios se realizará mediante APIs internas.
+---
 
 # Domain Model
 
@@ -177,12 +185,12 @@ Enterprise Auth Service expondrá APIs REST para consumo interno del ecosistema 
 No tendrá acceso directo a las bases de datos de otros servicios.
 
 Toda comunicación entre servicios deberá realizarse mediante contratos de API.
----
 
+---
 # Roadmap
 
-- [ ] Initialize Laravel Project
-- [ ] Configure PostgreSQL Connection
+- [x] Initialize Laravel Project
+- [x] Configure PostgreSQL Connection
 - [ ] Configure JWT Authentication
 - [ ] Create Initial Domain Models
 - [ ] Create OpenAPI Specification
@@ -190,10 +198,4 @@ Toda comunicación entre servicios deberá realizarse mediante contratos de API.
 - [ ] Implement Authorization Layer
 - [ ] Implement Audit Logging
 
-## Service Boundaries
 
-Enterprise Auth Service administra únicamente identidad, autenticación y autorización.
-
-La información organizacional (empresas, sucursales y configuración empresarial) será administrada por Enterprise Company Service.
-
-La comunicación entre ambos servicios se realizará mediante APIs internas.
