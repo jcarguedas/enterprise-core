@@ -125,6 +125,14 @@ DELETE /permissions/{id}
 
 ---
 
+# API Documentation
+
+The current REST API documentation is available at:
+
+- [Enterprise Auth Service API](docs/API.md)
+
+---
+
 # Security
 
 El servicio implementará:
