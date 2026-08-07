@@ -107,3 +107,76 @@ Enterprise Auth Service cuenta con una base funcional de RBAC, datos iniciales m
 - Crear endpoints iniciales de login/logout.
 - Crear pruebas para flujo de autenticación.
 - Documentar contratos API.
+
+## 2026-08-07
+
+### Summary
+
+Se avanzó en la implementación del flujo básico de autenticación API para Enterprise Auth Service, utilizando Laravel Sanctum y manteniendo una estrategia basada en pruebas automatizadas y documentación técnica.
+
+### Completed
+
+- Creación del ADR-010 para definir la estrategia de autenticación API.
+- Instalación y configuración de Laravel Sanctum.
+- Publicación de configuración de Sanctum.
+- Ejecución de migración para `personal_access_tokens`.
+- Registro de rutas API mediante `routes/api.php`.
+- Implementación de endpoints:
+  - `GET /api/health`
+  - `POST /api/login`
+  - `GET /api/me`
+  - `POST /api/logout`
+- Implementación de generación de tokens Bearer con Sanctum.
+- Protección de rutas mediante `auth:sanctum`.
+- Implementación de logout revocando el token actual.
+- Creación de pruebas automatizadas para:
+  - login exitoso
+  - login con credenciales inválidas
+  - validación de campos requeridos
+  - consulta del usuario autenticado
+  - acceso no autenticado a rutas protegidas
+  - logout autenticado
+  - logout no autenticado
+- Eliminación de tests genéricos creados por Laravel.
+- Creación de documentación API:
+  - `services/enterprise-auth-service/docs/API.md`
+- Creación de documentación de pruebas manuales:
+  - `services/enterprise-auth-service/docs/Manual-Testing.md`
+- Creación de documentación de testing:
+  - `services/enterprise-auth-service/docs/Testing.md`
+- Actualización del README del Auth Service para enlazar documentación técnica.
+- Integración de todas las features hacia `develop`.
+
+### Tests
+
+Resultado actual:
+
+```text
+15 tests passed
+42 assertions
+```
+
+### Git branches integrated into develop
+
+- feature/auth-api-authentication-strategy
+- feature/auth-sanctum-installation
+- feature/auth-login-endpoint
+- feature/auth-me-logout-endpoints
+- feature/auth-api-documentation
+- feature/auth-readme-api-link
+- feature/auth-manual-api-testing-notes
+- feature/auth-test-cleanup
+- feature/auth-testing-documentation
+
+### Current status
+
+Enterprise Auth Service cuenta con autenticación API básica funcional, generación de tokens, rutas protegidas, logout, documentación técnica y pruebas automatizadas reales.
+
+### Next steps
+
+- Implementar endpoint de registro o creación controlada de usuarios.
+- Definir política para creación de usuarios administrativos.
+- Crear endpoints para gestión de roles.
+- Crear endpoints para gestión de permisos.
+- Implementar middleware de permisos.
+- Evaluar auditoría de autenticación.
