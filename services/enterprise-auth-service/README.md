@@ -133,6 +133,14 @@ The current REST API documentation is available at:
 
 ---
 
+# Testing Documentation
+
+The current automated testing documentation is available at:
+
+- [Enterprise Auth Service Testing](docs/Testing.md)
+
+---
+
 # Security
 
 El servicio implementará:
