@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,6 +15,8 @@ class UserManagementTest extends TestCase
     public function test_authenticated_user_can_create_user(): void
     {
         $admin = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
 
         $token = $admin->createToken('auth-token')->plainTextToken;
 
@@ -55,6 +59,8 @@ class UserManagementTest extends TestCase
     {
         $admin = User::factory()->create();
 
+        $this->giveManageUsersPermission($admin);
+
         $token = $admin->createToken('auth-token')->plainTextToken;
 
         $response = $this->withToken($token)
@@ -77,6 +83,8 @@ class UserManagementTest extends TestCase
 
         $admin = User::factory()->create();
 
+        $this->giveManageUsersPermission($admin);
+
         $token = $admin->createToken('auth-token')->plainTextToken;
 
         $response = $this->withToken($token)
@@ -92,5 +100,51 @@ class UserManagementTest extends TestCase
         $response->assertJsonValidationErrors([
             'email',
         ]);
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_create_user(): void
+    {
+        $user = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson('/api/users', [
+                'name' => 'Operator User',
+                'email' => 'operator@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ]);
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    private function giveManageUsersPermission(User $user): void
+    {
+        $role = Role::updateOrCreate(
+            ['slug' => 'administrator'],
+            [
+                'name' => 'Administrator',
+                'description' => 'System administrator role',
+                'is_active' => true,
+            ]
+        );
+
+        $permission = Permission::updateOrCreate(
+            ['slug' => 'manage-users'],
+            [
+                'name' => 'Manage Users',
+                'module' => 'auth',
+                'description' => 'Allows managing users.',
+                'is_active' => true,
+            ]
+        );
+
+        $role->permissions()->syncWithoutDetaching([$permission->id]);
+        $user->roles()->syncWithoutDetaching([$role->id]);
     }
 }
