@@ -180,3 +180,56 @@ Enterprise Auth Service cuenta con autenticación API básica funcional, generac
 - Crear endpoints para gestión de permisos.
 - Implementar middleware de permisos.
 - Evaluar auditoría de autenticación.
+
+
+## 2026-08-10
+
+### Focus
+
+Continued development of the Enterprise Auth Service, focusing on enterprise-controlled user management and RBAC enforcement.
+
+### Completed
+
+- Added a protected `POST /api/users` endpoint for administrative user creation.
+- Added feature tests for user creation scenarios:
+  - Authenticated user can create a user.
+  - Guest user cannot create a user.
+  - Required validation errors are returned correctly.
+  - Duplicate email validation is enforced.
+- Restored the empty `tests/Unit` directory using `.gitkeep` so PHPUnit can run correctly.
+- Added RBAC enforcement to user creation.
+- Updated user creation so only authenticated users with the `manage-users` permission can create users.
+- Added test coverage for authenticated users without `manage-users`, expecting `403 Forbidden`.
+- Added `AGENTS.md` to define project instructions for Codex and future AI-assisted development.
+- Used Codex in review mode to inspect the current branch without modifying files.
+- Ran final validations:
+  - `vendor/bin/pint --dirty --format agent`
+  - `php artisan test --compact`
+  - `php artisan route:list`
+
+### Results
+
+- `POST /api/users` is now protected by both Sanctum authentication and RBAC authorization.
+- Current API behavior:
+  - Guest without token: `401 Unauthorized`
+  - Authenticated user without `manage-users`: `403 Forbidden`
+  - Authenticated user with `manage-users`: `201 Created`
+  - Invalid data: `422 Validation Error`
+  - Duplicate email: `422 Validation Error`
+- Test suite result: `20 passed, 56 assertions`.
+- Merged `feature/auth-user-management` into `develop`.
+- Merged `feature/auth-user-management-permission` into `develop`.
+- `develop` is up to date with `origin/develop`.
+
+### Notes
+
+The user management endpoint is now functionally correct, but the permission check currently lives inside `UserController`. A future improvement is to extract this logic into reusable middleware, such as `RequirePermission`, so administrative routes can be protected declaratively.
+
+### Next Step
+
+Create a reusable permission middleware and protect `POST /api/users` using a route-level permission requirement, for example:
+
+```php
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware('permission:manage-users');
+```
