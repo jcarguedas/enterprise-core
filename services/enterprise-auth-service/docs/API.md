@@ -156,6 +156,7 @@ Returned when the token is missing or invalid.
 
 ---
 
+
 ## Current Endpoints
 
 ```text
@@ -163,7 +164,10 @@ GET  /api/health
 POST /api/login
 GET  /api/me
 POST /api/logout
+GET  /api/users
+POST /api/users
 ```
+
 
 ## Authentication Strategy
 
@@ -175,4 +179,74 @@ Authorization is handled by the internal RBAC domain model:
 User::hasRole()
 User::hasPermission()
 Role::hasPermission()
+```
+## List Users
+
+```http
+GET /api/users
+```
+
+Lists users in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    {
+      "id": 2,
+      "name": "Operator User",
+      "email": "operator@example.com"
+    }
+  ]
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
 ```
