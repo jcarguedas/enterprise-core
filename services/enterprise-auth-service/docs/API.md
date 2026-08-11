@@ -166,6 +166,7 @@ GET  /api/me
 POST /api/logout
 GET  /api/users
 POST /api/users
+GET  /api/users/{user}
 ```
 
 
@@ -187,6 +188,84 @@ GET /api/users
 ```
 
 Lists users in the Enterprise Auth Service.
+
+---
+
+## Show User
+
+```http
+GET /api/users/{user}
+```
+
+Returns the details of a specific user in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `user` | integer | yes | User ID. |
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "user": {
+    "id": 2,
+    "name": "Operator User",
+    "email": "operator@example.com"
+  }
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+Requested user does not exist:
+
+```http
+404 Not Found
+```
 
 ### Authentication
 
