@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserManagementTest extends TestCase
@@ -147,6 +148,176 @@ class UserManagementTest extends TestCase
             ->getJson('/api/users/999999');
 
         $response->assertNotFound();
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_update_user_name_and_email(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create([
+            'name' => 'Original User',
+            'email' => 'original@example.com',
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'name' => 'Updated User',
+                'email' => 'updated@example.com',
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => 'Updated User',
+                'email' => 'updated@example.com',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Updated User',
+            'email' => 'updated@example.com',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_update_user_password(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => 'old-password',
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ]);
+
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+    }
+
+    public function test_guest_cannot_update_user(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->patchJson("/api/users/{$user->id}", [
+            'name' => 'Updated User',
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_update_user(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$targetUser->id}", [
+                'name' => 'Updated User',
+            ]);
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_for_missing_user_update(): void
+    {
+        $admin = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson('/api/users/999999', [
+                'name' => 'Updated User',
+            ]);
+
+        $response->assertNotFound();
+    }
+
+    public function test_update_user_email_must_be_unique_except_for_user_being_updated(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create([
+            'email' => 'current@example.com',
+        ]);
+        $otherUser = User::factory()->create([
+            'email' => 'other@example.com',
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $sameEmailResponse = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'email' => 'current@example.com',
+            ]);
+
+        $sameEmailResponse->assertOk();
+
+        $duplicateEmailResponse = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'email' => $otherUser->email,
+            ]);
+
+        $duplicateEmailResponse->assertUnprocessable();
+
+        $duplicateEmailResponse->assertJsonValidationErrors([
+            'email',
+        ]);
+    }
+
+    public function test_update_user_requires_valid_payload(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'name' => '',
+                'email' => 'not-an-email',
+                'password' => 'short',
+                'password_confirmation' => 'different',
+            ]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJsonValidationErrors([
+            'name',
+            'email',
+            'password',
+        ]);
     }
 
     public function test_authenticated_user_can_create_user(): void
