@@ -283,6 +283,11 @@ Route::post('/users', [UserController::class, 'store'])
 - Confirmed the route list now includes:
   - `PATCH /api/users/{user}`
 - Test suite result after user update endpoint: `34 passed, 86 assertions`.
+- Added `docs/architecture/User-Management.md` to document the User Management architecture.
+- Documented the enterprise-controlled user administration model.
+- Documented the RBAC security model for user management endpoints.
+- Documented current user management capabilities, validation strategy, test coverage, design decisions, and future improvements.
+- Removed `docs/architecture/.gitkeep` because the architecture directory now contains real documentation.
 
 ### Results
 
@@ -296,6 +301,8 @@ Route::post('/users', [UserController::class, 'store'])
 - User management endpoints are protected consistently through reusable permission middleware.
 - User management now supports listing, creating, viewing, and updating users.
 - User update operations are protected consistently through reusable RBAC permission middleware.
+- User Management now has both implementation-level API documentation and architecture-level documentation.
+- The architecture documentation explains the security model, route-level authorization, response shape, testing strategy, and future improvements.
 
 ### Notes
 
