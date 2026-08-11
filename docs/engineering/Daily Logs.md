@@ -233,3 +233,63 @@ Create a reusable permission middleware and protect `POST /api/users` using a ro
 Route::post('/users', [UserController::class, 'store'])
     ->middleware('permission:manage-users');
 ```
+
+## 2026-08-11
+
+### Focus
+
+Improved the Enterprise Auth Service authorization structure by extracting permission checks from the controller into reusable route middleware.
+
+### Completed
+
+- Created a reusable `RequirePermission` middleware.
+- Registered the middleware alias as `permission`.
+- Updated `POST /api/users` to use route-level permission protection:
+
+```php
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware('permission:manage-users');
+```
+
+- Removed the direct `manage-users` permission check from `UserController`.
+- Kept the existing user management behavior unchanged:
+  - Guest users receive `401 Unauthorized`.
+  - Authenticated users without `manage-users` receive `403 Forbidden`.
+  - Authenticated users with `manage-users` can create users.
+- Ran Laravel Pint on dirty files.
+- Ran the full test suite after the refactor.
+
+### Results
+
+- `POST /api/users` is now protected declaratively through middleware.
+- `UserController` is cleaner and focused on user creation.
+- Permission authorization is now reusable for future administrative endpoints.
+- Test suite result: `20 passed, 56 assertions`.
+- Merged `feature/auth-permission-middleware` into `develop`.
+- `develop` is up to date with `origin/develop`.
+
+### Notes
+
+This refactor improves maintainability because future routes can now declare required permissions directly at the route level instead of duplicating permission checks inside controllers.
+
+### Next Step
+
+Create a protected user listing endpoint:
+
+```php
+Route::get('/users', [UserController::class, 'index'])
+    ->middleware('permission:manage-users');
+```
+
+The endpoint should return a basic list of users and include tests for authorized users, authenticated users without permission, and guests.
+
+- Added a protected `GET /api/users` endpoint for administrative user listing.
+- Protected the user listing endpoint with `permission:manage-users`.
+- Added test coverage for user listing scenarios:
+  - Authenticated user with `manage-users` can list users.
+  - Guest user cannot list users.
+  - Authenticated user without `manage-users` receives `403 Forbidden`.
+- Confirmed the route list now includes both:
+  - `GET /api/users`
+  - `POST /api/users`
+- Test suite result after user listing endpoint: `23 passed, 61 assertions`.
