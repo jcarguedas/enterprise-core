@@ -82,6 +82,73 @@ class UserManagementTest extends TestCase
         ]);
     }
 
+    public function test_authenticated_user_with_manage_users_permission_can_view_user_detail(): void
+    {
+        $admin = User::factory()->create();
+
+        $user = User::factory()->create([
+            'name' => 'Detail User',
+            'email' => 'detail@example.com',
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson("/api/users/{$user->id}");
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => 'Detail User',
+                'email' => 'detail@example.com',
+            ],
+        ]);
+    }
+
+    public function test_guest_cannot_view_user_detail(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson("/api/users/{$user->id}");
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_view_user_detail(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson("/api/users/{$targetUser->id}");
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_for_missing_user_detail(): void
+    {
+        $admin = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/users/999999');
+
+        $response->assertNotFound();
+    }
+
     public function test_authenticated_user_can_create_user(): void
     {
         $admin = User::factory()->create();
