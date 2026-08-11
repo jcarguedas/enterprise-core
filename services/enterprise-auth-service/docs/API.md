@@ -167,6 +167,7 @@ POST /api/logout
 GET  /api/users
 POST /api/users
 GET  /api/users/{user}
+PATCH /api/users/{user}
 ```
 
 
@@ -198,6 +199,111 @@ GET /api/users/{user}
 ```
 
 Returns the details of a specific user in the Enterprise Auth Service.
+
+---
+
+## Update User
+
+```http
+PATCH /api/users/{user}
+```
+
+Updates an existing user in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `user` | integer | yes | User ID. |
+
+### Request Body
+
+All fields are optional, but when provided they must be valid.
+
+```json
+{
+  "name": "Updated User",
+  "email": "updated@example.com",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
+```
+
+### Validation Rules
+
+| Field | Rules |
+|---|---|
+| `name` | sometimes, required, string, max:255 |
+| `email` | sometimes, required, email, max:255, unique among users except the current user |
+| `password` | sometimes, required, string, min:8, confirmed |
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "user": {
+    "id": 2,
+    "name": "Updated User",
+    "email": "updated@example.com"
+  }
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+Invalid request body:
+
+```http
+422 Validation Error
+```
+
+Requested user does not exist:
+
+```http
+404 Not Found
+```
 
 ### Authentication
 
