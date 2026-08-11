@@ -269,6 +269,20 @@ Route::post('/users', [UserController::class, 'store'])
 - Confirmed the route list now includes:
   - `GET /api/users/{user}`
 - Test suite result after user detail endpoint: `27 passed, 67 assertions`.
+- Added a protected `PATCH /api/users/{user}` endpoint for administrative user updates.
+- Protected the user update endpoint with `permission:manage-users`.
+- Added test coverage for user update scenarios:
+  - Authenticated user with `manage-users` can update a user's name and email.
+  - Authenticated user with `manage-users` can update a user's password.
+  - Guest user cannot update users.
+  - Authenticated user without `manage-users` receives `403 Forbidden`.
+  - Authenticated user with `manage-users` receives `404 Not Found` when the requested user does not exist.
+  - Duplicate email validation is enforced.
+  - Invalid payloads return `422 Validation Error`.
+- Updated `API.md` to document the user update endpoint.
+- Confirmed the route list now includes:
+  - `PATCH /api/users/{user}`
+- Test suite result after user update endpoint: `34 passed, 86 assertions`.
 
 ### Results
 
@@ -280,6 +294,8 @@ Route::post('/users', [UserController::class, 'store'])
 - `develop` is up to date with `origin/develop`.
 - User management now supports listing users, creating users, and viewing individual user details.
 - User management endpoints are protected consistently through reusable permission middleware.
+- User management now supports listing, creating, viewing, and updating users.
+- User update operations are protected consistently through reusable RBAC permission middleware.
 
 ### Notes
 
