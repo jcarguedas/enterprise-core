@@ -20,6 +20,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:manage-users');
     Route::get('/users/{user}', [UserController::class, 'show'])
         ->middleware('permission:manage-users');
+    Route::patch('/users/{user}', [UserController::class, 'update'])
+        ->middleware('permission:manage-users');
     Route::post('/users', [UserController::class, 'store'])
         ->middleware('permission:manage-users');
 });
