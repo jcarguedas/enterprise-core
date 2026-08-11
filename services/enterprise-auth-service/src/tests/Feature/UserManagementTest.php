@@ -12,6 +12,76 @@ class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_authenticated_user_with_manage_users_permission_can_list_users(): void
+    {
+        $admin = User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+        ]);
+
+        $firstUser = User::factory()->create([
+            'name' => 'First User',
+            'email' => 'first@example.com',
+        ]);
+
+        $secondUser = User::factory()->create([
+            'name' => 'Second User',
+            'email' => 'second@example.com',
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/users');
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'users' => [
+                [
+                    'id' => $admin->id,
+                    'name' => 'Admin User',
+                    'email' => 'admin@example.com',
+                ],
+                [
+                    'id' => $firstUser->id,
+                    'name' => 'First User',
+                    'email' => 'first@example.com',
+                ],
+                [
+                    'id' => $secondUser->id,
+                    'name' => 'Second User',
+                    'email' => 'second@example.com',
+                ],
+            ],
+        ]);
+    }
+
+    public function test_guest_cannot_list_users(): void
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_list_users(): void
+    {
+        $user = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/users');
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
     public function test_authenticated_user_can_create_user(): void
     {
         $admin = User::factory()->create();

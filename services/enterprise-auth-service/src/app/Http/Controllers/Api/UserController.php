@@ -9,6 +9,18 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        $users = User::query()
+            ->select(['id', 'name', 'email'])
+            ->orderBy('id')
+            ->get();
+
+        return response()->json([
+            'users' => $users,
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
