@@ -258,6 +258,17 @@ Route::post('/users', [UserController::class, 'store'])
   - Authenticated users with `manage-users` can create users.
 - Ran Laravel Pint on dirty files.
 - Ran the full test suite after the refactor.
+- Added a protected `GET /api/users/{user}` endpoint for administrative user detail retrieval.
+- Protected the user detail endpoint with `permission:manage-users`.
+- Added test coverage for user detail scenarios:
+  - Authenticated user with `manage-users` can view user details.
+  - Guest user cannot view user details.
+  - Authenticated user without `manage-users` receives `403 Forbidden`.
+  - Authenticated user with `manage-users` receives `404 Not Found` when the requested user does not exist.
+- Updated `API.md` to document the user detail endpoint.
+- Confirmed the route list now includes:
+  - `GET /api/users/{user}`
+- Test suite result after user detail endpoint: `27 passed, 67 assertions`.
 
 ### Results
 
@@ -267,6 +278,8 @@ Route::post('/users', [UserController::class, 'store'])
 - Test suite result: `20 passed, 56 assertions`.
 - Merged `feature/auth-permission-middleware` into `develop`.
 - `develop` is up to date with `origin/develop`.
+- User management now supports listing users, creating users, and viewing individual user details.
+- User management endpoints are protected consistently through reusable permission middleware.
 
 ### Notes
 
