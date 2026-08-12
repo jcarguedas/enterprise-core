@@ -25,6 +25,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:manage-users');
     Route::post('/users/{user}/roles', [UserRoleController::class, 'store'])
         ->middleware('permission:manage-users');
+    Route::delete('/users/{user}/roles/{role}', [UserRoleController::class, 'destroy'])
+        ->middleware('permission:manage-users');
     Route::patch('/users/{user}', [UserController::class, 'update'])
         ->middleware('permission:manage-users');
     Route::post('/users', [UserController::class, 'store'])
