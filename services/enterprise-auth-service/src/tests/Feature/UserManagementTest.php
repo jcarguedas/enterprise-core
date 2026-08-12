@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -429,6 +430,270 @@ class UserManagementTest extends TestCase
         $response->assertJson([
             'message' => 'This action is unauthorized.',
         ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_list_user_roles(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $firstRole = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $secondRole = Role::create([
+            'name' => 'Auditor',
+            'slug' => 'auditor',
+            'description' => 'Auditor role',
+            'is_active' => false,
+        ]);
+
+        $user->roles()->syncWithoutDetaching([$secondRole->id, $firstRole->id]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson("/api/users/{$user->id}/roles");
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [
+                [
+                    'id' => $firstRole->id,
+                    'name' => 'Operator',
+                    'slug' => 'operator',
+                    'description' => 'Operator role',
+                    'is_active' => true,
+                ],
+                [
+                    'id' => $secondRole->id,
+                    'name' => 'Auditor',
+                    'slug' => 'auditor',
+                    'description' => 'Auditor role',
+                    'is_active' => false,
+                ],
+            ],
+        ]);
+    }
+
+    public function test_guest_cannot_list_user_roles(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson("/api/users/{$user->id}/roles");
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_list_user_roles(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson("/api/users/{$targetUser->id}/roles");
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_for_missing_user_roles(): void
+    {
+        $admin = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/users/999999/roles');
+
+        $response->assertNotFound();
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_assign_role_to_user(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson("/api/users/{$user->id}/roles", [
+                'role_id' => $role->id,
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [
+                [
+                    'id' => $role->id,
+                    'name' => 'Operator',
+                    'slug' => 'operator',
+                    'description' => 'Operator role',
+                    'is_active' => true,
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('role_user', [
+            'role_id' => $role->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_assigning_same_role_twice_does_not_create_duplicate_pivot_rows(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $this->withToken($token)
+            ->postJson("/api/users/{$user->id}/roles", [
+                'role_id' => $role->id,
+            ])
+            ->assertOk();
+
+        $this->withToken($token)
+            ->postJson("/api/users/{$user->id}/roles", [
+                'role_id' => $role->id,
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                'roles' => [
+                    [
+                        'id' => $role->id,
+                        'name' => 'Operator',
+                        'slug' => 'operator',
+                        'description' => 'Operator role',
+                        'is_active' => true,
+                    ],
+                ],
+            ]);
+
+        $this->assertSame(
+            1,
+            DB::table('role_user')
+                ->where('role_id', $role->id)
+                ->where('user_id', $user->id)
+                ->count()
+        );
+    }
+
+    public function test_guest_cannot_assign_user_roles(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $response = $this->postJson("/api/users/{$user->id}/roles", [
+            'role_id' => $role->id,
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_assign_user_roles(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson("/api/users/{$targetUser->id}/roles", [
+                'role_id' => $role->id,
+            ]);
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_assign_user_role_requires_valid_role_id(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson("/api/users/{$user->id}/roles", [
+                'role_id' => 999999,
+            ]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJsonValidationErrors([
+            'role_id',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_when_assigning_role_to_missing_user(): void
+    {
+        $admin = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson('/api/users/999999/roles', [
+                'role_id' => $role->id,
+            ]);
+
+        $response->assertNotFound();
     }
 
     private function giveManageUsersPermission(User $user): void

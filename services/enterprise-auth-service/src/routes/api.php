@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -19,6 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index'])
         ->middleware('permission:manage-users');
     Route::get('/users/{user}', [UserController::class, 'show'])
+        ->middleware('permission:manage-users');
+    Route::get('/users/{user}/roles', [UserRoleController::class, 'index'])
+        ->middleware('permission:manage-users');
+    Route::post('/users/{user}/roles', [UserRoleController::class, 'store'])
         ->middleware('permission:manage-users');
     Route::patch('/users/{user}', [UserController::class, 'update'])
         ->middleware('permission:manage-users');
