@@ -356,6 +356,24 @@ Extended Enterprise Auth Service user management with role assignment capabiliti
 - Confirmed the route list now includes:
   - `GET /api/users/{user}/roles`
   - `POST /api/users/{user}/roles`
+  - Added protected user role removal endpoint:
+  - `DELETE /api/users/{user}/roles/{role}`
+- Protected the role removal endpoint with `permission:manage-users`.
+- Implemented idempotent role removal behavior:
+  - If the user has the role, it is detached.
+  - If the user does not have the role, the endpoint still returns `200 OK`.
+  - The response returns the user's current roles.
+- Added test coverage for role removal scenarios:
+  - Authenticated user with `manage-users` can remove a role from a user.
+  - Removing a role that is not assigned remains idempotent.
+  - Guest user cannot remove roles.
+  - Authenticated user without `manage-users` receives `403 Forbidden`.
+  - Missing user returns `404 Not Found`.
+  - Missing role returns `404 Not Found`.
+  - Removing one role does not remove other roles assigned to the user.
+- Updated `API.md` to document the role removal endpoint.
+- Confirmed the route list now includes:
+  - `DELETE /api/users/{user}/roles/{role}`
 
 ### Results
 
@@ -363,6 +381,9 @@ Extended Enterprise Auth Service user management with role assignment capabiliti
 - Role assignment is idempotent and avoids duplicate pivot records.
 - Test suite result: `44 passed, 106 assertions`.
 - `develop` is up to date with `origin/develop`.
+- User role management now supports listing, assigning, and removing roles.
+- User role removal is idempotent and safe for repeated API calls.
+- Test suite result after role removal endpoint: `51 passed, 120 assertions`.
 
 ### Next Step
 
