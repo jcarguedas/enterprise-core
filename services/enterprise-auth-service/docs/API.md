@@ -8,6 +8,8 @@ Base path:
 /api
 ```
 
+---
+
 ## Health Check
 
 ### GET /api/health
@@ -156,20 +158,22 @@ Returned when the token is missing or invalid.
 
 ---
 
-
 ## Current Endpoints
 
 ```text
-GET  /api/health
-POST /api/login
-GET  /api/me
-POST /api/logout
-GET  /api/users
-POST /api/users
-GET  /api/users/{user}
+GET   /api/health
+POST  /api/login
+GET   /api/me
+POST  /api/logout
+GET   /api/users
+POST  /api/users
+GET   /api/users/{user}
 PATCH /api/users/{user}
+GET   /api/users/{user}/roles
+POST  /api/users/{user}/roles
 ```
 
+---
 
 ## Authentication Strategy
 
@@ -182,6 +186,16 @@ User::hasRole()
 User::hasPermission()
 Role::hasPermission()
 ```
+
+Administrative user management endpoints are protected with:
+
+```text
+auth:sanctum
+permission:manage-users
+```
+
+---
+
 ## List Users
 
 ```http
@@ -189,6 +203,160 @@ GET /api/users
 ```
 
 Lists users in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    {
+      "id": 2,
+      "name": "Operator User",
+      "email": "operator@example.com"
+    }
+  ]
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+---
+
+## Create User
+
+```http
+POST /api/users
+```
+
+Creates a new user in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Request Body
+
+```json
+{
+  "name": "Operator User",
+  "email": "operator@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+### Validation Rules
+
+| Field | Rules |
+|---|---|
+| `name` | required, string, max:255 |
+| `email` | required, email, max:255, unique among users |
+| `password` | required, string, min:8, confirmed |
+
+### Successful Response
+
+Status code:
+
+```http
+201 Created
+```
+
+Example response:
+
+```json
+{
+  "user": {
+    "id": 2,
+    "name": "Operator User",
+    "email": "operator@example.com"
+  }
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+Invalid request body or duplicate email:
+
+```http
+422 Validation Error
+```
 
 ---
 
@@ -199,6 +367,74 @@ GET /api/users/{user}
 ```
 
 Returns the details of a specific user in the Enterprise Auth Service.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `user` | integer | yes | User ID. |
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "user": {
+    "id": 2,
+    "name": "Operator User",
+    "email": "operator@example.com"
+  }
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+Requested user does not exist:
+
+```http
+404 Not Found
+```
 
 ---
 
@@ -305,6 +541,16 @@ Requested user does not exist:
 404 Not Found
 ```
 
+---
+
+## List User Roles
+
+```http
+GET /api/users/{user}/roles
+```
+
+Returns the roles assigned to a specific user.
+
 ### Authentication
 
 Requires a valid Bearer token.
@@ -337,11 +583,15 @@ Example response:
 
 ```json
 {
-  "user": {
-    "id": 2,
-    "name": "Operator User",
-    "email": "operator@example.com"
-  }
+  "roles": [
+    {
+      "id": 1,
+      "name": "Administrator",
+      "slug": "administrator",
+      "description": "System administrator role",
+      "is_active": true
+    }
+  ]
 }
 ```
 
@@ -373,6 +623,18 @@ Requested user does not exist:
 404 Not Found
 ```
 
+---
+
+## Assign Role to User
+
+```http
+POST /api/users/{user}/roles
+```
+
+Assigns a role to a specific user.
+
+This endpoint is idempotent. Assigning the same role more than once does not create duplicate role assignments.
+
 ### Authentication
 
 Requires a valid Bearer token.
@@ -387,6 +649,26 @@ Authorization: Bearer {token}
 manage-users
 ```
 
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `user` | integer | yes | User ID. |
+
+### Request Body
+
+```json
+{
+  "role_id": 1
+}
+```
+
+### Validation Rules
+
+| Field | Rules |
+|---|---|
+| `role_id` | required, exists in roles |
+
 ### Successful Response
 
 Status code:
@@ -399,16 +681,13 @@ Example response:
 
 ```json
 {
-  "users": [
+  "roles": [
     {
       "id": 1,
-      "name": "Admin User",
-      "email": "admin@example.com"
-    },
-    {
-      "id": 2,
-      "name": "Operator User",
-      "email": "operator@example.com"
+      "name": "Administrator",
+      "slug": "administrator",
+      "description": "System administrator role",
+      "is_active": true
     }
   ]
 }
@@ -434,4 +713,16 @@ Example response:
 {
   "message": "This action is unauthorized."
 }
+```
+
+Invalid or missing `role_id`:
+
+```http
+422 Validation Error
+```
+
+Requested user does not exist:
+
+```http
+404 Not Found
 ```
