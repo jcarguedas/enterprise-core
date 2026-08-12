@@ -696,6 +696,191 @@ class UserManagementTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function test_authenticated_user_with_manage_users_permission_can_remove_role_from_user(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $user->roles()->syncWithoutDetaching([$role->id]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/{$user->id}/roles/{$role->id}");
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [],
+        ]);
+
+        $this->assertDatabaseMissing('role_user', [
+            'role_id' => $role->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_removing_role_that_is_not_assigned_remains_idempotent(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/{$user->id}/roles/{$role->id}");
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [],
+        ]);
+    }
+
+    public function test_guest_cannot_remove_user_role(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $response = $this->deleteJson("/api/users/{$user->id}/roles/{$role->id}");
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_remove_user_role(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $targetUser->roles()->syncWithoutDetaching([$role->id]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/{$targetUser->id}/roles/{$role->id}");
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_when_removing_role_from_missing_user(): void
+    {
+        $admin = User::factory()->create();
+        $role = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/999999/roles/{$role->id}");
+
+        $response->assertNotFound();
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_receives_not_found_when_removing_missing_role(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/{$user->id}/roles/999999");
+
+        $response->assertNotFound();
+    }
+
+    public function test_removing_one_role_does_not_remove_other_roles_assigned_to_user(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+
+        $firstRole = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $secondRole = Role::create([
+            'name' => 'Auditor',
+            'slug' => 'auditor',
+            'description' => 'Auditor role',
+            'is_active' => false,
+        ]);
+
+        $user->roles()->syncWithoutDetaching([$firstRole->id, $secondRole->id]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->deleteJson("/api/users/{$user->id}/roles/{$firstRole->id}");
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [
+                [
+                    'id' => $secondRole->id,
+                    'name' => 'Auditor',
+                    'slug' => 'auditor',
+                    'description' => 'Auditor role',
+                    'is_active' => false,
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseMissing('role_user', [
+            'role_id' => $firstRole->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertDatabaseHas('role_user', [
+            'role_id' => $secondRole->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
     private function giveManageUsersPermission(User $user): void
     {
         $role = Role::updateOrCreate(

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,6 +22,13 @@ class UserRoleController extends Controller
         ]);
 
         $user->roles()->syncWithoutDetaching([$validated['role_id']]);
+
+        return $this->rolesResponse($user);
+    }
+
+    public function destroy(User $user, Role $role): JsonResponse
+    {
+        $user->roles()->detach($role->id);
 
         return $this->rolesResponse($user);
     }
