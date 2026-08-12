@@ -374,6 +374,26 @@ Extended Enterprise Auth Service user management with role assignment capabiliti
 - Updated `API.md` to document the role removal endpoint.
 - Confirmed the route list now includes:
   - `DELETE /api/users/{user}/roles/{role}`
+- Performed manual API testing with Postman for the Enterprise Auth Service.
+- Created a Postman collection named `Enterprise Auth Service`.
+- Configured Postman collection variables:
+  - `base_url`
+  - `token`
+  - `user_id`
+  - `role_id`
+- Configured a Postman post-response script to automatically store the latest created user ID into the `user_id` collection variable.
+- Verified login using the local admin user.
+- Verified authenticated profile retrieval with `GET /api/me`.
+- Verified user management endpoints manually:
+  - `GET /api/users`
+  - `POST /api/users`
+  - `GET /api/users/{user}`
+  - `PATCH /api/users/{user}`
+- Verified password update behavior by logging in with the updated user password.
+- Verified user role management endpoints manually:
+  - `GET /api/users/{user}/roles`
+  - `POST /api/users/{user}/roles`
+- Confirmed that assigning a role to a user works correctly through Postman.
 
 ### Results
 
@@ -384,6 +404,9 @@ Extended Enterprise Auth Service user management with role assignment capabiliti
 - User role management now supports listing, assigning, and removing roles.
 - User role removal is idempotent and safe for repeated API calls.
 - Test suite result after role removal endpoint: `51 passed, 120 assertions`.
+- Automated tests and manual Postman testing both confirm the current user management and role assignment flow.
+- The local API can now be demonstrated manually using Postman with collection variables and Bearer token authentication.
+- Remaining manual testing can continue tomorrow, including role removal, authorization failure cases, validation errors, and not found scenarios.
 
 ### Next Step
 
