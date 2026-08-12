@@ -171,6 +171,7 @@ GET   /api/users/{user}
 PATCH /api/users/{user}
 GET   /api/users/{user}/roles
 POST  /api/users/{user}/roles
+DELETE /api/users/{user}/roles/{role}
 ```
 
 ---
@@ -722,6 +723,91 @@ Invalid or missing `role_id`:
 ```
 
 Requested user does not exist:
+
+```http
+404 Not Found
+```
+
+---
+
+## Remove Role from User
+
+```http
+DELETE /api/users/{user}/roles/{role}
+```
+
+Removes a role from a specific user.
+
+This endpoint is idempotent. Removing a role that is not assigned to the user still returns `200 OK` with the user's current roles.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `user` | integer | yes | User ID. |
+| `role` | integer | yes | Role ID. |
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "roles": [
+    {
+      "id": 1,
+      "name": "Administrator",
+      "slug": "administrator",
+      "description": "System administrator role",
+      "is_active": true
+    }
+  ]
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
+```
+
+Requested user or role does not exist:
 
 ```http
 404 Not Found
