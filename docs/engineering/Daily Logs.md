@@ -329,3 +329,46 @@ The endpoint should return a basic list of users and include tests for authorize
   - `GET /api/users`
   - `POST /api/users`
 - Test suite result after user listing endpoint: `23 passed, 61 assertions`.
+
+
+## 2026-08-12
+
+### Focus
+
+Extended Enterprise Auth Service user management with role assignment capabilities.
+
+### Completed
+
+- Added protected user role management endpoints:
+  - `GET /api/users/{user}/roles`
+  - `POST /api/users/{user}/roles`
+- Created `UserRoleController` to keep role assignment logic separate from `UserController`.
+- Protected both role management endpoints with `permission:manage-users`.
+- Added test coverage for user role management scenarios:
+  - Authenticated user with `manage-users` can list a user's roles.
+  - Guest user cannot list user roles.
+  - Authenticated user without `manage-users` receives `403 Forbidden`.
+  - Missing user returns `404 Not Found`.
+  - Authenticated user with `manage-users` can assign a role to a user.
+  - Assigning the same role twice does not create duplicate role assignments.
+  - Invalid or missing `role_id` returns `422 Validation Error`.
+- Updated `API.md` to document user role listing and role assignment endpoints.
+- Confirmed the route list now includes:
+  - `GET /api/users/{user}/roles`
+  - `POST /api/users/{user}/roles`
+
+### Results
+
+- User management now supports listing, creating, viewing, updating, listing roles, and assigning roles.
+- Role assignment is idempotent and avoids duplicate pivot records.
+- Test suite result: `44 passed, 106 assertions`.
+- `develop` is up to date with `origin/develop`.
+
+### Next Step
+
+Add the endpoint to remove a role from a user:
+
+```text
+DELETE /api/users/{user}/roles/{role}
+```
+This endpoint should be protected with permission:manage-users, should be idempotent, and should return the user's current roles after removal.
