@@ -416,3 +416,67 @@ Add the endpoint to remove a role from a user:
 DELETE /api/users/{user}/roles/{role}
 ```
 This endpoint should be protected with permission:manage-users, should be idempotent, and should return the user's current roles after removal.
+
+## 2026-08-13
+
+### Focus
+
+Continued development of Enterprise Core, completing backend RBAC validation, adding role listing support, and bootstrapping the initial admin web frontend.
+
+### Completed
+
+- Continued from a clean `develop` branch.
+- Completed manual Postman validation for the user management and RBAC API.
+- Verified:
+  - `DELETE /api/users/{user}/roles/{role}`
+  - `401 Unauthorized` behavior without token
+  - `403 Forbidden` behavior with an authenticated user without `manage-users` permission
+  - `422 Validation Error` responses for missing fields
+  - `422 Validation Error` for duplicated email validation
+  - `422 Validation Error` for invalid `role_id` validation
+  - `404 Not Found` behavior for missing users
+  - `404 Not Found` behavior for missing roles
+- Implemented protected role listing endpoint:
+  - `GET /api/roles`
+  - Protected by `auth:sanctum` and `permission:manage-users`
+  - Returns roles ordered by ID ascending
+- Added automated tests for `GET /api/roles`.
+- Verified automated backend tests:
+  - `54 passed`
+  - `125 assertions`
+- Verified `GET /api/roles` manually in Postman.
+- Documented `GET /api/roles` in the auth service API documentation.
+- Created the frontend admin web application:
+  - `apps/enterprise-admin-web`
+  - Next.js
+  - TypeScript
+  - Tailwind CSS
+  - App Router
+  - Turbopack
+- Verified frontend build and lint.
+- Added initial Enterprise Core landing page with a sober modern enterprise dashboard style.
+- Reviewed the initial frontend screen in the browser.
+- Confirmed the visual direction:
+  - modern enterprise dashboard
+  - sober and professional
+  - subtle SaaS polish
+- Captured a future product decision:
+  - the system should support English and Spanish
+  - future modules should support local currency, Costa Rican colon, and US dollars where applicable
+
+### Results
+
+- Backend user management and RBAC are ready enough to support the first frontend admin workflows.
+- The project now has a separated backend service and frontend app structure.
+- The frontend foundation is ready for the next feature: login screen and API authentication flow.
+- Current backend test suite passes with `54 tests` and `125 assertions`.
+
+### Next Step
+
+- Integrate the admin web bootstrap branch into `develop`.
+- Start frontend authentication:
+  - `/login` page
+  - API login request
+  - token storage strategy for development
+  - protected dashboard layout
+- Later consider internationalization and currency formatting strategy.
