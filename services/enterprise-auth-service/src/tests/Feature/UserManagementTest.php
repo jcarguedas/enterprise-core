@@ -508,6 +508,83 @@ class UserManagementTest extends TestCase
         ]);
     }
 
+    public function test_guest_cannot_list_roles(): void
+    {
+        $response = $this->getJson('/api/roles');
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_without_manage_users_permission_cannot_list_roles(): void
+    {
+        $user = User::factory()->create();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/roles');
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'This action is unauthorized.',
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_list_roles(): void
+    {
+        $admin = User::factory()->create();
+
+        $secondRole = Role::create([
+            'name' => 'Auditor',
+            'slug' => 'auditor',
+            'description' => 'Auditor role',
+            'is_active' => false,
+        ]);
+
+        $firstRole = Role::create([
+            'name' => 'Operator',
+            'slug' => 'operator',
+            'description' => 'Operator role',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/roles');
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'roles' => [
+                [
+                    'id' => $secondRole->id,
+                    'name' => 'Auditor',
+                    'slug' => 'auditor',
+                    'description' => 'Auditor role',
+                    'is_active' => false,
+                ],
+                [
+                    'id' => $firstRole->id,
+                    'name' => 'Operator',
+                    'slug' => 'operator',
+                    'description' => 'Operator role',
+                    'is_active' => true,
+                ],
+                [
+                    'id' => Role::where('slug', 'administrator')->value('id'),
+                    'name' => 'Administrator',
+                    'slug' => 'administrator',
+                    'description' => 'System administrator role',
+                    'is_active' => true,
+                ],
+            ],
+        ]);
+    }
+
     public function test_authenticated_user_with_manage_users_permission_receives_not_found_for_missing_user_roles(): void
     {
         $admin = User::factory()->create();
