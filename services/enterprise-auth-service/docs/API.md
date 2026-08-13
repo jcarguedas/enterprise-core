@@ -169,6 +169,7 @@ GET   /api/users
 POST  /api/users
 GET   /api/users/{user}
 PATCH /api/users/{user}
+GET   /api/roles
 GET   /api/users/{user}/roles
 POST  /api/users/{user}/roles
 DELETE /api/users/{user}/roles/{role}
@@ -540,6 +541,76 @@ Requested user does not exist:
 
 ```http
 404 Not Found
+```
+
+---
+
+## List Roles
+
+```http
+GET /api/roles
+```
+
+Lists all roles in the Enterprise Auth Service ordered by ID ascending.
+
+### Authentication
+
+Requires a valid Bearer token.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+manage-users
+```
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "roles": [
+    {
+      "id": 1,
+      "name": "Administrator",
+      "slug": "administrator",
+      "description": "System administrator role",
+      "is_active": true
+    }
+  ]
+}
+```
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Authenticated user without `manage-users` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
 ```
 
 ---
