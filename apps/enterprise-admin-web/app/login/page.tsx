@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { apiConfig } from "@/lib/api-config";
-
-const TOKEN_STORAGE_KEY = "enterprise_core_token";
-const USER_STORAGE_KEY = "enterprise_core_user";
+import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 
 type LoginResponse = {
   token?: string;
@@ -40,6 +38,12 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (getStoredToken()) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
@@ -70,8 +74,7 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+      storeAuth(data.token, data.user);
       router.push("/dashboard");
     } catch {
       setErrorMessage(
