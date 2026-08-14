@@ -1,45 +1,73 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
+import { getCurrentUser } from "@/lib/auth-api";
 import {
   clearStoredAuth,
   getStoredToken,
-  getStoredUserJson,
-  parseStoredUser,
-  subscribeToAuthStorage,
+  StoredUser,
+  storeUser,
 } from "@/lib/auth-storage";
+
+type SessionStatus = "checking" | "ready" | "error";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const token = useSyncExternalStore(
-    subscribeToAuthStorage,
-    getStoredToken,
-    () => null,
-  );
-  const storedUserJson = useSyncExternalStore(
-    subscribeToAuthStorage,
-    getStoredUserJson,
-    () => null,
-  );
-  const user = useMemo(
-    () => parseStoredUser(storedUserJson),
-    [storedUserJson],
-  );
+  const [trustedUser, setTrustedUser] = useState<StoredUser | null>(null);
+  const [status, setStatus] = useState<SessionStatus>("checking");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    let isCurrent = true;
+    const token = getStoredToken();
+
     if (!token) {
+      clearStoredAuth();
       router.replace("/login");
+      return;
     }
-  }, [router, token]);
+
+    async function validateSession(currentToken: string) {
+      const result = await getCurrentUser(currentToken);
+
+      if (!isCurrent) {
+        return;
+      }
+
+      if (result.status === "authenticated") {
+        storeUser(result.user);
+        setTrustedUser(result.user);
+        setErrorMessage("");
+        setStatus("ready");
+        return;
+      }
+
+      if (result.status === "unauthorized") {
+        clearStoredAuth();
+        router.replace("/login");
+        return;
+      }
+
+      setTrustedUser(null);
+      setErrorMessage(result.message);
+      setStatus("error");
+    }
+
+    validateSession(token);
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [router]);
 
   function handleLogout() {
     clearStoredAuth();
     router.push("/login");
   }
 
-  const welcomeName = user?.name || user?.email || "administrator";
+  const welcomeName = trustedUser?.name || trustedUser?.email || "administrator";
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
@@ -76,8 +104,18 @@ export default function DashboardPage() {
               Dashboard
             </h1>
             <p className="mt-5 text-xl font-medium text-[#1f3a5f]">
-              {token ? `Welcome, ${welcomeName}.` : "Checking access..."}
+              {status === "ready"
+                ? `Welcome, ${welcomeName}.`
+                : "Validating session..."}
             </p>
+            {status === "error" ? (
+              <div
+                aria-live="polite"
+                className="mt-6 rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
+              >
+                {errorMessage}
+              </div>
+            ) : null}
             <p className="mt-6 text-base leading-7 text-[#475569]">
               Protected admin workspace placeholder.
             </p>

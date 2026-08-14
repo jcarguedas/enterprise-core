@@ -72,6 +72,15 @@ export function storeAuth(token: string, user: StoredUser) {
   emitAuthStorageChange();
 }
 
+export function storeUser(user: StoredUser) {
+  if (!isBrowser()) {
+    return;
+  }
+
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  emitAuthStorageChange();
+}
+
 export function clearStoredAuth() {
   if (!isBrowser()) {
     return;
