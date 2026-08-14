@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
+import { defaultMessages as t } from "@/lib/i18n/messages";
 
 type LoginResponse = {
   token?: string;
@@ -95,10 +96,10 @@ export default function LoginPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-[#111827]">
-                Enterprise Core
+                {t.productName}
               </p>
               <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
-                Admin Web
+                {t.adminWeb}
               </p>
             </div>
           </div>
@@ -106,7 +107,7 @@ export default function LoginPage() {
             href="/"
             className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
           >
-            Back to overview
+            {t.backToOverview}
           </Link>
         </header>
 
@@ -116,7 +117,7 @@ export default function LoginPage() {
               Secure operations console
             </p>
             <h1 className="text-4xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-5xl">
-              Enterprise Core
+              {t.productName}
             </h1>
             <p className="mt-4 text-2xl font-medium text-[#1f3a5f]">
               Admin Web Access
@@ -194,7 +195,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
               >
-                {isSubmitting ? "Signing in..." : "Sign in"}
+                {isSubmitting ? "Signing in..." : t.signIn}
               </button>
             </form>
           </div>

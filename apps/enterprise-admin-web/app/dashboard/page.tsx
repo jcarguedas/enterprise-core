@@ -10,6 +10,7 @@ import {
   StoredUser,
   storeUser,
 } from "@/lib/auth-storage";
+import { defaultMessages as t } from "@/lib/i18n/messages";
 
 type SessionStatus = "checking" | "ready" | "error";
 
@@ -89,10 +90,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-[#111827]">
-                Enterprise Core
+                {t.productName}
               </p>
               <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
-                Admin Web
+                {t.adminWeb}
               </p>
             </div>
           </div>
@@ -102,22 +103,22 @@ export default function DashboardPage() {
             disabled={isLoggingOut}
             className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[#d8dee8] disabled:text-[#64748b]"
           >
-            {isLoggingOut ? "Signing out..." : "Logout"}
+            {isLoggingOut ? t.signingOut : t.logout}
           </button>
         </header>
 
         <div className="flex flex-1 items-center py-14 lg:py-16">
           <div className="max-w-2xl">
             <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
-              Enterprise Core
+              {t.productName}
             </p>
             <h1 className="text-4xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-5xl">
-              Dashboard
+              {t.dashboard}
             </h1>
             <p className="mt-5 text-xl font-medium text-[#1f3a5f]">
               {status === "ready"
                 ? `Welcome, ${welcomeName}.`
-                : "Validating session..."}
+                : t.validatingSession}
             </p>
             {status === "error" ? (
               <div
@@ -128,7 +129,7 @@ export default function DashboardPage() {
               </div>
             ) : null}
             <p className="mt-6 text-base leading-7 text-[#475569]">
-              Protected admin workspace placeholder.
+              {t.protectedWorkspacePlaceholder}
             </p>
           </div>
         </div>
