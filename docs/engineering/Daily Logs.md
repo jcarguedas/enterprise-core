@@ -480,3 +480,54 @@ Continued development of Enterprise Core, completing backend RBAC validation, ad
   - token storage strategy for development
   - protected dashboard layout
 - Later consider internationalization and currency formatting strategy.
+
+## 2026-08-14
+
+### Focus
+
+Continued Enterprise Core frontend development on `feature/admin-web-login`, building the first admin web authentication flow and preparing a lightweight bilingual text foundation.
+
+### Completed
+
+- Started from clean `develop` and created `feature/admin-web-login`.
+- Added initial `/login` page for the admin web.
+- Updated the landing page "Go to Login" action to navigate to `/login`.
+- Added initial API configuration for the frontend using default backend URL `http://127.0.0.1:8000/api`.
+- Connected the login form to the Laravel auth API using `POST /api/login`.
+- Stored the returned token and user in `localStorage` for the initial development flow.
+- Added initial `/dashboard` placeholder page.
+- Added basic frontend route behavior:
+  - `/dashboard` redirects to `/login` when no token exists.
+  - `/login` redirects to `/dashboard` when a token exists.
+  - Local logout clears stored auth data.
+- Improved dashboard security by validating the stored token with `GET /api/me`.
+- Fixed the dashboard refresh behavior so it does not redirect too early during client initialization.
+- Confirmed invalid or unauthorized tokens are cleared and redirected to `/login`.
+- Added backend logout integration from the dashboard using `POST /api/logout`.
+- Added logout loading state.
+- Added a lightweight bilingual text foundation:
+  - English and Spanish supported.
+  - English as default language.
+  - Shared message structure added.
+- Confirmed future product direction for English/Spanish support and later CRC/USD currency formatting.
+- Ran frontend build and lint successfully.
+- Performed manual browser testing for:
+  - login success
+  - dashboard access
+  - dashboard refresh
+  - invalid routes
+  - logout
+  - backend unavailable behavior
+
+### Results
+
+- The admin web now has a functional first authentication flow.
+- The dashboard now validates the session against the Laravel backend instead of trusting `localStorage` alone.
+- The frontend has an initial structure for bilingual text support.
+- The feature is ready to be integrated into `develop`.
+
+### Next Step
+
+- Merge `feature/admin-web-login` into `develop`.
+- Start the protected admin layout and first real dashboard structure.
+- Then begin the Users UI that consumes the existing user management API.
