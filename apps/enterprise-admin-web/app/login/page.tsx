@@ -1,6 +1,87 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+
+import { apiConfig } from "@/lib/api-config";
+
+const TOKEN_STORAGE_KEY = "enterprise_core_token";
+const USER_STORAGE_KEY = "enterprise_core_user";
+
+type LoginResponse = {
+  token?: string;
+  token_type?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  message?: string;
+  errors?: Record<string, string[]>;
+};
+
+function getLoginErrorMessage(response: LoginResponse) {
+  if (response.errors) {
+    const messages = Object.values(response.errors).flat();
+
+    if (messages.length > 0) {
+      return messages.join(" ");
+    }
+  }
+
+  return response.message ?? "Unable to sign in. Please verify your credentials.";
+}
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`${apiConfig.baseUrl}/login`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as LoginResponse;
+
+      if (!response.ok) {
+        setErrorMessage(getLoginErrorMessage(data));
+        return;
+      }
+
+      if (!data.token || !data.user) {
+        setErrorMessage("The login response was incomplete. Please try again.");
+        return;
+      }
+
+      localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+      router.push("/dashboard");
+    } catch {
+      setErrorMessage(
+        "Unable to reach the auth service. Please confirm it is running and try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 sm:px-8 lg:px-10">
@@ -53,7 +134,16 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form className="mt-6 space-y-5">
+            <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+              {errorMessage ? (
+                <div
+                  aria-live="polite"
+                  className="rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
+                >
+                  {errorMessage}
+                </div>
+              ) : null}
+
               <div>
                 <label
                   htmlFor="email"
@@ -67,6 +157,9 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  disabled={isSubmitting}
                   className="mt-2 block h-12 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
                   placeholder="admin@example.com"
                 />
@@ -85,6 +178,9 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  disabled={isSubmitting}
                   className="mt-2 block h-12 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
                   placeholder="Enter your password"
                 />
@@ -92,9 +188,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2"
+                disabled={isSubmitting}
+                className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
               >
-                Sign in
+                {isSubmitting ? "Signing in..." : "Sign in"}
               </button>
             </form>
           </div>
