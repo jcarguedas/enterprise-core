@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const capabilities = [
   {
     title: "User Management",
@@ -58,12 +60,12 @@ export default function Home() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#"
+              <Link
+                href="/login"
                 className="inline-flex h-12 items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2"
               >
                 Go to Login
-              </a>
+              </Link>
               <a
                 href="#"
                 className="inline-flex h-12 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-6 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
