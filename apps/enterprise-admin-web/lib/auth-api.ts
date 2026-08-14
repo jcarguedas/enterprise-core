@@ -88,3 +88,13 @@ export async function getCurrentUser(token: string): Promise<CurrentUserResult> 
     };
   }
 }
+
+export async function logoutCurrentUser(token: string) {
+  await fetch(`${apiConfig.baseUrl}/logout`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}

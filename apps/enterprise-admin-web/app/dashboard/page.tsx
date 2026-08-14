@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getCurrentUser } from "@/lib/auth-api";
+import { getCurrentUser, logoutCurrentUser } from "@/lib/auth-api";
 import {
   clearStoredAuth,
   getStoredToken,
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [trustedUser, setTrustedUser] = useState<StoredUser | null>(null);
   const [status, setStatus] = useState<SessionStatus>("checking");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -62,9 +63,18 @@ export default function DashboardPage() {
     };
   }, [router]);
 
-  function handleLogout() {
-    clearStoredAuth();
-    router.push("/login");
+  async function handleLogout() {
+    const token = getStoredToken();
+    setIsLoggingOut(true);
+
+    try {
+      if (token) {
+        await logoutCurrentUser(token);
+      }
+    } finally {
+      clearStoredAuth();
+      router.push("/login");
+    }
   }
 
   const welcomeName = trustedUser?.name || trustedUser?.email || "administrator";
@@ -89,9 +99,10 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+            disabled={isLoggingOut}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[#d8dee8] disabled:text-[#64748b]"
           >
-            Logout
+            {isLoggingOut ? "Signing out..." : "Logout"}
           </button>
         </header>
 
