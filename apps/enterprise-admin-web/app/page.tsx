@@ -1,3 +1,7 @@
+import Link from "next/link";
+
+import { defaultMessages as t } from "@/lib/i18n/messages";
+
 const capabilities = [
   {
     title: "User Management",
@@ -27,10 +31,10 @@ export default function Home() {
             </div>
             <div>
               <p className="text-sm font-semibold text-[#111827]">
-                Enterprise Core
+                {t.productName}
               </p>
               <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
-                Admin Web
+                {t.adminWeb}
               </p>
             </div>
           </div>
@@ -46,7 +50,7 @@ export default function Home() {
               Enterprise administration workspace
             </p>
             <h1 className="text-5xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-6xl">
-              Enterprise Core
+              {t.productName}
             </h1>
             <p className="mt-5 text-2xl font-medium text-[#1f3a5f]">
               Intelligent Business Operations Platform
@@ -58,12 +62,12 @@ export default function Home() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#"
+              <Link
+                href="/login"
                 className="inline-flex h-12 items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2"
               >
-                Go to Login
-              </a>
+                {t.goToLogin}
+              </Link>
               <a
                 href="#"
                 className="inline-flex h-12 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-6 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
