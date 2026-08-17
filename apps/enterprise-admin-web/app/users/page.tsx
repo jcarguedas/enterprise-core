@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { StatusMessage } from "@/components/admin/StatusMessage";
+import { SummaryCard } from "@/components/admin/SummaryCard";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
@@ -97,51 +100,32 @@ export default function UsersPage() {
       onLogout={logout}
     >
       <div className="mx-auto max-w-6xl">
-        <div className="border-b border-[#d8dee8] pb-6">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="inline-flex w-fit rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
-              {t.productName}
-            </p>
-            <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
-              Coming next
-            </span>
-          </div>
-          <h1 className="text-3xl font-semibold leading-tight text-[#0f172a] sm:text-4xl">
-            Users
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#475569] sm:text-base">
-            Manage enterprise users, access, and account readiness.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow={t.productName}
+          title="Users"
+          description="Manage enterprise users, access, and account readiness."
+          rightBadge="Coming next"
+        />
 
         {status === "checking" ? (
-          <p className="mt-6 text-sm font-medium text-[#475569]">
+          <StatusMessage variant="info" className="mt-6">
             {t.validatingSession}
-          </p>
+          </StatusMessage>
         ) : null}
 
         {status === "error" ? (
-          <div
-            aria-live="polite"
-            className="mt-6 rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
-          >
+          <StatusMessage variant="error" className="mt-6">
             {errorMessage}
-          </div>
+          </StatusMessage>
         ) : null}
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {usersSummaryCards.map((card) => (
-            <article
+            <SummaryCard
               key={card.title}
-              className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]"
-            >
-              <h2 className="text-base font-semibold text-[#0f172a]">
-                {card.title}
-              </h2>
-              <p className="mt-4 text-sm leading-6 text-[#475569]">
-                {card.getDescription(users)}
-              </p>
-            </article>
+              title={card.title}
+              description={card.getDescription(users)}
+            />
           ))}
         </div>
 
@@ -161,18 +145,15 @@ export default function UsersPage() {
           </div>
 
           {usersStatus === "loading" ? (
-            <p className="px-5 py-5 text-sm font-medium text-[#475569]">
+            <StatusMessage variant="info" className="px-5 py-5">
               Loading users...
-            </p>
+            </StatusMessage>
           ) : null}
 
           {usersStatus === "error" ? (
-            <div
-              aria-live="polite"
-              className="m-5 rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
-            >
+            <StatusMessage variant="error" className="m-5">
               {usersErrorMessage}
-            </div>
+            </StatusMessage>
           ) : null}
 
           {usersStatus === "ready" ? (
