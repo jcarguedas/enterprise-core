@@ -140,9 +140,18 @@ export default function UsersPage() {
                 Read-only view of enterprise-managed users.
               </p>
             </div>
-            <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
-              Read only
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
+                CRUD coming next
+              </span>
+              <button
+                type="button"
+                disabled
+                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm opacity-55 disabled:cursor-not-allowed"
+              >
+                Create User
+              </button>
+            </div>
           </div>
 
           {usersStatus === "loading" ? (
