@@ -19,6 +19,9 @@ export function UsersTable({ users }: UsersTableProps) {
             <th scope="col" className="px-5 py-3">
               Email
             </th>
+            <th scope="col" className="px-5 py-3">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[#edf2f7] bg-white">
@@ -34,12 +37,30 @@ export function UsersTable({ users }: UsersTableProps) {
                 <td className="whitespace-nowrap px-5 py-4 text-[#475569]">
                   {user.email}
                 </td>
+                <td className="whitespace-nowrap px-5 py-4">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] opacity-70 disabled:cursor-not-allowed"
+                    >
+                      View Roles
+                    </button>
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] opacity-70 disabled:cursor-not-allowed"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
               <td
-                colSpan={3}
+                colSpan={4}
                 className="px-5 py-6 text-center text-sm text-[#64748b]"
               >
                 No users were returned by the API.
