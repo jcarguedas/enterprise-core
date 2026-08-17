@@ -531,3 +531,74 @@ Continued Enterprise Core frontend development on `feature/admin-web-login`, bui
 - Merge `feature/admin-web-login` into `develop`.
 - Start the protected admin layout and first real dashboard structure.
 - Then begin the Users UI that consumes the existing user management API.
+
+## 2026-08-17
+
+### Focus
+
+- Continued Enterprise Core admin web development.
+- Built the first protected admin layout foundation.
+- Started the Users module UI connected to the existing Laravel API.
+
+### Completed
+
+- Started from clean `develop` and created `feature/admin-web-protected-layout`.
+- Added protected admin layout components:
+  - `AdminShell`
+  - `AdminSidebar`
+  - `AdminHeader`
+- Refactored `/dashboard` to use the new protected admin layout.
+- Added sidebar navigation for:
+  - Dashboard
+  - Users
+  - Roles
+  - Settings
+- Added active navigation behavior for Dashboard and Users.
+- Confirmed browser extension hydration warning was not an app bug by testing in incognito mode.
+- Created `/users` protected page.
+- Extracted shared protected session logic into `use-protected-admin-session`.
+- Connected Users page to the existing backend endpoint `GET /api/users`.
+- Added typed users API helper in `lib/users-api.ts`.
+- Added loading, error, unauthorized, and empty-state handling for Users.
+- Added read-only Users table with ID, Name, Email.
+- Extracted shared admin UI components:
+  - `PageHeader`
+  - `StatusMessage`
+  - `SummaryCard`
+- Extracted `UsersTable` into `components/admin/users/UsersTable.tsx`.
+- Added disabled Create User placeholder action.
+- Added disabled Users table placeholder actions:
+  - View Roles
+  - Edit
+- Expanded i18n messages with Users-related English and Spanish labels.
+- Fixed Spanish accents and encoding in i18n messages.
+- Kept runtime language switching out of scope for now.
+- Ran frontend build and lint successfully.
+- Ran backend test suite successfully:
+  - `54 passed`
+  - `125 assertions`
+- Performed manual browser testing:
+  - login
+  - dashboard access
+  - users navigation
+  - users table loading
+  - sidebar active state
+  - dashboard refresh
+  - users refresh
+  - logout from protected area
+  - redirect to `/login` without session
+
+### Results
+
+- Admin web now has a reusable protected layout foundation.
+- Dashboard and Users share the same shell/header/sidebar structure.
+- Users is the first admin page consuming real backend data.
+- Users CRUD is visually prepared but not functionally implemented yet.
+- The frontend structure is cleaner and better prepared for the next CRUD steps.
+
+### Next Step
+
+- Merge `feature/admin-web-protected-layout` into `develop`.
+- Start implementing the first real Users CRUD action, likely Create User.
+- Consider extracting more reusable table/action patterns only when needed.
+- Add runtime language switching later in a dedicated branch.
