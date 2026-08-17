@@ -17,19 +17,17 @@ type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
 
 const usersSummaryCards = [
   {
-    title: "User Directory",
+    title: t.userDirectory,
     getDescription: (users: EnterpriseUser[]) =>
       `${users.length} enterprise account${users.length === 1 ? "" : "s"} available.`,
   },
   {
-    title: "Role Assignments",
-    getDescription: () =>
-      "Role assignment workflows will connect to this workspace next.",
+    title: t.roleAssignments,
+    getDescription: () => t.roleAssignmentsDescription,
   },
   {
-    title: "Access Status",
-    getDescription: () =>
-      "Access readiness tracking is planned for the user management module.",
+    title: t.accessStatus,
+    getDescription: () => t.accessStatusDescription,
   },
 ];
 
@@ -103,9 +101,9 @@ export default function UsersPage() {
       <div className="mx-auto max-w-6xl">
         <PageHeader
           eyebrow={t.productName}
-          title="Users"
-          description="Manage enterprise users, access, and account readiness."
-          rightBadge="Coming next"
+          title={t.users}
+          description={t.usersDescription}
+          rightBadge={t.comingNext}
         />
 
         {status === "checking" ? (
@@ -134,29 +132,29 @@ export default function UsersPage() {
           <div className="flex flex-col gap-2 border-b border-[#e2e8f0] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-base font-semibold text-[#0f172a]">
-                User Directory
+                {t.userDirectory}
               </h2>
               <p className="mt-1 text-sm text-[#64748b]">
-                Read-only view of enterprise-managed users.
+                {t.userDirectoryDescription}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
-                CRUD coming next
+                {t.crudComingNext}
               </span>
               <button
                 type="button"
                 disabled
                 className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm opacity-55 disabled:cursor-not-allowed"
               >
-                Create User
+                {t.createUser}
               </button>
             </div>
           </div>
 
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">
-              Loading users...
+              {t.loadingUsers}
             </StatusMessage>
           ) : null}
 

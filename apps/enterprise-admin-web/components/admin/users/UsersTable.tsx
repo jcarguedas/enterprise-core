@@ -1,3 +1,4 @@
+import { defaultMessages as t } from "@/lib/i18n/messages";
 import { EnterpriseUser } from "@/lib/users-api";
 
 type UsersTableProps = {
@@ -11,16 +12,16 @@ export function UsersTable({ users }: UsersTableProps) {
         <thead className="bg-[#f8fafc] text-xs font-semibold uppercase text-[#64748b]">
           <tr>
             <th scope="col" className="px-5 py-3">
-              ID
+              {t.id}
             </th>
             <th scope="col" className="px-5 py-3">
-              Name
+              {t.name}
             </th>
             <th scope="col" className="px-5 py-3">
-              Email
+              {t.email}
             </th>
             <th scope="col" className="px-5 py-3">
-              Actions
+              {t.actions}
             </th>
           </tr>
         </thead>
@@ -44,14 +45,14 @@ export function UsersTable({ users }: UsersTableProps) {
                       disabled
                       className="inline-flex h-8 items-center justify-center rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] opacity-70 disabled:cursor-not-allowed"
                     >
-                      View Roles
+                      {t.viewRoles}
                     </button>
                     <button
                       type="button"
                       disabled
                       className="inline-flex h-8 items-center justify-center rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] opacity-70 disabled:cursor-not-allowed"
                     >
-                      Edit
+                      {t.edit}
                     </button>
                   </div>
                 </td>
@@ -63,7 +64,7 @@ export function UsersTable({ users }: UsersTableProps) {
                 colSpan={4}
                 className="px-5 py-6 text-center text-sm text-[#64748b]"
               >
-                No users were returned by the API.
+                {t.noUsersReturned}
               </td>
             </tr>
           )}
