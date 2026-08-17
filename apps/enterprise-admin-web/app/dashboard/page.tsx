@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { AdminShell } from "@/components/admin/AdminShell";
 import { getCurrentUser, logoutCurrentUser } from "@/lib/auth-api";
 import {
   clearStoredAuth,
@@ -79,61 +80,85 @@ export default function DashboardPage() {
   }
 
   const welcomeName = trustedUser?.name || trustedUser?.email || "administrator";
+  const userDisplayName =
+    trustedUser?.name ||
+    trustedUser?.email ||
+    (status === "checking" ? t.validatingSession : "Session unavailable");
+  const dashboardCards = [
+    {
+      title: "User Management",
+      description:
+        "Manage enterprise-controlled user access, account visibility, and operational readiness.",
+      status: "Ready",
+    },
+    {
+      title: "Roles & Permissions",
+      description:
+        "Review role structures and permission boundaries for protected administrative actions.",
+      status: "Available",
+    },
+    {
+      title: "Enterprise Modules",
+      description:
+        "Track upcoming modules that will extend the Enterprise Core operations platform.",
+      status: "Planned",
+    },
+  ];
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
-      <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 sm:px-8 lg:px-10">
-        <header className="flex items-center justify-between border-b border-[#d8dee8] pb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-[#172033] text-sm font-semibold text-white">
-              EC
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#111827]">
-                {t.productName}
-              </p>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
-                {t.adminWeb}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[#d8dee8] disabled:text-[#64748b]"
-          >
-            {isLoggingOut ? t.signingOut : t.logout}
-          </button>
-        </header>
-
-        <div className="flex flex-1 items-center py-14 lg:py-16">
-          <div className="max-w-2xl">
-            <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
-              {t.productName}
-            </p>
-            <h1 className="text-4xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-5xl">
-              {t.dashboard}
-            </h1>
-            <p className="mt-5 text-xl font-medium text-[#1f3a5f]">
-              {status === "ready"
-                ? `Welcome, ${welcomeName}.`
-                : t.validatingSession}
-            </p>
-            {status === "error" ? (
-              <div
-                aria-live="polite"
-                className="mt-6 rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
-              >
-                {errorMessage}
-              </div>
-            ) : null}
-            <p className="mt-6 text-base leading-7 text-[#475569]">
-              {t.protectedWorkspacePlaceholder}
-            </p>
-          </div>
+    <AdminShell
+      userDisplayName={userDisplayName}
+      isLoggingOut={isLoggingOut}
+      onLogout={handleLogout}
+    >
+      <div className="mx-auto max-w-6xl">
+        <div className="border-b border-[#d8dee8] pb-6">
+          <p className="mb-4 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
+            {t.productName}
+          </p>
+          <h1 className="text-3xl font-semibold leading-tight text-[#0f172a] sm:text-4xl">
+            {t.dashboard}
+          </h1>
+          <p className="mt-4 text-lg font-medium text-[#1f3a5f]">
+            {status === "ready"
+              ? `Welcome, ${welcomeName}.`
+              : t.validatingSession}
+          </p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#475569] sm:text-base">
+            Protected admin workspace for Enterprise Core operations.
+          </p>
         </div>
-      </section>
-    </main>
+
+        {status === "error" ? (
+          <div
+            aria-live="polite"
+            className="mt-6 rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
+          >
+            {errorMessage}
+          </div>
+        ) : null}
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {dashboardCards.map((card) => (
+            <article
+              key={card.title}
+              className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-base font-semibold text-[#0f172a]">
+                  {card.title}
+                </h2>
+                <span className="inline-flex shrink-0 rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
+                  {card.status}
+                </span>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-[#475569]">
+                {card.description}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </AdminShell>
   );
 }
