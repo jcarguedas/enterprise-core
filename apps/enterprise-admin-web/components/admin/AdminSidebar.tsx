@@ -1,4 +1,7 @@
+ "use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { defaultMessages as t } from "@/lib/i18n/messages";
 
@@ -6,26 +9,24 @@ const navigationItems = [
   {
     label: "Dashboard",
     href: "/dashboard",
-    isActive: true,
   },
   {
     label: "Users",
-    href: "#",
-    isActive: false,
+    href: "/users",
   },
   {
     label: "Roles",
     href: "#",
-    isActive: false,
   },
   {
     label: "Settings",
     href: "#",
-    isActive: false,
   },
 ];
 
 export function AdminSidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="border-b border-[#d8dee8] bg-[#101827] text-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
       <div className="flex h-full flex-col">
@@ -46,9 +47,9 @@ export function AdminSidebar() {
             <Link
               key={item.label}
               href={item.href}
-              aria-current={item.isActive ? "page" : undefined}
+              aria-current={pathname === item.href ? "page" : undefined}
               className={`inline-flex h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium transition-colors ${
-                item.isActive
+                pathname === item.href
                   ? "bg-white text-[#101827] shadow-sm"
                   : "text-[#cbd5e1] hover:bg-white/10 hover:text-white"
               }`}
