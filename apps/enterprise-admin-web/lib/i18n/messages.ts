@@ -18,6 +18,8 @@ export type SharedMessages = {
   accessStatus: string;
   accessStatusDescription: string;
   createUser: string;
+  refresh: string;
+  refreshingUsers: string;
   crudComingNext: string;
   comingNext: string;
   readOnly: string;
@@ -61,6 +63,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "Access readiness tracking is planned for the user management module.",
     createUser: "Create User",
+    refresh: "Refresh",
+    refreshingUsers: "Refreshing users...",
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
     readOnly: "Read only",
@@ -97,6 +101,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "El seguimiento de preparación de acceso está planificado para el módulo de gestión de usuarios.",
     createUser: "Crear usuario",
+    refresh: "Actualizar",
+    refreshingUsers: "Actualizando usuarios...",
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
     readOnly: "Solo lectura",

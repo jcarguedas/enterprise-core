@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -45,6 +45,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<EnterpriseUser[]>([]);
   const [usersStatus, setUsersStatus] = useState<UsersLoadStatus>("idle");
   const [usersErrorMessage, setUsersErrorMessage] = useState("");
+  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
   const createUserFlow = useCreateUser({
     onUserCreated: (createdUser) => {
       setUsers((currentUsers) => {
@@ -68,28 +69,31 @@ export default function UsersPage() {
     },
   });
 
-  useEffect(() => {
-    if (status !== "ready") {
-      return;
-    }
+  const loadUsers = useCallback(
+    async (
+      currentToken: string,
+      options: {
+        isRefresh?: boolean;
+        shouldApplyResult?: () => boolean;
+      } = {},
+    ) => {
+      const { isRefresh = false, shouldApplyResult = () => true } = options;
 
-    let isCurrent = true;
-    const token = getStoredToken();
-
-    if (!token) {
-      clearStoredAuth();
-      router.replace("/login");
-      return;
-    }
-
-    async function loadUsers(currentToken: string) {
       setUsersStatus("loading");
       setUsersErrorMessage("");
 
+      if (isRefresh) {
+        setIsRefreshingUsers(true);
+      }
+
       const result = await getUsers(currentToken);
 
-      if (!isCurrent) {
+      if (!shouldApplyResult()) {
         return;
+      }
+
+      if (isRefresh) {
+        setIsRefreshingUsers(false);
       }
 
       if (result.status === "success") {
@@ -107,14 +111,48 @@ export default function UsersPage() {
       setUsers([]);
       setUsersErrorMessage(result.message);
       setUsersStatus("error");
+    },
+    [router],
+  );
+
+  const refreshUsers = useCallback(() => {
+    const token = getStoredToken();
+
+    if (!token) {
+      clearStoredAuth();
+      router.replace("/login");
+      return;
     }
 
-    loadUsers(token);
+    loadUsers(token, { isRefresh: true });
+  }, [loadUsers, router]);
+
+  useEffect(() => {
+    if (status !== "ready") {
+      return;
+    }
+
+    let isCurrent = true;
+    const token = getStoredToken();
+
+    if (!token) {
+      clearStoredAuth();
+      router.replace("/login");
+      return;
+    }
+
+    Promise.resolve().then(() => {
+      if (!isCurrent) {
+        return;
+      }
+
+      loadUsers(token, { shouldApplyResult: () => isCurrent });
+    });
 
     return () => {
       isCurrent = false;
     };
-  }, [router, status]);
+  }, [loadUsers, router, status]);
 
   return (
     <AdminShell
@@ -164,6 +202,16 @@ export default function UsersPage() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
+                onClick={refreshUsers}
+                disabled={
+                  usersStatus === "loading" || createUserFlow.isSubmitting
+                }
+                className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+              >
+                {t.refresh}
+              </button>
+              <button
+                type="button"
                 onClick={createUserFlow.showForm}
                 disabled={
                   createUserFlow.isFormVisible || createUserFlow.isSubmitting
@@ -203,7 +251,7 @@ export default function UsersPage() {
 
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">
-              {t.loadingUsers}
+              {isRefreshingUsers ? t.refreshingUsers : t.loadingUsers}
             </StatusMessage>
           ) : null}
 
