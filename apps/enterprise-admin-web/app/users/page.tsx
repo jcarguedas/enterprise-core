@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -11,8 +11,9 @@ import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
 import { UsersTable } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useCreateUser } from "@/lib/use-create-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
-import { createUser, EnterpriseUser, getUsers } from "@/lib/users-api";
+import { EnterpriseUser, getUsers } from "@/lib/users-api";
 
 type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
 
@@ -44,15 +45,28 @@ export default function UsersPage() {
   const [users, setUsers] = useState<EnterpriseUser[]>([]);
   const [usersStatus, setUsersStatus] = useState<UsersLoadStatus>("idle");
   const [usersErrorMessage, setUsersErrorMessage] = useState("");
-  const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
-  const [createName, setCreateName] = useState("");
-  const [createEmail, setCreateEmail] = useState("");
-  const [createPassword, setCreatePassword] = useState("");
-  const [createPasswordConfirmation, setCreatePasswordConfirmation] =
-    useState("");
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
-  const [createSuccessMessage, setCreateSuccessMessage] = useState("");
-  const [createErrorMessages, setCreateErrorMessages] = useState<string[]>([]);
+  const createUserFlow = useCreateUser({
+    onUserCreated: (createdUser) => {
+      setUsers((currentUsers) => {
+        const existingUserIndex = currentUsers.findIndex(
+          (user) => user.id === createdUser.id,
+        );
+
+        if (existingUserIndex === -1) {
+          return [createdUser, ...currentUsers];
+        }
+
+        return currentUsers.map((user) =>
+          user.id === createdUser.id ? createdUser : user,
+        );
+      });
+      setUsersStatus("ready");
+    },
+    onUnauthorized: () => {
+      clearStoredAuth();
+      router.replace("/login");
+    },
+  });
 
   useEffect(() => {
     if (status !== "ready") {
@@ -102,84 +116,6 @@ export default function UsersPage() {
     };
   }, [router, status]);
 
-  function resetCreateForm() {
-    setCreateName("");
-    setCreateEmail("");
-    setCreatePassword("");
-    setCreatePasswordConfirmation("");
-  }
-
-  function handleShowCreateForm() {
-    setCreateSuccessMessage("");
-    setCreateErrorMessages([]);
-    setIsCreateFormVisible(true);
-  }
-
-  function handleCancelCreateUser() {
-    resetCreateForm();
-    setCreateErrorMessages([]);
-    setIsCreateFormVisible(false);
-  }
-
-  async function handleCreateUser(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setCreateSuccessMessage("");
-    setCreateErrorMessages([]);
-    setIsCreatingUser(true);
-
-    const token = getStoredToken();
-
-    if (!token) {
-      setIsCreatingUser(false);
-      clearStoredAuth();
-      router.replace("/login");
-      return;
-    }
-
-    const result = await createUser(token, {
-      name: createName,
-      email: createEmail,
-      password: createPassword,
-      password_confirmation: createPasswordConfirmation,
-    });
-
-    setIsCreatingUser(false);
-
-    if (result.status === "success") {
-      setUsers((currentUsers) => {
-        const existingUserIndex = currentUsers.findIndex(
-          (user) => user.id === result.user.id,
-        );
-
-        if (existingUserIndex === -1) {
-          return [result.user, ...currentUsers];
-        }
-
-        return currentUsers.map((user) =>
-          user.id === result.user.id ? result.user : user,
-        );
-      });
-      setUsersStatus("ready");
-      resetCreateForm();
-      setIsCreateFormVisible(false);
-      setCreateSuccessMessage(t.userCreatedSuccessfully);
-      return;
-    }
-
-    if (result.status === "unauthorized") {
-      clearStoredAuth();
-      router.replace("/login");
-      return;
-    }
-
-    if (result.status === "validation_error") {
-      setCreateErrorMessages(result.messages);
-      return;
-    }
-
-    setCreateErrorMessages([result.message]);
-  }
-
   return (
     <AdminShell
       userDisplayName={userDisplayName}
@@ -228,8 +164,10 @@ export default function UsersPage() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={handleShowCreateForm}
-                disabled={isCreateFormVisible || isCreatingUser}
+                onClick={createUserFlow.showForm}
+                disabled={
+                  createUserFlow.isFormVisible || createUserFlow.isSubmitting
+                }
                 className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
                 aria-label={t.showCreateUserForm}
               >
@@ -238,26 +176,28 @@ export default function UsersPage() {
             </div>
           </div>
 
-          {createSuccessMessage ? (
+          {createUserFlow.successMessage ? (
             <StatusMessage variant="success" className="m-5">
-              {createSuccessMessage}
+              {createUserFlow.successMessage}
             </StatusMessage>
           ) : null}
 
-          {isCreateFormVisible ? (
+          {createUserFlow.isFormVisible ? (
             <CreateUserForm
-              name={createName}
-              email={createEmail}
-              password={createPassword}
-              passwordConfirmation={createPasswordConfirmation}
-              isSubmitting={isCreatingUser}
-              errorMessages={createErrorMessages}
-              onNameChange={setCreateName}
-              onEmailChange={setCreateEmail}
-              onPasswordChange={setCreatePassword}
-              onPasswordConfirmationChange={setCreatePasswordConfirmation}
-              onSubmit={handleCreateUser}
-              onCancel={handleCancelCreateUser}
+              name={createUserFlow.name}
+              email={createUserFlow.email}
+              password={createUserFlow.password}
+              passwordConfirmation={createUserFlow.passwordConfirmation}
+              isSubmitting={createUserFlow.isSubmitting}
+              errorMessages={createUserFlow.errorMessages}
+              onNameChange={createUserFlow.setName}
+              onEmailChange={createUserFlow.setEmail}
+              onPasswordChange={createUserFlow.setPassword}
+              onPasswordConfirmationChange={
+                createUserFlow.setPasswordConfirmation
+              }
+              onSubmit={createUserFlow.submit}
+              onCancel={createUserFlow.cancelForm}
             />
           ) : null}
 
