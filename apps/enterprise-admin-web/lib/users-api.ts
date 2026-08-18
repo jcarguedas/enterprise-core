@@ -11,6 +11,19 @@ type UsersResponse = {
   message?: string;
 };
 
+type CreateUserResponse = {
+  user?: EnterpriseUser;
+  message?: string;
+  errors?: Record<string, string[] | string>;
+};
+
+export type CreateUserPayload = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+};
+
 export type UsersResult =
   | {
       status: "success";
@@ -23,6 +36,33 @@ export type UsersResult =
       status: "error";
       message: string;
     };
+
+export type CreateUserResult =
+  | {
+      status: "success";
+      user: EnterpriseUser;
+    }
+  | {
+      status: "unauthorized";
+    }
+  | {
+      status: "validation_error";
+      messages: string[];
+    }
+  | {
+      status: "error";
+      message: string;
+    };
+
+function getValidationMessages(response: CreateUserResponse) {
+  if (!response.errors) {
+    return response.message ? [response.message] : [];
+  }
+
+  return Object.values(response.errors).flatMap((value) =>
+    Array.isArray(value) ? value : [value],
+  );
+}
 
 export async function getUsers(token: string): Promise<UsersResult> {
   try {
@@ -60,6 +100,69 @@ export async function getUsers(token: string): Promise<UsersResult> {
     return {
       status: "success",
       users: data.users,
+    };
+  } catch {
+    return {
+      status: "error",
+      message:
+        "Unable to reach the auth service. Please confirm it is running and try again.",
+    };
+  }
+}
+
+export async function createUser(
+  token: string,
+  payload: CreateUserPayload,
+): Promise<CreateUserResult> {
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}/users`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = (await response.json().catch(() => ({}))) as CreateUserResponse;
+
+    if (response.status === 401) {
+      return {
+        status: "unauthorized",
+      };
+    }
+
+    if (response.status === 422) {
+      const messages = getValidationMessages(data);
+
+      return {
+        status: "validation_error",
+        messages:
+          messages.length > 0
+            ? messages
+            : ["Please correct the highlighted fields and try again."],
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        status: "error",
+        message:
+          data.message ?? "Unable to create the user. Please try again shortly.",
+      };
+    }
+
+    if (!data.user) {
+      return {
+        status: "error",
+        message: "The create user response was incomplete. Please try again.",
+      };
+    }
+
+    return {
+      status: "success",
+      user: data.user,
     };
   } catch {
     return {

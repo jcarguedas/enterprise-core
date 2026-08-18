@@ -1,4 +1,4 @@
-import { DEFAULT_LANGUAGE, SupportedLanguage } from "@/lib/i18n/config";
+﻿import { DEFAULT_LANGUAGE, SupportedLanguage } from "@/lib/i18n/config";
 
 export type SharedMessages = {
   productName: string;
@@ -18,6 +18,8 @@ export type SharedMessages = {
   accessStatus: string;
   accessStatusDescription: string;
   createUser: string;
+  refresh: string;
+  refreshingUsers: string;
   crudComingNext: string;
   comingNext: string;
   readOnly: string;
@@ -29,6 +31,13 @@ export type SharedMessages = {
   id: string;
   name: string;
   email: string;
+  password: string;
+  passwordConfirmation: string;
+  cancel: string;
+  creatingUser: string;
+  showCreateUserForm: string;
+  userCreatedSuccessfully: string;
+  validationError: string;
   validatingSession: string;
   protectedWorkspacePlaceholder: string;
 };
@@ -54,6 +63,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "Access readiness tracking is planned for the user management module.",
     createUser: "Create User",
+    refresh: "Refresh",
+    refreshingUsers: "Refreshing users...",
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
     readOnly: "Read only",
@@ -65,6 +76,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     id: "ID",
     name: "Name",
     email: "Email",
+    password: "Password",
+    passwordConfirmation: "Password Confirmation",
+    cancel: "Cancel",
+    creatingUser: "Creating user...",
+    showCreateUserForm: "Show create user form",
+    userCreatedSuccessfully: "User created successfully.",
+    validationError: "Validation error",
     validatingSession: "Validating session...",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
   },
@@ -83,6 +101,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "El seguimiento de preparación de acceso está planificado para el módulo de gestión de usuarios.",
     createUser: "Crear usuario",
+    refresh: "Actualizar",
+    refreshingUsers: "Actualizando usuarios...",
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
     readOnly: "Solo lectura",
@@ -94,6 +114,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     id: "ID",
     name: "Nombre",
     email: "Correo electrónico",
+    password: "Contraseña",
+    passwordConfirmation: "Confirmación de contraseña",
+    cancel: "Cancelar",
+    creatingUser: "Creando usuario...",
+    showCreateUserForm: "Mostrar formulario para crear usuario",
+    userCreatedSuccessfully: "Usuario creado correctamente.",
+    validationError: "Error de validación",
     adminWeb: "Admin Web",
     goToLogin: "Ir al inicio de sesión",
     backToOverview: "Volver al resumen",
@@ -102,7 +129,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     signingOut: "Cerrando sesión...",
     dashboard: "Dashboard",
     validatingSession: "Validando sesión...",
-    protectedWorkspacePlaceholder: "Marcador de posición del espacio administrativo protegido.",
+    protectedWorkspacePlaceholder:
+      "Marcador de posición del espacio administrativo protegido.",
   },
 };
 

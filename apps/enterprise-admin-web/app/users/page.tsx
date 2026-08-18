@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusMessage } from "@/components/admin/StatusMessage";
 import { SummaryCard } from "@/components/admin/SummaryCard";
+import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
 import { UsersTable } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useCreateUser } from "@/lib/use-create-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
 import { EnterpriseUser, getUsers } from "@/lib/users-api";
 
@@ -43,29 +45,55 @@ export default function UsersPage() {
   const [users, setUsers] = useState<EnterpriseUser[]>([]);
   const [usersStatus, setUsersStatus] = useState<UsersLoadStatus>("idle");
   const [usersErrorMessage, setUsersErrorMessage] = useState("");
+  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
+  const createUserFlow = useCreateUser({
+    onUserCreated: (createdUser) => {
+      setUsers((currentUsers) => {
+        const existingUserIndex = currentUsers.findIndex(
+          (user) => user.id === createdUser.id,
+        );
 
-  useEffect(() => {
-    if (status !== "ready") {
-      return;
-    }
+        if (existingUserIndex === -1) {
+          return [createdUser, ...currentUsers];
+        }
 
-    let isCurrent = true;
-    const token = getStoredToken();
-
-    if (!token) {
+        return currentUsers.map((user) =>
+          user.id === createdUser.id ? createdUser : user,
+        );
+      });
+      setUsersStatus("ready");
+    },
+    onUnauthorized: () => {
       clearStoredAuth();
       router.replace("/login");
-      return;
-    }
+    },
+  });
 
-    async function loadUsers(currentToken: string) {
+  const loadUsers = useCallback(
+    async (
+      currentToken: string,
+      options: {
+        isRefresh?: boolean;
+        shouldApplyResult?: () => boolean;
+      } = {},
+    ) => {
+      const { isRefresh = false, shouldApplyResult = () => true } = options;
+
       setUsersStatus("loading");
       setUsersErrorMessage("");
 
+      if (isRefresh) {
+        setIsRefreshingUsers(true);
+      }
+
       const result = await getUsers(currentToken);
 
-      if (!isCurrent) {
+      if (!shouldApplyResult()) {
         return;
+      }
+
+      if (isRefresh) {
+        setIsRefreshingUsers(false);
       }
 
       if (result.status === "success") {
@@ -83,14 +111,48 @@ export default function UsersPage() {
       setUsers([]);
       setUsersErrorMessage(result.message);
       setUsersStatus("error");
+    },
+    [router],
+  );
+
+  const refreshUsers = useCallback(() => {
+    const token = getStoredToken();
+
+    if (!token) {
+      clearStoredAuth();
+      router.replace("/login");
+      return;
     }
 
-    loadUsers(token);
+    loadUsers(token, { isRefresh: true });
+  }, [loadUsers, router]);
+
+  useEffect(() => {
+    if (status !== "ready") {
+      return;
+    }
+
+    let isCurrent = true;
+    const token = getStoredToken();
+
+    if (!token) {
+      clearStoredAuth();
+      router.replace("/login");
+      return;
+    }
+
+    Promise.resolve().then(() => {
+      if (!isCurrent) {
+        return;
+      }
+
+      loadUsers(token, { shouldApplyResult: () => isCurrent });
+    });
 
     return () => {
       isCurrent = false;
     };
-  }, [router, status]);
+  }, [loadUsers, router, status]);
 
   return (
     <AdminShell
@@ -103,7 +165,6 @@ export default function UsersPage() {
           eyebrow={t.productName}
           title={t.users}
           description={t.usersDescription}
-          rightBadge={t.comingNext}
         />
 
         {status === "checking" ? (
@@ -139,22 +200,58 @@ export default function UsersPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
-                {t.crudComingNext}
-              </span>
               <button
                 type="button"
-                disabled
-                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm opacity-55 disabled:cursor-not-allowed"
+                onClick={refreshUsers}
+                disabled={
+                  usersStatus === "loading" || createUserFlow.isSubmitting
+                }
+                className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+              >
+                {t.refresh}
+              </button>
+              <button
+                type="button"
+                onClick={createUserFlow.showForm}
+                disabled={
+                  createUserFlow.isFormVisible || createUserFlow.isSubmitting
+                }
+                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                aria-label={t.showCreateUserForm}
               >
                 {t.createUser}
               </button>
             </div>
           </div>
 
+          {createUserFlow.successMessage ? (
+            <StatusMessage variant="success" className="m-5">
+              {createUserFlow.successMessage}
+            </StatusMessage>
+          ) : null}
+
+          {createUserFlow.isFormVisible ? (
+            <CreateUserForm
+              name={createUserFlow.name}
+              email={createUserFlow.email}
+              password={createUserFlow.password}
+              passwordConfirmation={createUserFlow.passwordConfirmation}
+              isSubmitting={createUserFlow.isSubmitting}
+              errorMessages={createUserFlow.errorMessages}
+              onNameChange={createUserFlow.setName}
+              onEmailChange={createUserFlow.setEmail}
+              onPasswordChange={createUserFlow.setPassword}
+              onPasswordConfirmationChange={
+                createUserFlow.setPasswordConfirmation
+              }
+              onSubmit={createUserFlow.submit}
+              onCancel={createUserFlow.cancelForm}
+            />
+          ) : null}
+
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">
-              {t.loadingUsers}
+              {isRefreshingUsers ? t.refreshingUsers : t.loadingUsers}
             </StatusMessage>
           ) : null}
 
