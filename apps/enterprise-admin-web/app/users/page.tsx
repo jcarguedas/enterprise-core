@@ -142,6 +142,24 @@ export default function UsersPage() {
     loadUsers(token, { isRefresh: true });
   }, [loadUsers, router]);
 
+  function handleShowCreateUserForm() {
+    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+      return;
+    }
+
+    editUserFlow.cancelEditing();
+    createUserFlow.showForm();
+  }
+
+  function handleEditUser(user: EnterpriseUser) {
+    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+      return;
+    }
+
+    createUserFlow.cancelForm();
+    editUserFlow.startEditingUser(user);
+  }
+
   useEffect(() => {
     if (status !== "ready") {
       return;
@@ -229,9 +247,11 @@ export default function UsersPage() {
               </button>
               <button
                 type="button"
-                onClick={createUserFlow.showForm}
+                onClick={handleShowCreateUserForm}
                 disabled={
-                  createUserFlow.isFormVisible || createUserFlow.isSubmitting
+                  createUserFlow.isFormVisible ||
+                  createUserFlow.isSubmitting ||
+                  editUserFlow.isSubmitting
                 }
                 className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
                 aria-label={t.showCreateUserForm}
@@ -300,7 +320,7 @@ export default function UsersPage() {
           {usersStatus === "ready" ? (
             <UsersTable
               users={users}
-              onEditUser={editUserFlow.startEditingUser}
+              onEditUser={handleEditUser}
             />
           ) : null}
         </section>
