@@ -602,3 +602,49 @@ Continued Enterprise Core frontend development on `feature/admin-web-login`, bui
 - Start implementing the first real Users CRUD action, likely Create User.
 - Consider extracting more reusable table/action patterns only when needed.
 - Add runtime language switching later in a dedicated branch.
+
+## 2026-08-18
+
+### Focus
+
+Continued Enterprise Core admin web development, completing the first real Users module CRUD flows and documenting the current frontend capabilities.
+
+### Completed
+
+- Implemented Create User flow in the admin web.
+- Added typed `createUser` API helper using `POST /api/users`.
+- Added password confirmation support required by backend validation.
+- Added validation error handling for `422` responses.
+- Extracted `CreateUserForm` component.
+- Extracted `useCreateUser` hook.
+- Added manual users Refresh action.
+- Merged create-user work into `develop` and pushed it.
+- Implemented Edit User flow in the admin web.
+- Added typed `updateUser` API helper using `PATCH /api/users/{userId}`.
+- Added `EditUserForm` component.
+- Added `useEditUser` hook.
+- Enabled Edit action in `UsersTable`.
+- Kept View Roles disabled as a placeholder.
+- Coordinated Create/Edit forms so only one form can be active at a time.
+- Merged edit-user work into `develop` and pushed it.
+- Updated admin web README with current Users module capabilities and local development commands.
+
+### Results
+
+- Admin web now supports login, protected session validation, real Users API data, user creation, user editing, and manual users refresh.
+- Create and Edit forms are reusable, coordinated, and backed by typed API helpers and focused hooks.
+- View Roles remains intentionally disabled until role management UI is implemented.
+- Frontend validation:
+  - `npm run build` passed.
+  - `npm run lint` passed.
+- Backend validation:
+  - `php artisan test` passed with `54 tests` and `125 assertions`.
+- `develop` is up to date with `origin/develop`.
+- Working tree is clean.
+- Latest commit: `docs(admin-web): document users module capabilities`.
+
+### Next Step
+
+- Implement View Roles UI.
+- Later consider user deactivation instead of hard delete.
+- Later add language switcher as a dedicated feature.
