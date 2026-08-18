@@ -18,8 +18,10 @@ export type SharedMessages = {
   accessStatus: string;
   accessStatusDescription: string;
   createUser: string;
+  editUser: string;
   refresh: string;
   refreshingUsers: string;
+  saveChanges: string;
   crudComingNext: string;
   comingNext: string;
   readOnly: string;
@@ -35,8 +37,10 @@ export type SharedMessages = {
   passwordConfirmation: string;
   cancel: string;
   creatingUser: string;
+  updatingUser: string;
   showCreateUserForm: string;
   userCreatedSuccessfully: string;
+  userUpdatedSuccessfully: string;
   validationError: string;
   validatingSession: string;
   protectedWorkspacePlaceholder: string;
@@ -63,8 +67,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "Access readiness tracking is planned for the user management module.",
     createUser: "Create User",
+    editUser: "Edit User",
     refresh: "Refresh",
     refreshingUsers: "Refreshing users...",
+    saveChanges: "Save changes",
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
     readOnly: "Read only",
@@ -80,8 +86,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     passwordConfirmation: "Password Confirmation",
     cancel: "Cancel",
     creatingUser: "Creating user...",
+    updatingUser: "Updating user...",
     showCreateUserForm: "Show create user form",
     userCreatedSuccessfully: "User created successfully.",
+    userUpdatedSuccessfully: "User updated successfully.",
     validationError: "Validation error",
     validatingSession: "Validating session...",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
@@ -101,8 +109,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessStatusDescription:
       "El seguimiento de preparación de acceso está planificado para el módulo de gestión de usuarios.",
     createUser: "Crear usuario",
+    editUser: "Editar usuario",
     refresh: "Actualizar",
     refreshingUsers: "Actualizando usuarios...",
+    saveChanges: "Guardar cambios",
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
     readOnly: "Solo lectura",
@@ -118,8 +128,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     passwordConfirmation: "Confirmación de contraseña",
     cancel: "Cancelar",
     creatingUser: "Creando usuario...",
+    updatingUser: "Actualizando usuario...",
     showCreateUserForm: "Mostrar formulario para crear usuario",
     userCreatedSuccessfully: "Usuario creado correctamente.",
+    userUpdatedSuccessfully: "Usuario actualizado correctamente.",
     validationError: "Error de validación",
     adminWeb: "Admin Web",
     goToLogin: "Ir al inicio de sesión",
