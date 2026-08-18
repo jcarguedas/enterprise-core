@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -11,7 +11,7 @@ import { UsersTable } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
-import { EnterpriseUser, getUsers } from "@/lib/users-api";
+import { createUser, EnterpriseUser, getUsers } from "@/lib/users-api";
 
 type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
 
@@ -43,6 +43,15 @@ export default function UsersPage() {
   const [users, setUsers] = useState<EnterpriseUser[]>([]);
   const [usersStatus, setUsersStatus] = useState<UsersLoadStatus>("idle");
   const [usersErrorMessage, setUsersErrorMessage] = useState("");
+  const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+  const [createName, setCreateName] = useState("");
+  const [createEmail, setCreateEmail] = useState("");
+  const [createPassword, setCreatePassword] = useState("");
+  const [createPasswordConfirmation, setCreatePasswordConfirmation] =
+    useState("");
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [createSuccessMessage, setCreateSuccessMessage] = useState("");
+  const [createErrorMessages, setCreateErrorMessages] = useState<string[]>([]);
 
   useEffect(() => {
     if (status !== "ready") {
@@ -92,6 +101,84 @@ export default function UsersPage() {
     };
   }, [router, status]);
 
+  function resetCreateForm() {
+    setCreateName("");
+    setCreateEmail("");
+    setCreatePassword("");
+    setCreatePasswordConfirmation("");
+  }
+
+  function handleShowCreateForm() {
+    setCreateSuccessMessage("");
+    setCreateErrorMessages([]);
+    setIsCreateFormVisible(true);
+  }
+
+  function handleCancelCreateUser() {
+    resetCreateForm();
+    setCreateErrorMessages([]);
+    setIsCreateFormVisible(false);
+  }
+
+  async function handleCreateUser(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCreateSuccessMessage("");
+    setCreateErrorMessages([]);
+    setIsCreatingUser(true);
+
+    const token = getStoredToken();
+
+    if (!token) {
+      setIsCreatingUser(false);
+      clearStoredAuth();
+      router.replace("/login");
+      return;
+    }
+
+    const result = await createUser(token, {
+      name: createName,
+      email: createEmail,
+      password: createPassword,
+      password_confirmation: createPasswordConfirmation,
+    });
+
+    setIsCreatingUser(false);
+
+    if (result.status === "success") {
+      setUsers((currentUsers) => {
+        const existingUserIndex = currentUsers.findIndex(
+          (user) => user.id === result.user.id,
+        );
+
+        if (existingUserIndex === -1) {
+          return [result.user, ...currentUsers];
+        }
+
+        return currentUsers.map((user) =>
+          user.id === result.user.id ? result.user : user,
+        );
+      });
+      setUsersStatus("ready");
+      resetCreateForm();
+      setIsCreateFormVisible(false);
+      setCreateSuccessMessage(t.userCreatedSuccessfully);
+      return;
+    }
+
+    if (result.status === "unauthorized") {
+      clearStoredAuth();
+      router.replace("/login");
+      return;
+    }
+
+    if (result.status === "validation_error") {
+      setCreateErrorMessages(result.messages);
+      return;
+    }
+
+    setCreateErrorMessages([result.message]);
+  }
+
   return (
     <AdminShell
       userDisplayName={userDisplayName}
@@ -103,7 +190,6 @@ export default function UsersPage() {
           eyebrow={t.productName}
           title={t.users}
           description={t.usersDescription}
-          rightBadge={t.comingNext}
         />
 
         {status === "checking" ? (
@@ -139,18 +225,139 @@ export default function UsersPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex w-fit rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
-                {t.crudComingNext}
-              </span>
               <button
                 type="button"
-                disabled
-                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm opacity-55 disabled:cursor-not-allowed"
+                onClick={handleShowCreateForm}
+                disabled={isCreateFormVisible || isCreatingUser}
+                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                aria-label={t.showCreateUserForm}
               >
                 {t.createUser}
               </button>
             </div>
           </div>
+
+          {createSuccessMessage ? (
+            <StatusMessage variant="success" className="m-5">
+              {createSuccessMessage}
+            </StatusMessage>
+          ) : null}
+
+          {isCreateFormVisible ? (
+            <form
+              className="border-b border-[#e2e8f0] bg-[#fbfcfe] px-5 py-5"
+              onSubmit={handleCreateUser}
+            >
+              {createErrorMessages.length > 0 ? (
+                <StatusMessage variant="error" className="mb-5">
+                  <span className="font-semibold">{t.validationError}: </span>
+                  {createErrorMessages.join(" ")}
+                </StatusMessage>
+              ) : null}
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label
+                    htmlFor="create-user-name"
+                    className="block text-sm font-medium text-[#334155]"
+                  >
+                    {t.name}
+                  </label>
+                  <input
+                    id="create-user-name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    value={createName}
+                    onChange={(event) => setCreateName(event.target.value)}
+                    disabled={isCreatingUser}
+                    className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="create-user-email"
+                    className="block text-sm font-medium text-[#334155]"
+                  >
+                    {t.email}
+                  </label>
+                  <input
+                    id="create-user-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={createEmail}
+                    onChange={(event) => setCreateEmail(event.target.value)}
+                    disabled={isCreatingUser}
+                    className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="create-user-password"
+                    className="block text-sm font-medium text-[#334155]"
+                  >
+                    {t.password}
+                  </label>
+                  <input
+                    id="create-user-password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={createPassword}
+                    onChange={(event) => setCreatePassword(event.target.value)}
+                    disabled={isCreatingUser}
+                    className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="create-user-password-confirmation"
+                    className="block text-sm font-medium text-[#334155]"
+                  >
+                    {t.passwordConfirmation}
+                  </label>
+                  <input
+                    id="create-user-password-confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={createPasswordConfirmation}
+                    onChange={(event) =>
+                      setCreatePasswordConfirmation(event.target.value)
+                    }
+                    disabled={isCreatingUser}
+                    className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={isCreatingUser}
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                >
+                  {isCreatingUser ? t.creatingUser : t.createUser}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelCreateUser}
+                  disabled={isCreatingUser}
+                  className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                >
+                  {t.cancel}
+                </button>
+              </div>
+            </form>
+          ) : null}
 
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">

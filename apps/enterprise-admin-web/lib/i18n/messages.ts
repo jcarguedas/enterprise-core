@@ -1,4 +1,4 @@
-import { DEFAULT_LANGUAGE, SupportedLanguage } from "@/lib/i18n/config";
+﻿import { DEFAULT_LANGUAGE, SupportedLanguage } from "@/lib/i18n/config";
 
 export type SharedMessages = {
   productName: string;
@@ -29,6 +29,13 @@ export type SharedMessages = {
   id: string;
   name: string;
   email: string;
+  password: string;
+  passwordConfirmation: string;
+  cancel: string;
+  creatingUser: string;
+  showCreateUserForm: string;
+  userCreatedSuccessfully: string;
+  validationError: string;
   validatingSession: string;
   protectedWorkspacePlaceholder: string;
 };
@@ -65,6 +72,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     id: "ID",
     name: "Name",
     email: "Email",
+    password: "Password",
+    passwordConfirmation: "Password Confirmation",
+    cancel: "Cancel",
+    creatingUser: "Creating user...",
+    showCreateUserForm: "Show create user form",
+    userCreatedSuccessfully: "User created successfully.",
+    validationError: "Validation error",
     validatingSession: "Validating session...",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
   },
@@ -94,6 +108,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     id: "ID",
     name: "Nombre",
     email: "Correo electrónico",
+    password: "Contraseña",
+    passwordConfirmation: "Confirmación de contraseña",
+    cancel: "Cancelar",
+    creatingUser: "Creando usuario...",
+    showCreateUserForm: "Mostrar formulario para crear usuario",
+    userCreatedSuccessfully: "Usuario creado correctamente.",
+    validationError: "Error de validación",
     adminWeb: "Admin Web",
     goToLogin: "Ir al inicio de sesión",
     backToOverview: "Volver al resumen",
@@ -102,7 +123,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     signingOut: "Cerrando sesión...",
     dashboard: "Dashboard",
     validatingSession: "Validando sesión...",
-    protectedWorkspacePlaceholder: "Marcador de posición del espacio administrativo protegido.",
+    protectedWorkspacePlaceholder:
+      "Marcador de posición del espacio administrativo protegido.",
   },
 };
 
