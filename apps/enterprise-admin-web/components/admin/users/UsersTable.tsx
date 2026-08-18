@@ -3,9 +3,10 @@ import { EnterpriseUser } from "@/lib/users-api";
 
 type UsersTableProps = {
   users: EnterpriseUser[];
+  onEditUser: (user: EnterpriseUser) => void;
 };
 
-export function UsersTable({ users }: UsersTableProps) {
+export function UsersTable({ onEditUser, users }: UsersTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-[#e2e8f0] text-left text-sm">
@@ -49,8 +50,9 @@ export function UsersTable({ users }: UsersTableProps) {
                     </button>
                     <button
                       type="button"
-                      disabled
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] opacity-70 disabled:cursor-not-allowed"
+                      onClick={() => onEditUser(user)}
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                      aria-label={`${t.editUser}: ${user.name}`}
                     >
                       {t.edit}
                     </button>

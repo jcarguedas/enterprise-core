@@ -8,10 +8,12 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusMessage } from "@/components/admin/StatusMessage";
 import { SummaryCard } from "@/components/admin/SummaryCard";
 import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
+import { EditUserForm } from "@/components/admin/users/EditUserForm";
 import { UsersTable } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { useCreateUser } from "@/lib/use-create-user";
+import { useEditUser } from "@/lib/use-edit-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
 import { EnterpriseUser, getUsers } from "@/lib/users-api";
 
@@ -62,6 +64,19 @@ export default function UsersPage() {
         );
       });
       setUsersStatus("ready");
+    },
+    onUnauthorized: () => {
+      clearStoredAuth();
+      router.replace("/login");
+    },
+  });
+  const editUserFlow = useEditUser({
+    onUserUpdated: (updatedUser) => {
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === updatedUser.id ? updatedUser : user,
+        ),
+      );
     },
     onUnauthorized: () => {
       clearStoredAuth();
@@ -126,6 +141,24 @@ export default function UsersPage() {
 
     loadUsers(token, { isRefresh: true });
   }, [loadUsers, router]);
+
+  function handleShowCreateUserForm() {
+    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+      return;
+    }
+
+    editUserFlow.cancelEditing();
+    createUserFlow.showForm();
+  }
+
+  function handleEditUser(user: EnterpriseUser) {
+    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+      return;
+    }
+
+    createUserFlow.cancelForm();
+    editUserFlow.startEditingUser(user);
+  }
 
   useEffect(() => {
     if (status !== "ready") {
@@ -204,7 +237,9 @@ export default function UsersPage() {
                 type="button"
                 onClick={refreshUsers}
                 disabled={
-                  usersStatus === "loading" || createUserFlow.isSubmitting
+                  usersStatus === "loading" ||
+                  createUserFlow.isSubmitting ||
+                  editUserFlow.isSubmitting
                 }
                 className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
               >
@@ -212,9 +247,11 @@ export default function UsersPage() {
               </button>
               <button
                 type="button"
-                onClick={createUserFlow.showForm}
+                onClick={handleShowCreateUserForm}
                 disabled={
-                  createUserFlow.isFormVisible || createUserFlow.isSubmitting
+                  createUserFlow.isFormVisible ||
+                  createUserFlow.isSubmitting ||
+                  editUserFlow.isSubmitting
                 }
                 className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
                 aria-label={t.showCreateUserForm}
@@ -227,6 +264,12 @@ export default function UsersPage() {
           {createUserFlow.successMessage ? (
             <StatusMessage variant="success" className="m-5">
               {createUserFlow.successMessage}
+            </StatusMessage>
+          ) : null}
+
+          {editUserFlow.successMessage ? (
+            <StatusMessage variant="success" className="m-5">
+              {editUserFlow.successMessage}
             </StatusMessage>
           ) : null}
 
@@ -249,6 +292,19 @@ export default function UsersPage() {
             />
           ) : null}
 
+          {editUserFlow.isFormVisible ? (
+            <EditUserForm
+              name={editUserFlow.name}
+              email={editUserFlow.email}
+              isSubmitting={editUserFlow.isSubmitting}
+              errorMessages={editUserFlow.errorMessages}
+              onNameChange={editUserFlow.setName}
+              onEmailChange={editUserFlow.setEmail}
+              onSubmit={editUserFlow.submit}
+              onCancel={editUserFlow.cancelEditing}
+            />
+          ) : null}
+
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">
               {isRefreshingUsers ? t.refreshingUsers : t.loadingUsers}
@@ -262,7 +318,10 @@ export default function UsersPage() {
           ) : null}
 
           {usersStatus === "ready" ? (
-            <UsersTable users={users} />
+            <UsersTable
+              users={users}
+              onEditUser={handleEditUser}
+            />
           ) : null}
         </section>
       </div>

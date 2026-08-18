@@ -11,7 +11,7 @@ type UsersResponse = {
   message?: string;
 };
 
-type CreateUserResponse = {
+type UserResponse = {
   user?: EnterpriseUser;
   message?: string;
   errors?: Record<string, string[] | string>;
@@ -22,6 +22,11 @@ export type CreateUserPayload = {
   email: string;
   password: string;
   password_confirmation: string;
+};
+
+export type UpdateUserPayload = {
+  name: string;
+  email: string;
 };
 
 export type UsersResult =
@@ -54,7 +59,24 @@ export type CreateUserResult =
       message: string;
     };
 
-function getValidationMessages(response: CreateUserResponse) {
+export type UpdateUserResult =
+  | {
+      status: "success";
+      user: EnterpriseUser;
+    }
+  | {
+      status: "unauthorized";
+    }
+  | {
+      status: "validation_error";
+      messages: string[];
+    }
+  | {
+      status: "error";
+      message: string;
+    };
+
+function getValidationMessages(response: UserResponse) {
   if (!response.errors) {
     return response.message ? [response.message] : [];
   }
@@ -125,7 +147,7 @@ export async function createUser(
       body: JSON.stringify(payload),
     });
 
-    const data = (await response.json().catch(() => ({}))) as CreateUserResponse;
+    const data = (await response.json().catch(() => ({}))) as UserResponse;
 
     if (response.status === 401) {
       return {
@@ -157,6 +179,70 @@ export async function createUser(
       return {
         status: "error",
         message: "The create user response was incomplete. Please try again.",
+      };
+    }
+
+    return {
+      status: "success",
+      user: data.user,
+    };
+  } catch {
+    return {
+      status: "error",
+      message:
+        "Unable to reach the auth service. Please confirm it is running and try again.",
+    };
+  }
+}
+
+export async function updateUser(
+  token: string,
+  userId: number,
+  payload: UpdateUserPayload,
+): Promise<UpdateUserResult> {
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = (await response.json().catch(() => ({}))) as UserResponse;
+
+    if (response.status === 401) {
+      return {
+        status: "unauthorized",
+      };
+    }
+
+    if (response.status === 422) {
+      const messages = getValidationMessages(data);
+
+      return {
+        status: "validation_error",
+        messages:
+          messages.length > 0
+            ? messages
+            : ["Please correct the highlighted fields and try again."],
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        status: "error",
+        message:
+          data.message ?? "Unable to update the user. Please try again shortly.",
+      };
+    }
+
+    if (!data.user) {
+      return {
+        status: "error",
+        message: "The update user response was incomplete. Please try again.",
       };
     }
 
