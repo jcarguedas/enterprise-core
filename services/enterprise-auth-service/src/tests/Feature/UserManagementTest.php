@@ -427,6 +427,113 @@ class UserManagementTest extends TestCase
         ]);
     }
 
+    public function test_authenticated_user_with_manage_users_permission_cannot_deactivate_own_account(): void
+    {
+        $admin = User::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$admin->id}", [
+                'is_active' => false,
+            ]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJsonValidationErrors([
+            'is_active',
+        ]);
+
+        $response->assertJson([
+            'errors' => [
+                'is_active' => [
+                    'You cannot deactivate your own account.',
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $admin->id,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_update_own_name_and_email(): void
+    {
+        $admin = User::factory()->create([
+            'name' => 'Original Admin',
+            'email' => 'original-admin@example.com',
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$admin->id}", [
+                'name' => 'Updated Admin',
+                'email' => 'updated-admin@example.com',
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $admin->id,
+                'name' => 'Updated Admin',
+                'email' => 'updated-admin@example.com',
+                'is_active' => true,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $admin->id,
+            'name' => 'Updated Admin',
+            'email' => 'updated-admin@example.com',
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_deactivate_another_user(): void
+    {
+        $admin = User::factory()->create([
+            'is_active' => true,
+        ]);
+        $user = User::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'is_active' => false,
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => false,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_active' => false,
+        ]);
+    }
+
     public function test_authenticated_user_with_manage_users_permission_can_reactivate_user(): void
     {
         $admin = User::factory()->create();

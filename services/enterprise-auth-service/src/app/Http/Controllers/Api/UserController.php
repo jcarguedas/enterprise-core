@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -44,6 +45,16 @@ class UserController extends Controller
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
+
+        if (
+            array_key_exists('is_active', $validated) &&
+            $validated['is_active'] === false &&
+            $request->user()->is($user)
+        ) {
+            throw ValidationException::withMessages([
+                'is_active' => ['You cannot deactivate your own account.'],
+            ]);
+        }
 
         $user->update($validated);
 
