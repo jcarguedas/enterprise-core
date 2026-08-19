@@ -88,6 +88,19 @@ export type AssignUserRoleResult =
       message: string;
     };
 
+export type RemoveUserRoleResult =
+  | {
+      status: "success";
+      roles: EnterpriseRole[];
+    }
+  | {
+      status: "unauthorized";
+    }
+  | {
+      status: "error";
+      message: string;
+    };
+
 export type CreateUserResult =
   | {
       status: "success";
@@ -326,6 +339,60 @@ export async function assignUserRole(
       return {
         status: "error",
         message: "The assign role response was incomplete. Please try again.",
+      };
+    }
+
+    return {
+      status: "success",
+      roles: data.roles,
+    };
+  } catch {
+    return {
+      status: "error",
+      message:
+        "Unable to reach the auth service. Please confirm it is running and try again.",
+    };
+  }
+}
+
+export async function removeUserRole(
+  token: string,
+  userId: number,
+  roleId: number,
+): Promise<RemoveUserRoleResult> {
+  try {
+    const response = await fetch(
+      `${apiConfig.baseUrl}/users/${userId}/roles/${roleId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const data = (await response.json().catch(() => ({}))) as UserRolesResponse;
+
+    if (response.status === 401) {
+      return {
+        status: "unauthorized",
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        status: "error",
+        message:
+          data.message ??
+          "Unable to remove the role. Please try again shortly.",
+      };
+    }
+
+    if (!Array.isArray(data.roles)) {
+      return {
+        status: "error",
+        message: "The remove role response was incomplete. Please try again.",
       };
     }
 
