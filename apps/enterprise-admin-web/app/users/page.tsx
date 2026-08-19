@@ -9,13 +9,16 @@ import { StatusMessage } from "@/components/admin/StatusMessage";
 import { SummaryCard } from "@/components/admin/SummaryCard";
 import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
 import { EditUserForm } from "@/components/admin/users/EditUserForm";
+import { UserRolesPanel } from "@/components/admin/users/UserRolesPanel";
 import { UsersTable } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { useCreateUser } from "@/lib/use-create-user";
 import { useEditUser } from "@/lib/use-edit-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
-import { EnterpriseUser, getUsers } from "@/lib/users-api";
+import { useUserRoles } from "@/lib/use-user-roles";
+import { getUsers } from "@/lib/users-api";
+import type { EnterpriseUser } from "@/lib/users-api";
 
 type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
 
@@ -78,6 +81,12 @@ export default function UsersPage() {
         ),
       );
     },
+    onUnauthorized: () => {
+      clearStoredAuth();
+      router.replace("/login");
+    },
+  });
+  const userRolesFlow = useUserRoles({
     onUnauthorized: () => {
       clearStoredAuth();
       router.replace("/login");
@@ -148,6 +157,7 @@ export default function UsersPage() {
     }
 
     editUserFlow.cancelEditing();
+    userRolesFlow.closeRolesPanel();
     createUserFlow.showForm();
   }
 
@@ -157,7 +167,18 @@ export default function UsersPage() {
     }
 
     createUserFlow.cancelForm();
+    userRolesFlow.closeRolesPanel();
     editUserFlow.startEditingUser(user);
+  }
+
+  function handleViewRoles(user: EnterpriseUser) {
+    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+      return;
+    }
+
+    createUserFlow.cancelForm();
+    editUserFlow.cancelEditing();
+    userRolesFlow.showRolesForUser(user);
   }
 
   useEffect(() => {
@@ -305,6 +326,16 @@ export default function UsersPage() {
             />
           ) : null}
 
+          {userRolesFlow.isVisible ? (
+            <UserRolesPanel
+              user={userRolesFlow.selectedUser}
+              roles={userRolesFlow.roles}
+              isLoading={userRolesFlow.isLoading}
+              errorMessage={userRolesFlow.errorMessage}
+              onClose={userRolesFlow.closeRolesPanel}
+            />
+          ) : null}
+
           {usersStatus === "loading" ? (
             <StatusMessage variant="info" className="px-5 py-5">
               {isRefreshingUsers ? t.refreshingUsers : t.loadingUsers}
@@ -321,6 +352,7 @@ export default function UsersPage() {
             <UsersTable
               users={users}
               onEditUser={handleEditUser}
+              onViewRoles={handleViewRoles}
             />
           ) : null}
         </section>

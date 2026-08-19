@@ -6,8 +6,21 @@ export type EnterpriseUser = {
   email: string;
 };
 
+export type EnterpriseRole = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_active: boolean;
+};
+
 type UsersResponse = {
   users?: EnterpriseUser[];
+  message?: string;
+};
+
+type UserRolesResponse = {
+  roles?: EnterpriseRole[];
   message?: string;
 };
 
@@ -33,6 +46,19 @@ export type UsersResult =
   | {
       status: "success";
       users: EnterpriseUser[];
+    }
+  | {
+      status: "unauthorized";
+    }
+  | {
+      status: "error";
+      message: string;
+    };
+
+export type UserRolesResult =
+  | {
+      status: "success";
+      roles: EnterpriseRole[];
     }
   | {
       status: "unauthorized";
@@ -122,6 +148,56 @@ export async function getUsers(token: string): Promise<UsersResult> {
     return {
       status: "success",
       users: data.users,
+    };
+  } catch {
+    return {
+      status: "error",
+      message:
+        "Unable to reach the auth service. Please confirm it is running and try again.",
+    };
+  }
+}
+
+export async function getUserRoles(
+  token: string,
+  userId: number,
+): Promise<UserRolesResult> {
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}/users/${userId}/roles`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = (await response.json().catch(() => ({}))) as UserRolesResponse;
+
+    if (response.status === 401) {
+      return {
+        status: "unauthorized",
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        status: "error",
+        message:
+          data.message ??
+          "Unable to load roles for this user. Please try again shortly.",
+      };
+    }
+
+    if (!Array.isArray(data.roles)) {
+      return {
+        status: "error",
+        message: "The user roles response was incomplete. Please try again.",
+      };
+    }
+
+    return {
+      status: "success",
+      roles: data.roles,
     };
   } catch {
     return {
