@@ -16,12 +16,24 @@ portfolio-grade user administration workflows.
 - Manual users refresh to reload the user directory from the API.
 - Create/Edit form coordination so only one user form is active at a time.
 - User role management for viewing, assigning, and removing user roles.
+- User status controls for viewing, deactivating, and reactivating users.
 
 Current limitations:
 
-- No user deactivation flow yet.
-- No delete user flow yet.
+- No hard delete user flow yet.
 - No runtime language switcher yet.
+- Self-deactivation protection is not implemented yet.
+
+## User Status Controls
+
+The Users module displays each user's active or inactive status from the
+`is_active` field returned by the Enterprise Auth API.
+
+Administrators can deactivate or reactivate users directly from the user table.
+Status changes are submitted through `PATCH /api/users/{user}` and update the
+affected row without a full page reload.
+
+Inactive users are blocked from logging in by the backend.
 
 ## User Role Management
 
