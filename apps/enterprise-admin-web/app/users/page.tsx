@@ -46,6 +46,7 @@ export default function UsersPage() {
     isLoggingOut,
     logout,
     status,
+    trustedUser,
     userDisplayName,
   } = useProtectedAdminSession();
   const [users, setUsers] = useState<EnterpriseUser[]>([]);
@@ -421,6 +422,7 @@ export default function UsersPage() {
           {usersStatus === "ready" ? (
             <UsersTable
               users={users}
+              currentUserId={trustedUser?.id ?? null}
               isActionsDisabled={
                 createUserFlow.isSubmitting ||
                 editUserFlow.isSubmitting ||
