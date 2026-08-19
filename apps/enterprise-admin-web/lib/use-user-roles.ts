@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
-import { getUserRoles } from "@/lib/users-api";
+import { defaultMessages as t } from "@/lib/i18n/messages";
+import { assignUserRole, getRoles, getUserRoles } from "@/lib/users-api";
 import type { EnterpriseRole, EnterpriseUser } from "@/lib/users-api";
 
 type UseUserRolesOptions = {
@@ -14,9 +15,14 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
   const requestIdRef = useRef(0);
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
   const [roles, setRoles] = useState<EnterpriseRole[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<EnterpriseRole[]>([]);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAssigningRole, setIsAssigningRole] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [assignErrorMessages, setAssignErrorMessages] = useState<string[]>([]);
+  const [assignSuccessMessage, setAssignSuccessMessage] = useState("");
 
   async function showRolesForUser(user: EnterpriseUser) {
     const requestId = requestIdRef.current + 1;
@@ -24,7 +30,11 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
 
     setSelectedUser(user);
     setRoles([]);
+    setAvailableRoles([]);
+    setSelectedRoleId("");
     setErrorMessage("");
+    setAssignErrorMessages([]);
+    setAssignSuccessMessage("");
     setIsVisible(true);
     setIsLoading(true);
 
@@ -36,7 +46,10 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
       return;
     }
 
-    const result = await getUserRoles(token, user.id);
+    const [userRolesResult, availableRolesResult] = await Promise.all([
+      getUserRoles(token, user.id),
+      getRoles(token),
+    ]);
 
     if (requestId !== requestIdRef.current) {
       return;
@@ -44,8 +57,66 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
 
     setIsLoading(false);
 
+    if (
+      userRolesResult.status === "unauthorized" ||
+      availableRolesResult.status === "unauthorized"
+    ) {
+      onUnauthorized();
+      return;
+    }
+
+    if (userRolesResult.status === "success") {
+      setRoles(userRolesResult.roles);
+    } else {
+      setErrorMessage(userRolesResult.message);
+    }
+
+    if (availableRolesResult.status === "success") {
+      setAvailableRoles(availableRolesResult.roles);
+      return;
+    }
+
+    setAssignErrorMessages([availableRolesResult.message]);
+  }
+
+  async function assignSelectedRole() {
+    setAssignErrorMessages([]);
+    setAssignSuccessMessage("");
+
+    if (!selectedUser || !selectedRoleId) {
+      return;
+    }
+
+    const requestId = requestIdRef.current;
+    const roleId = Number(selectedRoleId);
+
+    if (!Number.isInteger(roleId)) {
+      setAssignErrorMessages(["Please select a valid role and try again."]);
+      return;
+    }
+
+    setIsAssigningRole(true);
+
+    const token = getStoredToken();
+
+    if (!token) {
+      setIsAssigningRole(false);
+      onUnauthorized();
+      return;
+    }
+
+    const result = await assignUserRole(token, selectedUser.id, roleId);
+
+    if (requestId !== requestIdRef.current) {
+      return;
+    }
+
+    setIsAssigningRole(false);
+
     if (result.status === "success") {
       setRoles(result.roles);
+      setSelectedRoleId("");
+      setAssignSuccessMessage(t.roleAssignedSuccessfully);
       return;
     }
 
@@ -54,25 +125,42 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
       return;
     }
 
-    setErrorMessage(result.message);
+    if (result.status === "validation_error") {
+      setAssignErrorMessages(result.messages);
+      return;
+    }
+
+    setAssignErrorMessages([result.message]);
   }
 
   function closeRolesPanel() {
     requestIdRef.current += 1;
     setSelectedUser(null);
     setRoles([]);
+    setAvailableRoles([]);
+    setSelectedRoleId("");
     setErrorMessage("");
+    setAssignErrorMessages([]);
+    setAssignSuccessMessage("");
     setIsLoading(false);
+    setIsAssigningRole(false);
     setIsVisible(false);
   }
 
   return {
+    assignErrorMessages,
+    assignSuccessMessage,
+    availableRoles,
     errorMessage,
+    isAssigningRole,
     isLoading,
     isVisible,
     roles,
     selectedUser,
+    selectedRoleId,
+    assignSelectedRole,
     closeRolesPanel,
+    setSelectedRoleId,
     showRolesForUser,
   };
 }

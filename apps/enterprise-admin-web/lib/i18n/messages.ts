@@ -37,6 +37,12 @@ export type SharedMessages = {
   active: string;
   inactive: string;
   userRoles: string;
+  assignRole: string;
+  availableRoles: string;
+  selectRole: string;
+  assigningRole: string;
+  roleAssignedSuccessfully: string;
+  noAvailableRoles: string;
   edit: string;
   id: string;
   name: string;
@@ -94,6 +100,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     active: "Active",
     inactive: "Inactive",
     userRoles: "User Roles",
+    assignRole: "Assign Role",
+    availableRoles: "Available Roles",
+    selectRole: "Select a role",
+    assigningRole: "Assigning role...",
+    roleAssignedSuccessfully: "Role assigned successfully.",
+    noAvailableRoles: "No active roles are available to assign.",
     edit: "Edit",
     id: "ID",
     name: "Name",
@@ -144,6 +156,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     active: "Activo",
     inactive: "Inactivo",
     userRoles: "Roles del usuario",
+    assignRole: "Asignar rol",
+    availableRoles: "Roles disponibles",
+    selectRole: "Selecciona un rol",
+    assigningRole: "Asignando rol...",
+    roleAssignedSuccessfully: "Rol asignado correctamente.",
+    noAvailableRoles: "No hay roles activos disponibles para asignar.",
     edit: "Editar",
     id: "ID",
     name: "Nombre",

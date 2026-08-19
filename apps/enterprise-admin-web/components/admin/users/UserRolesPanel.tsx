@@ -5,21 +5,40 @@ import type { EnterpriseRole, EnterpriseUser } from "@/lib/users-api";
 type UserRolesPanelProps = {
   user: EnterpriseUser | null;
   roles: EnterpriseRole[];
+  availableRoles: EnterpriseRole[];
+  selectedRoleId: string;
   isLoading: boolean;
+  isAssigningRole: boolean;
   errorMessage: string;
+  assignErrorMessages: string[];
+  assignSuccessMessage: string;
+  onSelectedRoleIdChange: (roleId: string) => void;
+  onAssignRole: () => void;
   onClose: () => void;
 };
 
 export function UserRolesPanel({
   user,
   roles,
+  availableRoles,
+  selectedRoleId,
   isLoading,
+  isAssigningRole,
   errorMessage,
+  assignErrorMessages,
+  assignSuccessMessage,
+  onSelectedRoleIdChange,
+  onAssignRole,
   onClose,
 }: UserRolesPanelProps) {
   if (!user) {
     return null;
   }
+
+  const assignedRoleIds = new Set(roles.map((role) => role.id));
+  const assignableRoles = availableRoles.filter(
+    (role) => role.is_active && !assignedRoleIds.has(role.id),
+  );
 
   return (
     <section className="border-b border-[#e2e8f0] bg-[#fbfcfe] px-5 py-5">
@@ -37,7 +56,7 @@ export function UserRolesPanel({
         <button
           type="button"
           onClick={onClose}
-          disabled={isLoading}
+          disabled={isLoading || isAssigningRole}
           className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
         >
           {t.close}
@@ -54,6 +73,68 @@ export function UserRolesPanel({
         <StatusMessage variant="error" className="mt-5">
           {errorMessage}
         </StatusMessage>
+      ) : null}
+
+      {!isLoading && !errorMessage ? (
+        <div className="mt-5 rounded-md border border-[#d8dee8] bg-white p-4">
+          <h4 className="text-sm font-semibold text-[#0f172a]">
+            {t.assignRole}
+          </h4>
+
+          {assignErrorMessages.length > 0 ? (
+            <StatusMessage variant="error" className="mt-4">
+              {assignErrorMessages.join(" ")}
+            </StatusMessage>
+          ) : null}
+
+          {assignSuccessMessage ? (
+            <StatusMessage variant="success" className="mt-4">
+              {assignSuccessMessage}
+            </StatusMessage>
+          ) : null}
+
+          {assignableRoles.length === 0 ? (
+            <StatusMessage variant="info" className="mt-4">
+              {t.noAvailableRoles}
+            </StatusMessage>
+          ) : (
+            <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div>
+                <label
+                  htmlFor="assign-user-role"
+                  className="block text-sm font-medium text-[#334155]"
+                >
+                  {t.availableRoles}
+                </label>
+                <select
+                  id="assign-user-role"
+                  value={selectedRoleId}
+                  onChange={(event) =>
+                    onSelectedRoleIdChange(event.target.value)
+                  }
+                  disabled={isLoading || isAssigningRole}
+                  className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                >
+                  <option value="">{t.selectRole}</option>
+                  {assignableRoles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={onAssignRole}
+                disabled={isLoading || isAssigningRole || !selectedRoleId}
+                className="inline-flex h-11 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+              >
+                {isAssigningRole ? t.assigningRole : t.assignRole}
+              </button>
+            </div>
+          )}
+        </div>
       ) : null}
 
       {!isLoading && !errorMessage && roles.length === 0 ? (
