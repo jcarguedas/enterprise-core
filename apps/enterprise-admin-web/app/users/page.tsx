@@ -334,11 +334,13 @@ export default function UsersPage() {
               selectedRoleId={userRolesFlow.selectedRoleId}
               isLoading={userRolesFlow.isLoading}
               isAssigningRole={userRolesFlow.isAssigningRole}
+              removingRoleId={userRolesFlow.removingRoleId}
               errorMessage={userRolesFlow.errorMessage}
               assignErrorMessages={userRolesFlow.assignErrorMessages}
               assignSuccessMessage={userRolesFlow.assignSuccessMessage}
               onSelectedRoleIdChange={userRolesFlow.setSelectedRoleId}
               onAssignRole={userRolesFlow.assignSelectedRole}
+              onRemoveRole={userRolesFlow.removeRole}
               onClose={userRolesFlow.closeRolesPanel}
             />
           ) : null}

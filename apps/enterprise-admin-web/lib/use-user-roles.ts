@@ -4,7 +4,12 @@ import { useRef, useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
-import { assignUserRole, getRoles, getUserRoles } from "@/lib/users-api";
+import {
+  assignUserRole,
+  getRoles,
+  getUserRoles,
+  removeUserRole,
+} from "@/lib/users-api";
 import type { EnterpriseRole, EnterpriseUser } from "@/lib/users-api";
 
 type UseUserRolesOptions = {
@@ -20,6 +25,7 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isAssigningRole, setIsAssigningRole] = useState(false);
+  const [removingRoleId, setRemovingRoleId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [assignErrorMessages, setAssignErrorMessages] = useState<string[]>([]);
   const [assignSuccessMessage, setAssignSuccessMessage] = useState("");
@@ -80,6 +86,10 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
   }
 
   async function assignSelectedRole() {
+    if (removingRoleId !== null) {
+      return;
+    }
+
     setAssignErrorMessages([]);
     setAssignSuccessMessage("");
 
@@ -133,6 +143,47 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
     setAssignErrorMessages([result.message]);
   }
 
+  async function removeRole(roleId: number) {
+    if (!selectedUser || isLoading || isAssigningRole || removingRoleId !== null) {
+      return;
+    }
+
+    const requestId = requestIdRef.current;
+
+    setAssignErrorMessages([]);
+    setAssignSuccessMessage("");
+    setRemovingRoleId(roleId);
+
+    const token = getStoredToken();
+
+    if (!token) {
+      setRemovingRoleId(null);
+      onUnauthorized();
+      return;
+    }
+
+    const result = await removeUserRole(token, selectedUser.id, roleId);
+
+    if (requestId !== requestIdRef.current) {
+      return;
+    }
+
+    setRemovingRoleId(null);
+
+    if (result.status === "success") {
+      setRoles(result.roles);
+      setAssignSuccessMessage(t.roleRemovedSuccessfully);
+      return;
+    }
+
+    if (result.status === "unauthorized") {
+      onUnauthorized();
+      return;
+    }
+
+    setAssignErrorMessages([result.message]);
+  }
+
   function closeRolesPanel() {
     requestIdRef.current += 1;
     setSelectedUser(null);
@@ -144,6 +195,7 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
     setAssignSuccessMessage("");
     setIsLoading(false);
     setIsAssigningRole(false);
+    setRemovingRoleId(null);
     setIsVisible(false);
   }
 
@@ -155,11 +207,13 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
     isAssigningRole,
     isLoading,
     isVisible,
+    removingRoleId,
     roles,
     selectedUser,
     selectedRoleId,
     assignSelectedRole,
     closeRolesPanel,
+    removeRole,
     setSelectedRoleId,
     showRolesForUser,
   };
