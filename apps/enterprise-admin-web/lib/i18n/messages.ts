@@ -29,6 +29,14 @@ export type SharedMessages = {
   noUsersReturned: string;
   actions: string;
   viewRoles: string;
+  close: string;
+  loadingRoles: string;
+  noRolesAssigned: string;
+  roleSlug: string;
+  roleStatus: string;
+  active: string;
+  inactive: string;
+  userRoles: string;
   edit: string;
   id: string;
   name: string;
@@ -78,6 +86,14 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     noUsersReturned: "No users were returned by the API.",
     actions: "Actions",
     viewRoles: "View Roles",
+    close: "Close",
+    loadingRoles: "Loading roles...",
+    noRolesAssigned: "No roles are assigned to this user.",
+    roleSlug: "Slug",
+    roleStatus: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    userRoles: "User Roles",
     edit: "Edit",
     id: "ID",
     name: "Name",
@@ -120,6 +136,14 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     noUsersReturned: "La API no devolvió usuarios.",
     actions: "Acciones",
     viewRoles: "Ver roles",
+    close: "Cerrar",
+    loadingRoles: "Cargando roles...",
+    noRolesAssigned: "Este usuario no tiene roles asignados.",
+    roleSlug: "Slug",
+    roleStatus: "Estado",
+    active: "Activo",
+    inactive: "Inactivo",
+    userRoles: "Roles del usuario",
     edit: "Editar",
     id: "ID",
     name: "Nombre",
