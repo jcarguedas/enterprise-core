@@ -648,3 +648,61 @@ Continued Enterprise Core admin web development, completing the first real Users
 - Implement View Roles UI.
 - Later consider user deactivation instead of hard delete.
 - Later add language switcher as a dedicated feature.
+
+## 2026-08-19
+
+### Focus
+
+Completed a full user access management cycle across the Enterprise Auth Service backend, Enterprise Admin Web frontend, and project documentation.
+
+### Completed
+
+- Implemented Admin Web user role management:
+  - View assigned roles for a user.
+  - Assign active roles to a user.
+  - Remove assigned roles from a user.
+  - Updated the Admin Web README to document user role management.
+  - Published the role management work to `develop`.
+- Implemented Auth Service user status support:
+  - Added `users.is_active` migration.
+  - Included `is_active` in user API responses.
+  - Added `is_active` support to `PATCH /api/users/{user}`.
+  - Ensured new users default to active.
+  - Blocked inactive users from login.
+  - Updated backend API and manual testing documentation.
+- Implemented Admin Web user status controls:
+  - Display Active/Inactive status in the Users table.
+  - Allow administrators to deactivate and reactivate users.
+  - Update user status rows without a full page reload.
+  - Added `use-user-status` hook.
+  - Updated user status i18n messages.
+  - Updated the Admin Web README to document status controls.
+- Implemented self-deactivation protection:
+  - Backend blocks authenticated users from deactivating their own account.
+  - Backend returns `422 Validation Error` with `You cannot deactivate your own account.`
+  - Added backend tests for self-deactivation prevention, own profile updates, and deactivating another user.
+  - Frontend disables the Deactivate button for the currently authenticated active user.
+  - Edit and View Roles remain available for the current user.
+
+### Validation
+
+- Admin Web build passed.
+- Admin Web lint passed.
+- Auth Service tests passed:
+  - `61 tests`
+  - `148 assertions`
+- Manual browser testing passed for user status controls.
+
+### Notes
+
+- The backend remains the source of truth for self-deactivation prevention.
+- The frontend prevents self-deactivation as a UX improvement.
+- A local database migration was required to add `is_active` before testing with existing local data.
+- Newly created users appear first in local UI state, but backend refresh ordering places users by ID ascending. This is acceptable for now.
+
+### Next Step
+
+- Consider documenting the full user management workflow in the root README or portfolio notes.
+- Consider notification auto-dismiss or progress indicators.
+- Consider pagination, search, and sorting for the Users table.
+- Consider token revocation or request-time blocking for users deactivated after already having an active token.
