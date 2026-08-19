@@ -499,6 +499,10 @@ All fields are optional, but when provided they must be valid.
 | `is_active` | sometimes, boolean |
 | `password` | sometimes, required, string, min:8, confirmed |
 
+Self-deactivation is blocked. If an authenticated user sends
+`is_active: false` for their own user record, the API returns `422 Validation
+Error` with `You cannot deactivate your own account.`
+
 ### Successful Response
 
 Status code:
