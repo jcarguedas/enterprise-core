@@ -13,9 +13,10 @@ class UserController extends Controller
     public function index(): JsonResponse
     {
         $users = User::query()
-            ->select(['id', 'name', 'email'])
+            ->select(['id', 'name', 'email', 'is_active'])
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->map(fn (User $user): array => $this->userPayload($user));
 
         return response()->json([
             'users' => $users,
@@ -25,11 +26,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -45,16 +42,13 @@ class UserController extends Controller
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $user->update($validated);
 
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -67,13 +61,23 @@ class UserController extends Controller
         ]);
 
         $user = User::create($validated);
+        $user->refresh();
 
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => $this->userPayload($user),
         ], 201);
+    }
+
+    /**
+     * @return array{id: int, name: string, email: string, is_active: bool}
+     */
+    private function userPayload(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'is_active' => (bool) $user->is_active,
+        ];
     }
 }

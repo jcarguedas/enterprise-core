@@ -64,6 +64,8 @@ Authenticates a user and returns a Bearer token.
 }
 ```
 
+Inactive users receive the same generic `401 Unauthorized` response.
+
 ### Response 422
 
 Returned when required fields are missing or invalid.
@@ -236,12 +238,14 @@ Example response:
     {
       "id": 1,
       "name": "Admin User",
-      "email": "admin@example.com"
+      "email": "admin@example.com",
+      "is_active": true
     },
     {
       "id": 2,
       "name": "Operator User",
-      "email": "operator@example.com"
+      "email": "operator@example.com",
+      "is_active": true
     }
   ]
 }
@@ -278,6 +282,8 @@ POST /api/users
 ```
 
 Creates a new user in the Enterprise Auth Service.
+
+New users are active by default.
 
 ### Authentication
 
@@ -327,7 +333,8 @@ Example response:
   "user": {
     "id": 2,
     "name": "Operator User",
-    "email": "operator@example.com"
+    "email": "operator@example.com",
+    "is_active": true
   }
 }
 ```
@@ -405,7 +412,8 @@ Example response:
   "user": {
     "id": 2,
     "name": "Operator User",
-    "email": "operator@example.com"
+    "email": "operator@example.com",
+    "is_active": true
   }
 }
 ```
@@ -476,6 +484,7 @@ All fields are optional, but when provided they must be valid.
 {
   "name": "Updated User",
   "email": "updated@example.com",
+  "is_active": false,
   "password": "newpassword123",
   "password_confirmation": "newpassword123"
 }
@@ -487,6 +496,7 @@ All fields are optional, but when provided they must be valid.
 |---|---|
 | `name` | sometimes, required, string, max:255 |
 | `email` | sometimes, required, email, max:255, unique among users except the current user |
+| `is_active` | sometimes, boolean |
 | `password` | sometimes, required, string, min:8, confirmed |
 
 ### Successful Response
@@ -504,7 +514,8 @@ Example response:
   "user": {
     "id": 2,
     "name": "Updated User",
-    "email": "updated@example.com"
+    "email": "updated@example.com",
+    "is_active": false
   }
 }
 ```

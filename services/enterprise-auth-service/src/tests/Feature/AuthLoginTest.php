@@ -42,6 +42,26 @@ class AuthLoginTest extends TestCase
         ]);
     }
 
+    public function test_inactive_user_cannot_login(): void
+    {
+        User::factory()->create([
+            'email' => 'inactive@example.com',
+            'password' => bcrypt('password123'),
+            'is_active' => false,
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'inactive@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertUnauthorized();
+
+        $response->assertJson([
+            'message' => 'Invalid credentials.',
+        ]);
+    }
+
     public function test_user_cannot_login_with_invalid_password(): void
     {
         User::factory()->create([

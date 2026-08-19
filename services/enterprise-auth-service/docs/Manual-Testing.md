@@ -184,4 +184,5 @@ Expected result:
 - Tokens must not be committed to Git.
 - The `.env` file must not be committed.
 - Test users created manually are only for local development.
+- User management responses include `is_active`; new users default to active, and inactive users cannot login.
 - Automated tests remain the source of truth for expected API behavior.
