@@ -53,6 +53,7 @@ export type SharedMessages = {
   reactivatingUser: string;
   userDeactivatedSuccessfully: string;
   userReactivatedSuccessfully: string;
+  cannotDeactivateOwnAccount: string;
   edit: string;
   id: string;
   name: string;
@@ -126,6 +127,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     reactivatingUser: "Reactivating...",
     userDeactivatedSuccessfully: "User deactivated successfully.",
     userReactivatedSuccessfully: "User reactivated successfully.",
+    cannotDeactivateOwnAccount: "You cannot deactivate your own account.",
     edit: "Edit",
     id: "ID",
     name: "Name",
@@ -192,6 +194,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     reactivatingUser: "Reactivando...",
     userDeactivatedSuccessfully: "Usuario desactivado correctamente.",
     userReactivatedSuccessfully: "Usuario reactivado correctamente.",
+    cannotDeactivateOwnAccount: "No puedes desactivar tu propia cuenta.",
     edit: "Editar",
     id: "ID",
     name: "Nombre",

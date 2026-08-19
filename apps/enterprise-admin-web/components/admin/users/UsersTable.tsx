@@ -3,6 +3,7 @@ import type { EnterpriseUser } from "@/lib/users-api";
 
 type UsersTableProps = {
   users: EnterpriseUser[];
+  currentUserId: number | null;
   isActionsDisabled: boolean;
   updatingUserStatusId: number | null;
   onEditUser: (user: EnterpriseUser) => void;
@@ -11,6 +12,7 @@ type UsersTableProps = {
 };
 
 export function UsersTable({
+  currentUserId,
   isActionsDisabled,
   onEditUser,
   onToggleUserStatus,
@@ -42,69 +44,83 @@ export function UsersTable({
         </thead>
         <tbody className="divide-y divide-[#edf2f7] bg-white">
           {users.length > 0 ? (
-            users.map((user) => (
-              <tr key={user.id}>
-                <td className="whitespace-nowrap px-5 py-4 font-medium text-[#334155]">
-                  {user.id}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 font-medium text-[#0f172a]">
-                  {user.name}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-[#475569]">
-                  {user.email}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4">
-                  <span
-                    className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
-                      user.is_active
-                        ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-                        : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
-                    }`}
-                  >
-                    {user.is_active ? t.active : t.inactive}
-                  </span>
-                </td>
-                <td className="whitespace-nowrap px-5 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onViewRoles(user)}
-                      disabled={isActionsDisabled}
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
-                      aria-label={`${t.viewRoles}: ${user.name}`}
+            users.map((user) => {
+              const isOwnActiveUser =
+                currentUserId === user.id && user.is_active;
+              const isStatusActionDisabled =
+                isActionsDisabled || isOwnActiveUser;
+              const statusActionLabel = user.is_active
+                ? t.deactivateUser
+                : t.reactivateUser;
+              const statusActionAccessibleLabel = isOwnActiveUser
+                ? t.cannotDeactivateOwnAccount
+                : `${statusActionLabel}: ${user.name}`;
+
+              return (
+                <tr key={user.id}>
+                  <td className="whitespace-nowrap px-5 py-4 font-medium text-[#334155]">
+                    {user.id}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 font-medium text-[#0f172a]">
+                    {user.name}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-[#475569]">
+                    {user.email}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4">
+                    <span
+                      className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
+                        user.is_active
+                          ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
+                          : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
+                      }`}
                     >
-                      {t.viewRoles}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onEditUser(user)}
-                      disabled={isActionsDisabled}
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
-                      aria-label={`${t.editUser}: ${user.name}`}
-                    >
-                      {t.edit}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onToggleUserStatus(user)}
-                      disabled={isActionsDisabled}
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
-                      aria-label={`${
-                        user.is_active ? t.deactivateUser : t.reactivateUser
-                      }: ${user.name}`}
-                    >
-                      {updatingUserStatusId === user.id
-                        ? user.is_active
-                          ? t.deactivatingUser
-                          : t.reactivatingUser
-                        : user.is_active
-                          ? t.deactivateUser
-                          : t.reactivateUser}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
+                      {user.is_active ? t.active : t.inactive}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onViewRoles(user)}
+                        disabled={isActionsDisabled}
+                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        aria-label={`${t.viewRoles}: ${user.name}`}
+                      >
+                        {t.viewRoles}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onEditUser(user)}
+                        disabled={isActionsDisabled}
+                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        aria-label={`${t.editUser}: ${user.name}`}
+                      >
+                        {t.edit}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onToggleUserStatus(user)}
+                        disabled={isStatusActionDisabled}
+                        title={
+                          isOwnActiveUser
+                            ? t.cannotDeactivateOwnAccount
+                            : undefined
+                        }
+                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        aria-label={statusActionAccessibleLabel}
+                      >
+                        {updatingUserStatusId === user.id
+                          ? user.is_active
+                            ? t.deactivatingUser
+                            : t.reactivatingUser
+                          : statusActionLabel}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td
