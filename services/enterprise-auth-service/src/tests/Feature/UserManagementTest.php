@@ -46,16 +46,19 @@ class UserManagementTest extends TestCase
                     'id' => $admin->id,
                     'name' => 'Admin User',
                     'email' => 'admin@example.com',
+                    'is_active' => true,
                 ],
                 [
                     'id' => $firstUser->id,
                     'name' => 'First User',
                     'email' => 'first@example.com',
+                    'is_active' => true,
                 ],
                 [
                     'id' => $secondUser->id,
                     'name' => 'Second User',
                     'email' => 'second@example.com',
+                    'is_active' => true,
                 ],
             ],
         ]);
@@ -107,6 +110,7 @@ class UserManagementTest extends TestCase
                 'id' => $user->id,
                 'name' => 'Detail User',
                 'email' => 'detail@example.com',
+                'is_active' => true,
             ],
         ]);
     }
@@ -176,6 +180,7 @@ class UserManagementTest extends TestCase
                 'id' => $user->id,
                 'name' => 'Updated User',
                 'email' => 'updated@example.com',
+                'is_active' => true,
             ],
         ]);
 
@@ -210,6 +215,7 @@ class UserManagementTest extends TestCase
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'is_active' => true,
             ],
         ]);
 
@@ -310,6 +316,7 @@ class UserManagementTest extends TestCase
                 'email' => 'not-an-email',
                 'password' => 'short',
                 'password_confirmation' => 'different',
+                'is_active' => 'not-a-boolean',
             ]);
 
         $response->assertUnprocessable();
@@ -318,6 +325,7 @@ class UserManagementTest extends TestCase
             'name',
             'email',
             'password',
+            'is_active',
         ]);
     }
 
@@ -343,12 +351,112 @@ class UserManagementTest extends TestCase
             'user' => [
                 'name' => 'Operator User',
                 'email' => 'operator@example.com',
+                'is_active' => true,
             ],
         ]);
 
         $this->assertDatabaseHas('users', [
             'name' => 'Operator User',
             'email' => 'operator@example.com',
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_created_user_defaults_to_active(): void
+    {
+        $admin = User::factory()->create();
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson('/api/users', [
+                'name' => 'Active User',
+                'email' => 'active@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ]);
+
+        $response->assertCreated();
+
+        $response->assertJson([
+            'user' => [
+                'name' => 'Active User',
+                'email' => 'active@example.com',
+                'is_active' => true,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'active@example.com',
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_deactivate_user(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'is_active' => false,
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => false,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_active' => false,
+        ]);
+    }
+
+    public function test_authenticated_user_with_manage_users_permission_can_reactivate_user(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create([
+            'is_active' => false,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->patchJson("/api/users/{$user->id}", [
+                'is_active' => true,
+            ]);
+
+        $response->assertOk();
+
+        $response->assertExactJson([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => true,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_active' => true,
         ]);
     }
 
