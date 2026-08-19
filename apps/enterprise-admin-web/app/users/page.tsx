@@ -330,8 +330,15 @@ export default function UsersPage() {
             <UserRolesPanel
               user={userRolesFlow.selectedUser}
               roles={userRolesFlow.roles}
+              availableRoles={userRolesFlow.availableRoles}
+              selectedRoleId={userRolesFlow.selectedRoleId}
               isLoading={userRolesFlow.isLoading}
+              isAssigningRole={userRolesFlow.isAssigningRole}
               errorMessage={userRolesFlow.errorMessage}
+              assignErrorMessages={userRolesFlow.assignErrorMessages}
+              assignSuccessMessage={userRolesFlow.assignSuccessMessage}
+              onSelectedRoleIdChange={userRolesFlow.setSelectedRoleId}
+              onAssignRole={userRolesFlow.assignSelectedRole}
               onClose={userRolesFlow.closeRolesPanel}
             />
           ) : null}
