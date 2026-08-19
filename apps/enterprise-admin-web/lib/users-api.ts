@@ -4,6 +4,7 @@ export type EnterpriseUser = {
   id: number;
   name: string;
   email: string;
+  is_active: boolean;
 };
 
 export type EnterpriseRole = {
@@ -41,8 +42,9 @@ export type CreateUserPayload = {
 };
 
 export type UpdateUserPayload = {
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
+  is_active?: boolean;
 };
 
 export type UsersResult =

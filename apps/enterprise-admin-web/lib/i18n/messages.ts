@@ -28,6 +28,7 @@ export type SharedMessages = {
   loadingUsers: string;
   noUsersReturned: string;
   actions: string;
+  status: string;
   viewRoles: string;
   close: string;
   loadingRoles: string;
@@ -46,6 +47,12 @@ export type SharedMessages = {
   removeRole: string;
   removingRole: string;
   roleRemovedSuccessfully: string;
+  deactivateUser: string;
+  reactivateUser: string;
+  deactivatingUser: string;
+  reactivatingUser: string;
+  userDeactivatedSuccessfully: string;
+  userReactivatedSuccessfully: string;
   edit: string;
   id: string;
   name: string;
@@ -94,6 +101,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     loadingUsers: "Loading users...",
     noUsersReturned: "No users were returned by the API.",
     actions: "Actions",
+    status: "Status",
     viewRoles: "View Roles",
     close: "Close",
     loadingRoles: "Loading roles...",
@@ -112,6 +120,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     removeRole: "Remove",
     removingRole: "Removing...",
     roleRemovedSuccessfully: "Role removed successfully.",
+    deactivateUser: "Deactivate",
+    reactivateUser: "Reactivate",
+    deactivatingUser: "Deactivating...",
+    reactivatingUser: "Reactivating...",
+    userDeactivatedSuccessfully: "User deactivated successfully.",
+    userReactivatedSuccessfully: "User reactivated successfully.",
     edit: "Edit",
     id: "ID",
     name: "Name",
@@ -153,6 +167,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     loadingUsers: "Cargando usuarios...",
     noUsersReturned: "La API no devolvió usuarios.",
     actions: "Acciones",
+    status: "Estado",
     viewRoles: "Ver roles",
     close: "Cerrar",
     loadingRoles: "Cargando roles...",
@@ -171,6 +186,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     removeRole: "Quitar",
     removingRole: "Quitando...",
     roleRemovedSuccessfully: "Rol quitado correctamente.",
+    deactivateUser: "Desactivar",
+    reactivateUser: "Reactivar",
+    deactivatingUser: "Desactivando...",
+    reactivatingUser: "Reactivando...",
+    userDeactivatedSuccessfully: "Usuario desactivado correctamente.",
+    userReactivatedSuccessfully: "Usuario reactivado correctamente.",
     edit: "Editar",
     id: "ID",
     name: "Nombre",
