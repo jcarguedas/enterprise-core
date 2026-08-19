@@ -10,13 +10,33 @@ portfolio-grade user administration workflows.
 - Protected admin shell with session validation before rendering admin pages.
 - Protected dashboard entry point for authenticated administrators.
 - Users module backed by real API data from `GET /api/users`.
+- User directory with list, refresh, create, and edit workflows.
 - Create User flow with validation feedback and authenticated API submission.
 - Edit User flow for updating user name and email.
 - Manual users refresh to reload the user directory from the API.
 - Create/Edit form coordination so only one user form is active at a time.
+- User role management for viewing, assigning, and removing user roles.
 
-Current limitation: the View Roles action is still a disabled placeholder while
-role assignment workflows are implemented.
+Current limitations:
+
+- No user deactivation flow yet.
+- No delete user flow yet.
+- No runtime language switcher yet.
+
+## User Role Management
+
+The Users module includes protected role management actions for each user:
+
+- View assigned roles with role name, slug, status, and description.
+- Assign active roles from the available role catalog.
+- Remove assigned roles without deleting the role itself.
+
+These workflows use authenticated API calls against the Enterprise Auth API:
+
+- `GET /api/users/{user}/roles`
+- `GET /api/roles`
+- `POST /api/users/{user}/roles`
+- `DELETE /api/users/{user}/roles/{role}`
 
 ## Local Development
 
