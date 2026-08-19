@@ -17,6 +17,7 @@ import { useCreateUser } from "@/lib/use-create-user";
 import { useEditUser } from "@/lib/use-edit-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
 import { useUserRoles } from "@/lib/use-user-roles";
+import { useUserStatus } from "@/lib/use-user-status";
 import { getUsers } from "@/lib/users-api";
 import type { EnterpriseUser } from "@/lib/users-api";
 
@@ -92,6 +93,24 @@ export default function UsersPage() {
       router.replace("/login");
     },
   });
+  const userStatusFlow = useUserStatus({
+    onUserUpdated: (updatedUser) => {
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === updatedUser.id ? updatedUser : user,
+        ),
+      );
+    },
+    onUnauthorized: () => {
+      clearStoredAuth();
+      router.replace("/login");
+    },
+  });
+  const isUserRolesBusy =
+    userRolesFlow.isLoading ||
+    userRolesFlow.isAssigningRole ||
+    userRolesFlow.removingRoleId !== null;
+  const isUserStatusUpdating = userStatusFlow.updatingUserStatusId !== null;
 
   const loadUsers = useCallback(
     async (
@@ -152,33 +171,61 @@ export default function UsersPage() {
   }, [loadUsers, router]);
 
   function handleShowCreateUserForm() {
-    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+    if (
+      createUserFlow.isSubmitting ||
+      editUserFlow.isSubmitting ||
+      isUserStatusUpdating
+    ) {
       return;
     }
 
+    userStatusFlow.clearMessages();
     editUserFlow.cancelEditing();
     userRolesFlow.closeRolesPanel();
     createUserFlow.showForm();
   }
 
   function handleEditUser(user: EnterpriseUser) {
-    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+    if (
+      createUserFlow.isSubmitting ||
+      editUserFlow.isSubmitting ||
+      isUserStatusUpdating
+    ) {
       return;
     }
 
+    userStatusFlow.clearMessages();
     createUserFlow.cancelForm();
     userRolesFlow.closeRolesPanel();
     editUserFlow.startEditingUser(user);
   }
 
   function handleViewRoles(user: EnterpriseUser) {
-    if (createUserFlow.isSubmitting || editUserFlow.isSubmitting) {
+    if (
+      createUserFlow.isSubmitting ||
+      editUserFlow.isSubmitting ||
+      isUserStatusUpdating
+    ) {
       return;
     }
 
+    userStatusFlow.clearMessages();
     createUserFlow.cancelForm();
     editUserFlow.cancelEditing();
     userRolesFlow.showRolesForUser(user);
+  }
+
+  function handleToggleUserStatus(user: EnterpriseUser) {
+    if (
+      createUserFlow.isSubmitting ||
+      editUserFlow.isSubmitting ||
+      isUserRolesBusy ||
+      isUserStatusUpdating
+    ) {
+      return;
+    }
+
+    userStatusFlow.updateUserStatus(user);
   }
 
   useEffect(() => {
@@ -260,7 +307,8 @@ export default function UsersPage() {
                 disabled={
                   usersStatus === "loading" ||
                   createUserFlow.isSubmitting ||
-                  editUserFlow.isSubmitting
+                  editUserFlow.isSubmitting ||
+                  isUserStatusUpdating
                 }
                 className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
               >
@@ -272,7 +320,8 @@ export default function UsersPage() {
                 disabled={
                   createUserFlow.isFormVisible ||
                   createUserFlow.isSubmitting ||
-                  editUserFlow.isSubmitting
+                  editUserFlow.isSubmitting ||
+                  isUserStatusUpdating
                 }
                 className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
                 aria-label={t.showCreateUserForm}
@@ -291,6 +340,18 @@ export default function UsersPage() {
           {editUserFlow.successMessage ? (
             <StatusMessage variant="success" className="m-5">
               {editUserFlow.successMessage}
+            </StatusMessage>
+          ) : null}
+
+          {userStatusFlow.successMessage ? (
+            <StatusMessage variant="success" className="m-5">
+              {userStatusFlow.successMessage}
+            </StatusMessage>
+          ) : null}
+
+          {userStatusFlow.errorMessages.length > 0 ? (
+            <StatusMessage variant="error" className="m-5">
+              {userStatusFlow.errorMessages.join(" ")}
             </StatusMessage>
           ) : null}
 
@@ -360,7 +421,15 @@ export default function UsersPage() {
           {usersStatus === "ready" ? (
             <UsersTable
               users={users}
+              isActionsDisabled={
+                createUserFlow.isSubmitting ||
+                editUserFlow.isSubmitting ||
+                isUserRolesBusy ||
+                isUserStatusUpdating
+              }
+              updatingUserStatusId={userStatusFlow.updatingUserStatusId}
               onEditUser={handleEditUser}
+              onToggleUserStatus={handleToggleUserStatus}
               onViewRoles={handleViewRoles}
             />
           ) : null}

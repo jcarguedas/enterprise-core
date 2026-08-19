@@ -3,13 +3,19 @@ import type { EnterpriseUser } from "@/lib/users-api";
 
 type UsersTableProps = {
   users: EnterpriseUser[];
+  isActionsDisabled: boolean;
+  updatingUserStatusId: number | null;
   onEditUser: (user: EnterpriseUser) => void;
+  onToggleUserStatus: (user: EnterpriseUser) => void;
   onViewRoles: (user: EnterpriseUser) => void;
 };
 
 export function UsersTable({
+  isActionsDisabled,
   onEditUser,
+  onToggleUserStatus,
   onViewRoles,
+  updatingUserStatusId,
   users,
 }: UsersTableProps) {
   return (
@@ -25,6 +31,9 @@ export function UsersTable({
             </th>
             <th scope="col" className="px-5 py-3">
               {t.email}
+            </th>
+            <th scope="col" className="px-5 py-3">
+              {t.status}
             </th>
             <th scope="col" className="px-5 py-3">
               {t.actions}
@@ -45,11 +54,23 @@ export function UsersTable({
                   {user.email}
                 </td>
                 <td className="whitespace-nowrap px-5 py-4">
+                  <span
+                    className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
+                      user.is_active
+                        ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
+                        : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
+                    }`}
+                  >
+                    {user.is_active ? t.active : t.inactive}
+                  </span>
+                </td>
+                <td className="whitespace-nowrap px-5 py-4">
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() => onViewRoles(user)}
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                      disabled={isActionsDisabled}
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
                       aria-label={`${t.viewRoles}: ${user.name}`}
                     >
                       {t.viewRoles}
@@ -57,10 +78,28 @@ export function UsersTable({
                     <button
                       type="button"
                       onClick={() => onEditUser(user)}
-                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                      disabled={isActionsDisabled}
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
                       aria-label={`${t.editUser}: ${user.name}`}
                     >
                       {t.edit}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onToggleUserStatus(user)}
+                      disabled={isActionsDisabled}
+                      className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                      aria-label={`${
+                        user.is_active ? t.deactivateUser : t.reactivateUser
+                      }: ${user.name}`}
+                    >
+                      {updatingUserStatusId === user.id
+                        ? user.is_active
+                          ? t.deactivatingUser
+                          : t.reactivatingUser
+                        : user.is_active
+                          ? t.deactivateUser
+                          : t.reactivateUser}
                     </button>
                   </div>
                 </td>
@@ -69,7 +108,7 @@ export function UsersTable({
           ) : (
             <tr>
               <td
-                colSpan={4}
+                colSpan={5}
                 className="px-5 py-6 text-center text-sm text-[#64748b]"
               >
                 {t.noUsersReturned}
