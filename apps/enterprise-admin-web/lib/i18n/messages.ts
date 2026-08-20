@@ -26,6 +26,10 @@ export type SharedMessages = {
   clearSearch: string;
   noUsersMatchSearch: string;
   showingUsersCount: string;
+  usersPerPage: string;
+  previousPage: string;
+  nextPage: string;
+  usersPageCount: string;
   sortById: string;
   sortByName: string;
   sortByEmail: string;
@@ -110,6 +114,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     clearSearch: "Clear search",
     noUsersMatchSearch: "No users match your search.",
     showingUsersCount: "Showing {visible} of {total} users",
+    usersPerPage: "Users per page",
+    previousPage: "Previous",
+    nextPage: "Next",
+    usersPageCount: "Page {current} of {total}",
     sortById: "Sort by ID",
     sortByName: "Sort by name",
     sortByEmail: "Sort by email",
@@ -188,6 +196,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     clearSearch: "Limpiar búsqueda",
     noUsersMatchSearch: "Ningún usuario coincide con tu búsqueda.",
     showingUsersCount: "Mostrando {visible} de {total} usuarios",
+    usersPerPage: "Usuarios por página",
+    previousPage: "Anterior",
+    nextPage: "Siguiente",
+    usersPageCount: "Página {current} de {total}",
     sortById: "Ordenar por ID",
     sortByName: "Ordenar por nombre",
     sortByEmail: "Ordenar por correo electrónico",
