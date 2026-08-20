@@ -27,6 +27,8 @@ import type { EnterpriseUser } from "@/lib/users-api";
 
 type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
 
+const PAGE_SIZE_OPTIONS = [5, 10, 25];
+
 const usersSummaryCards = [
   {
     title: t.userDirectory,
@@ -61,6 +63,8 @@ export default function UsersPage() {
   const [sortKey, setSortKey] = useState<UserSortKey | null>(null);
   const [sortDirection, setSortDirection] =
     useState<UserSortDirection>("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const createUserFlow = useCreateUser({
     onUserCreated: (createdUser) => {
       setUsers((currentUsers) => {
@@ -178,6 +182,16 @@ export default function UsersPage() {
   const usersCountMessage = t.showingUsersCount
     .replace("{visible}", displayedUsers.length.toString())
     .replace("{total}", users.length.toString());
+  const totalPages = Math.max(1, Math.ceil(displayedUsers.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const pageStartIndex = (safeCurrentPage - 1) * pageSize;
+  const paginatedUsers = displayedUsers.slice(
+    pageStartIndex,
+    pageStartIndex + pageSize,
+  );
+  const usersPageCountMessage = t.usersPageCount
+    .replace("{current}", safeCurrentPage.toString())
+    .replace("{total}", totalPages.toString());
   const usersEmptyMessage =
     users.length > 0 && normalizedSearchQuery
       ? t.noUsersMatchSearch
@@ -297,6 +311,16 @@ export default function UsersPage() {
     }
 
     userStatusFlow.updateUserStatus(user);
+  }
+
+  function handleSearchQueryChange(nextSearchQuery: string) {
+    setSearchQuery(nextSearchQuery);
+    setCurrentPage(1);
+  }
+
+  function handlePageSizeChange(nextPageSize: number) {
+    setPageSize(nextPageSize);
+    setCurrentPage(1);
   }
 
   function handleSort(nextSortKey: UserSortKey) {
@@ -549,14 +573,16 @@ export default function UsersPage() {
                         id="users-search"
                         type="search"
                         value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
+                        onChange={(event) =>
+                          handleSearchQueryChange(event.target.value)
+                        }
                         placeholder={t.searchUsersPlaceholder}
                         className="block h-10 min-w-0 flex-1 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
                       />
                       {searchQuery ? (
                         <button
                           type="button"
-                          onClick={() => setSearchQuery("")}
+                          onClick={() => handleSearchQueryChange("")}
                           className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
                           aria-label={t.clearSearch}
                         >
@@ -565,13 +591,64 @@ export default function UsersPage() {
                       ) : null}
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-[#64748b]">
-                    {usersCountMessage}
-                  </p>
+                  <div className="flex flex-col gap-3 md:items-end">
+                    <p className="text-sm font-medium text-[#64748b]">
+                      {usersCountMessage}
+                    </p>
+                    {displayedUsers.length > 0 ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label
+                          htmlFor="users-page-size"
+                          className="text-sm font-medium text-[#334155]"
+                        >
+                          {t.usersPerPage}
+                        </label>
+                        <select
+                          id="users-page-size"
+                          value={pageSize}
+                          onChange={(event) =>
+                            handlePageSizeChange(Number(event.target.value))
+                          }
+                          className="h-10 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                        >
+                          {PAGE_SIZE_OPTIONS.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCurrentPage((page) => Math.max(1, page - 1))
+                          }
+                          disabled={safeCurrentPage === 1}
+                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        >
+                          {t.previousPage}
+                        </button>
+                        <span className="text-sm font-medium text-[#64748b]">
+                          {usersPageCountMessage}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCurrentPage((page) =>
+                              Math.min(totalPages, page + 1),
+                            )
+                          }
+                          disabled={safeCurrentPage === totalPages}
+                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        >
+                          {t.nextPage}
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </div>
               <UsersTable
-                users={displayedUsers}
+                users={paginatedUsers}
                 currentUserId={trustedUser?.id ?? null}
                 emptyMessage={usersEmptyMessage}
                 isActionsDisabled={
