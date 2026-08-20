@@ -12,6 +12,7 @@ type EditUserFormProps = {
   onEmailChange: (value: string) => void;
   onSubmit: FormEventHandler<HTMLFormElement>;
   onCancel: () => void;
+  onClearErrorMessages: () => void;
 };
 
 export function EditUserForm({
@@ -23,6 +24,7 @@ export function EditUserForm({
   onEmailChange,
   onSubmit,
   onCancel,
+  onClearErrorMessages,
 }: EditUserFormProps) {
   return (
     <form
@@ -30,7 +32,12 @@ export function EditUserForm({
       onSubmit={onSubmit}
     >
       {errorMessages.length > 0 ? (
-        <StatusMessage variant="error" className="mb-5">
+        <StatusMessage
+          variant="error"
+          className="mb-5"
+          dismissible
+          onDismiss={onClearErrorMessages}
+        >
           <span className="font-semibold">{t.validationError}: </span>
           {errorMessages.join(" ")}
         </StatusMessage>

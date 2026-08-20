@@ -43,6 +43,14 @@ export function useCreateUser({
     setIsFormVisible(false);
   }
 
+  function clearSuccessMessage() {
+    setSuccessMessage("");
+  }
+
+  function clearErrorMessages() {
+    setErrorMessages([]);
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSuccessMessage("");
@@ -97,6 +105,8 @@ export function useCreateUser({
     passwordConfirmation,
     successMessage,
     cancelForm,
+    clearErrorMessages,
+    clearSuccessMessage,
     setEmail,
     setName,
     setPassword,

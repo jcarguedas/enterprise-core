@@ -15,6 +15,9 @@ type UserRolesPanelProps = {
   assignSuccessMessage: string;
   onSelectedRoleIdChange: (roleId: string) => void;
   onAssignRole: () => void;
+  onClearAssignErrorMessages: () => void;
+  onClearAssignSuccessMessage: () => void;
+  onClearErrorMessage: () => void;
   onRemoveRole: (roleId: number) => void;
   onClose: () => void;
 };
@@ -32,6 +35,9 @@ export function UserRolesPanel({
   assignSuccessMessage,
   onSelectedRoleIdChange,
   onAssignRole,
+  onClearAssignErrorMessages,
+  onClearAssignSuccessMessage,
+  onClearErrorMessage,
   onRemoveRole,
   onClose,
 }: UserRolesPanelProps) {
@@ -74,7 +80,12 @@ export function UserRolesPanel({
       ) : null}
 
       {!isLoading && errorMessage ? (
-        <StatusMessage variant="error" className="mt-5">
+        <StatusMessage
+          variant="error"
+          className="mt-5"
+          dismissible
+          onDismiss={onClearErrorMessage}
+        >
           {errorMessage}
         </StatusMessage>
       ) : null}
@@ -86,13 +97,24 @@ export function UserRolesPanel({
           </h4>
 
           {assignErrorMessages.length > 0 ? (
-            <StatusMessage variant="error" className="mt-4">
+            <StatusMessage
+              variant="error"
+              className="mt-4"
+              dismissible
+              onDismiss={onClearAssignErrorMessages}
+            >
               {assignErrorMessages.join(" ")}
             </StatusMessage>
           ) : null}
 
           {assignSuccessMessage ? (
-            <StatusMessage variant="success" className="mt-4">
+            <StatusMessage
+              variant="success"
+              className="mt-4"
+              dismissible
+              autoDismiss
+              onDismiss={onClearAssignSuccessMessage}
+            >
               {assignSuccessMessage}
             </StatusMessage>
           ) : null}

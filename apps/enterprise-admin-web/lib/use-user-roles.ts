@@ -199,6 +199,18 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
     setIsVisible(false);
   }
 
+  function clearErrorMessage() {
+    setErrorMessage("");
+  }
+
+  function clearAssignErrorMessages() {
+    setAssignErrorMessages([]);
+  }
+
+  function clearAssignSuccessMessage() {
+    setAssignSuccessMessage("");
+  }
+
   return {
     assignErrorMessages,
     assignSuccessMessage,
@@ -212,6 +224,9 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
     selectedUser,
     selectedRoleId,
     assignSelectedRole,
+    clearAssignErrorMessages,
+    clearAssignSuccessMessage,
+    clearErrorMessage,
     closeRolesPanel,
     removeRole,
     setSelectedRoleId,
