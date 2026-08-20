@@ -40,6 +40,14 @@ export function useEditUser({
     setIsFormVisible(false);
   }
 
+  function clearSuccessMessage() {
+    setSuccessMessage("");
+  }
+
+  function clearErrorMessages() {
+    setErrorMessages([]);
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSuccessMessage("");
@@ -98,6 +106,8 @@ export function useEditUser({
     selectedUser,
     successMessage,
     cancelEditing,
+    clearErrorMessages,
+    clearSuccessMessage,
     setEmail,
     setName,
     startEditingUser,

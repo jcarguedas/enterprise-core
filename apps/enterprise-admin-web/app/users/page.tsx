@@ -333,25 +333,48 @@ export default function UsersPage() {
           </div>
 
           {createUserFlow.successMessage ? (
-            <StatusMessage variant="success" className="m-5">
+            <StatusMessage
+              variant="success"
+              className="m-5"
+              dismissible
+              autoDismiss
+              onDismiss={createUserFlow.clearSuccessMessage}
+            >
               {createUserFlow.successMessage}
             </StatusMessage>
           ) : null}
 
           {editUserFlow.successMessage ? (
-            <StatusMessage variant="success" className="m-5">
+            <StatusMessage
+              variant="success"
+              className="m-5"
+              dismissible
+              autoDismiss
+              onDismiss={editUserFlow.clearSuccessMessage}
+            >
               {editUserFlow.successMessage}
             </StatusMessage>
           ) : null}
 
           {userStatusFlow.successMessage ? (
-            <StatusMessage variant="success" className="m-5">
+            <StatusMessage
+              variant="success"
+              className="m-5"
+              dismissible
+              autoDismiss
+              onDismiss={userStatusFlow.clearMessages}
+            >
               {userStatusFlow.successMessage}
             </StatusMessage>
           ) : null}
 
           {userStatusFlow.errorMessages.length > 0 ? (
-            <StatusMessage variant="error" className="m-5">
+            <StatusMessage
+              variant="error"
+              className="m-5"
+              dismissible
+              onDismiss={userStatusFlow.clearMessages}
+            >
               {userStatusFlow.errorMessages.join(" ")}
             </StatusMessage>
           ) : null}
@@ -372,6 +395,7 @@ export default function UsersPage() {
               }
               onSubmit={createUserFlow.submit}
               onCancel={createUserFlow.cancelForm}
+              onClearErrorMessages={createUserFlow.clearErrorMessages}
             />
           ) : null}
 
@@ -385,6 +409,7 @@ export default function UsersPage() {
               onEmailChange={editUserFlow.setEmail}
               onSubmit={editUserFlow.submit}
               onCancel={editUserFlow.cancelEditing}
+              onClearErrorMessages={editUserFlow.clearErrorMessages}
             />
           ) : null}
 
@@ -402,6 +427,13 @@ export default function UsersPage() {
               assignSuccessMessage={userRolesFlow.assignSuccessMessage}
               onSelectedRoleIdChange={userRolesFlow.setSelectedRoleId}
               onAssignRole={userRolesFlow.assignSelectedRole}
+              onClearAssignErrorMessages={
+                userRolesFlow.clearAssignErrorMessages
+              }
+              onClearAssignSuccessMessage={
+                userRolesFlow.clearAssignSuccessMessage
+              }
+              onClearErrorMessage={userRolesFlow.clearErrorMessage}
               onRemoveRole={userRolesFlow.removeRole}
               onClose={userRolesFlow.closeRolesPanel}
             />

@@ -31,6 +31,7 @@ export type SharedMessages = {
   status: string;
   viewRoles: string;
   close: string;
+  dismissMessage: string;
   loadingRoles: string;
   noRolesAssigned: string;
   roleSlug: string;
@@ -105,6 +106,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     status: "Status",
     viewRoles: "View Roles",
     close: "Close",
+    dismissMessage: "Dismiss message",
     loadingRoles: "Loading roles...",
     noRolesAssigned: "No roles are assigned to this user.",
     roleSlug: "Slug",
@@ -172,6 +174,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     status: "Estado",
     viewRoles: "Ver roles",
     close: "Cerrar",
+    dismissMessage: "Cerrar mensaje",
     loadingRoles: "Cargando roles...",
     noRolesAssigned: "Este usuario no tiene roles asignados.",
     roleSlug: "Slug",
