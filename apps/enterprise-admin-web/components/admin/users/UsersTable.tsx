@@ -1,42 +1,94 @@
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import type { EnterpriseUser } from "@/lib/users-api";
 
+export type UserSortDirection = "asc" | "desc";
+export type UserSortKey = "id" | "name" | "email" | "status";
+
 type UsersTableProps = {
   users: EnterpriseUser[];
   currentUserId: number | null;
+  emptyMessage: string;
   isActionsDisabled: boolean;
+  sortDirection: UserSortDirection;
+  sortKey: UserSortKey | null;
   updatingUserStatusId: number | null;
   onEditUser: (user: EnterpriseUser) => void;
+  onSort: (sortKey: UserSortKey) => void;
   onToggleUserStatus: (user: EnterpriseUser) => void;
   onViewRoles: (user: EnterpriseUser) => void;
 };
 
 export function UsersTable({
   currentUserId,
+  emptyMessage,
   isActionsDisabled,
   onEditUser,
+  onSort,
   onToggleUserStatus,
   onViewRoles,
+  sortDirection,
+  sortKey,
   updatingUserStatusId,
   users,
 }: UsersTableProps) {
+  function getSortIndicator(headerSortKey: UserSortKey) {
+    if (sortKey !== headerSortKey) {
+      return "";
+    }
+
+    return sortDirection === "asc" ? "↑" : "↓";
+  }
+
+  function getAriaSort(headerSortKey: UserSortKey) {
+    if (sortKey !== headerSortKey) {
+      return "none";
+    }
+
+    return sortDirection === "asc" ? "ascending" : "descending";
+  }
+
+  function getSortButtonLabel(headerSortKey: UserSortKey) {
+    const labels = {
+      id: t.sortById,
+      name: t.sortByName,
+      email: t.sortByEmail,
+      status: t.sortByStatus,
+    };
+
+    return labels[headerSortKey];
+  }
+
+  function renderSortableHeader(headerSortKey: UserSortKey, label: string) {
+    return (
+      <th
+        scope="col"
+        className="px-5 py-3"
+        aria-sort={getAriaSort(headerSortKey)}
+      >
+        <button
+          type="button"
+          onClick={() => onSort(headerSortKey)}
+          className="inline-flex items-center gap-1 font-semibold uppercase text-[#64748b] transition-colors hover:text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+          aria-label={getSortButtonLabel(headerSortKey)}
+        >
+          <span>{label}</span>
+          <span aria-hidden="true" className="inline-block w-3 text-left">
+            {getSortIndicator(headerSortKey)}
+          </span>
+        </button>
+      </th>
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-[#e2e8f0] text-left text-sm">
         <thead className="bg-[#f8fafc] text-xs font-semibold uppercase text-[#64748b]">
           <tr>
-            <th scope="col" className="px-5 py-3">
-              {t.id}
-            </th>
-            <th scope="col" className="px-5 py-3">
-              {t.name}
-            </th>
-            <th scope="col" className="px-5 py-3">
-              {t.email}
-            </th>
-            <th scope="col" className="px-5 py-3">
-              {t.status}
-            </th>
+            {renderSortableHeader("id", t.id)}
+            {renderSortableHeader("name", t.name)}
+            {renderSortableHeader("email", t.email)}
+            {renderSortableHeader("status", t.status)}
             <th scope="col" className="px-5 py-3">
               {t.actions}
             </th>
@@ -127,7 +179,7 @@ export function UsersTable({
                 colSpan={5}
                 className="px-5 py-6 text-center text-sm text-[#64748b]"
               >
-                {t.noUsersReturned}
+                {emptyMessage}
               </td>
             </tr>
           )}
