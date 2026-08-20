@@ -14,6 +14,8 @@ portfolio-grade user administration workflows.
 - Client-side user search across currently loaded ID, name, email, and status
   values.
 - Sortable user table columns for ID, Name, Email, and Status.
+- Client-side user pagination over currently loaded users, with page sizes of
+  5, 10, and 25 applied after search and sorting.
 - Filtered user empty state when no currently loaded users match the search.
 - Visible/total user count for filtered directory results.
 - Create User flow with validation feedback and authenticated API submission.
@@ -26,9 +28,9 @@ portfolio-grade user administration workflows.
 Current limitations:
 
 - No hard delete user flow yet.
-- No backend pagination or server-side user search yet.
+- No backend pagination or server-side user search yet; current pagination and
+  search are local to the loaded user set.
 - No runtime language switcher yet.
-- Self-deactivation protection is not implemented yet.
 
 ## User Status Controls
 
