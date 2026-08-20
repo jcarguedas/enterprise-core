@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -11,6 +11,10 @@ import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
 import { EditUserForm } from "@/components/admin/users/EditUserForm";
 import { UserRolesPanel } from "@/components/admin/users/UserRolesPanel";
 import { UsersTable } from "@/components/admin/users/UsersTable";
+import type {
+  UserSortDirection,
+  UserSortKey,
+} from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { useCreateUser } from "@/lib/use-create-user";
@@ -53,6 +57,10 @@ export default function UsersPage() {
   const [usersStatus, setUsersStatus] = useState<UsersLoadStatus>("idle");
   const [usersErrorMessage, setUsersErrorMessage] = useState("");
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = useState<UserSortKey | null>(null);
+  const [sortDirection, setSortDirection] =
+    useState<UserSortDirection>("asc");
   const createUserFlow = useCreateUser({
     onUserCreated: (createdUser) => {
       setUsers((currentUsers) => {
@@ -112,6 +120,68 @@ export default function UsersPage() {
     userRolesFlow.isAssigningRole ||
     userRolesFlow.removingRoleId !== null;
   const isUserStatusUpdating = userStatusFlow.updatingUserStatusId !== null;
+  const normalizedSearchQuery = searchQuery.trim().replace(/\s+/g, " ");
+  const displayedUsers = useMemo(() => {
+    const normalizedQuery = normalizedSearchQuery.toLowerCase();
+    const filteredUsers = normalizedQuery
+      ? users.filter((user) => {
+          const statusLabel = user.is_active ? t.active : t.inactive;
+          const searchableText = [
+            user.id.toString(),
+            user.name,
+            user.email,
+            statusLabel,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          return searchableText.includes(normalizedQuery);
+        })
+      : users;
+
+    if (!sortKey) {
+      return filteredUsers;
+    }
+
+    return filteredUsers
+      .map((user, index) => ({ index, user }))
+      .sort((left, right) => {
+        const sortMultiplier = sortDirection === "asc" ? 1 : -1;
+        let comparison = 0;
+
+        if (sortKey === "id") {
+          comparison = left.user.id - right.user.id;
+        }
+
+        if (sortKey === "name") {
+          comparison = left.user.name.localeCompare(right.user.name);
+        }
+
+        if (sortKey === "email") {
+          comparison = left.user.email.localeCompare(right.user.email);
+        }
+
+        if (sortKey === "status") {
+          const leftStatus = left.user.is_active ? t.active : t.inactive;
+          const rightStatus = right.user.is_active ? t.active : t.inactive;
+          comparison = leftStatus.localeCompare(rightStatus);
+        }
+
+        if (comparison === 0) {
+          return left.index - right.index;
+        }
+
+        return comparison * sortMultiplier;
+      })
+      .map(({ user }) => user);
+  }, [normalizedSearchQuery, sortDirection, sortKey, users]);
+  const usersCountMessage = t.showingUsersCount
+    .replace("{visible}", displayedUsers.length.toString())
+    .replace("{total}", users.length.toString());
+  const usersEmptyMessage =
+    users.length > 0 && normalizedSearchQuery
+      ? t.noUsersMatchSearch
+      : t.noUsersReturned;
 
   const loadUsers = useCallback(
     async (
@@ -227,6 +297,18 @@ export default function UsersPage() {
     }
 
     userStatusFlow.updateUserStatus(user);
+  }
+
+  function handleSort(nextSortKey: UserSortKey) {
+    if (sortKey === nextSortKey) {
+      setSortDirection((currentDirection) =>
+        currentDirection === "asc" ? "desc" : "asc",
+      );
+      return;
+    }
+
+    setSortKey(nextSortKey);
+    setSortDirection("asc");
   }
 
   useEffect(() => {
@@ -452,20 +534,61 @@ export default function UsersPage() {
           ) : null}
 
           {usersStatus === "ready" ? (
-            <UsersTable
-              users={users}
-              currentUserId={trustedUser?.id ?? null}
-              isActionsDisabled={
-                createUserFlow.isSubmitting ||
-                editUserFlow.isSubmitting ||
-                isUserRolesBusy ||
-                isUserStatusUpdating
-              }
-              updatingUserStatusId={userStatusFlow.updatingUserStatusId}
-              onEditUser={handleEditUser}
-              onToggleUserStatus={handleToggleUserStatus}
-              onViewRoles={handleViewRoles}
-            />
+            <>
+              <div className="border-b border-[#e2e8f0] px-5 py-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <label
+                      htmlFor="users-search"
+                      className="block text-sm font-medium text-[#334155]"
+                    >
+                      {t.searchUsers}
+                    </label>
+                    <div className="mt-2 flex max-w-xl gap-2">
+                      <input
+                        id="users-search"
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder={t.searchUsersPlaceholder}
+                        className="block h-10 min-w-0 flex-1 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                      />
+                      {searchQuery ? (
+                        <button
+                          type="button"
+                          onClick={() => setSearchQuery("")}
+                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                          aria-label={t.clearSearch}
+                        >
+                          {t.clearSearch}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-[#64748b]">
+                    {usersCountMessage}
+                  </p>
+                </div>
+              </div>
+              <UsersTable
+                users={displayedUsers}
+                currentUserId={trustedUser?.id ?? null}
+                emptyMessage={usersEmptyMessage}
+                isActionsDisabled={
+                  createUserFlow.isSubmitting ||
+                  editUserFlow.isSubmitting ||
+                  isUserRolesBusy ||
+                  isUserStatusUpdating
+                }
+                sortDirection={sortDirection}
+                sortKey={sortKey}
+                updatingUserStatusId={userStatusFlow.updatingUserStatusId}
+                onEditUser={handleEditUser}
+                onSort={handleSort}
+                onToggleUserStatus={handleToggleUserStatus}
+                onViewRoles={handleViewRoles}
+              />
+            </>
           ) : null}
         </section>
       </div>

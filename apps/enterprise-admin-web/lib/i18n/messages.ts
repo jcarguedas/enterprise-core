@@ -21,6 +21,15 @@ export type SharedMessages = {
   editUser: string;
   refresh: string;
   refreshingUsers: string;
+  searchUsers: string;
+  searchUsersPlaceholder: string;
+  clearSearch: string;
+  noUsersMatchSearch: string;
+  showingUsersCount: string;
+  sortById: string;
+  sortByName: string;
+  sortByEmail: string;
+  sortByStatus: string;
   saveChanges: string;
   crudComingNext: string;
   comingNext: string;
@@ -96,6 +105,15 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUser: "Edit User",
     refresh: "Refresh",
     refreshingUsers: "Refreshing users...",
+    searchUsers: "Search users",
+    searchUsersPlaceholder: "Search by ID, name, email, or status",
+    clearSearch: "Clear search",
+    noUsersMatchSearch: "No users match your search.",
+    showingUsersCount: "Showing {visible} of {total} users",
+    sortById: "Sort by ID",
+    sortByName: "Sort by name",
+    sortByEmail: "Sort by email",
+    sortByStatus: "Sort by status",
     saveChanges: "Save changes",
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
@@ -164,6 +182,16 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUser: "Editar usuario",
     refresh: "Actualizar",
     refreshingUsers: "Actualizando usuarios...",
+    searchUsers: "Buscar usuarios",
+    searchUsersPlaceholder:
+      "Busca por ID, nombre, correo electrónico o estado",
+    clearSearch: "Limpiar búsqueda",
+    noUsersMatchSearch: "Ningún usuario coincide con tu búsqueda.",
+    showingUsersCount: "Mostrando {visible} de {total} usuarios",
+    sortById: "Ordenar por ID",
+    sortByName: "Ordenar por nombre",
+    sortByEmail: "Ordenar por correo electrónico",
+    sortByStatus: "Ordenar por estado",
     saveChanges: "Guardar cambios",
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
