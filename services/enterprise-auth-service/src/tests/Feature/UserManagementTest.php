@@ -71,6 +71,26 @@ class UserManagementTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function test_inactive_authenticated_user_with_existing_token_cannot_list_users(): void
+    {
+        $admin = User::factory()->create([
+            'is_active' => false,
+        ]);
+
+        $this->giveManageUsersPermission($admin);
+
+        $token = $admin->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/users');
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'Your account is inactive.',
+        ]);
+    }
+
     public function test_authenticated_user_without_manage_users_permission_cannot_list_users(): void
     {
         $user = User::factory()->create();
