@@ -53,6 +53,10 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+Authenticated API routes require an active user account at request time. If a
+previously issued Sanctum token belongs to an inactive user, protected endpoints
+return `403` with `Your account is inactive.`.
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

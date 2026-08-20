@@ -15,6 +15,7 @@ class AuthMeLogoutTest extends TestCase
         $user = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
+            'is_active' => true,
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -30,6 +31,24 @@ class AuthMeLogoutTest extends TestCase
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
             ],
+        ]);
+    }
+
+    public function test_inactive_authenticated_user_with_existing_token_cannot_get_profile(): void
+    {
+        $user = User::factory()->create([
+            'is_active' => false,
+        ]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->getJson('/api/me');
+
+        $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'Your account is inactive.',
         ]);
     }
 
