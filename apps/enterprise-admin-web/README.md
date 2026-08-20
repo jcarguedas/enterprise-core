@@ -11,6 +11,11 @@ portfolio-grade user administration workflows.
 - Protected dashboard entry point for authenticated administrators.
 - Users module backed by real API data from `GET /api/users`.
 - User directory with list, refresh, create, and edit workflows.
+- Client-side user search across currently loaded ID, name, email, and status
+  values.
+- Sortable user table columns for ID, Name, Email, and Status.
+- Filtered user empty state when no currently loaded users match the search.
+- Visible/total user count for filtered directory results.
 - Create User flow with validation feedback and authenticated API submission.
 - Edit User flow for updating user name and email.
 - Manual users refresh to reload the user directory from the API.
@@ -21,6 +26,7 @@ portfolio-grade user administration workflows.
 Current limitations:
 
 - No hard delete user flow yet.
+- No backend pagination or server-side user search yet.
 - No runtime language switcher yet.
 - Self-deactivation protection is not implemented yet.
 
