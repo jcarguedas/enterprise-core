@@ -8,11 +8,13 @@ import { updateUser } from "@/lib/users-api";
 import type { EnterpriseUser } from "@/lib/users-api";
 
 type UseUserStatusOptions = {
+  onInactiveAccount: () => void;
   onUnauthorized: () => void;
   onUserUpdated: (updatedUser: EnterpriseUser) => void;
 };
 
 export function useUserStatus({
+  onInactiveAccount,
   onUnauthorized,
   onUserUpdated,
 }: UseUserStatusOptions) {
@@ -58,6 +60,11 @@ export function useUserStatus({
 
     if (result.status === "unauthorized") {
       onUnauthorized();
+      return;
+    }
+
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
       return;
     }
 

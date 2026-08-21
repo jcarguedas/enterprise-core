@@ -80,6 +80,7 @@ export type SharedMessages = {
   showCreateUserForm: string;
   userCreatedSuccessfully: string;
   userUpdatedSuccessfully: string;
+  inactiveAccountLoginMessage: string;
   validationError: string;
   validatingSession: string;
   protectedWorkspacePlaceholder: string;
@@ -168,6 +169,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     showCreateUserForm: "Show create user form",
     userCreatedSuccessfully: "User created successfully.",
     userUpdatedSuccessfully: "User updated successfully.",
+    inactiveAccountLoginMessage:
+      "Your account is inactive. Contact an administrator.",
     validationError: "Validation error",
     validatingSession: "Validating session...",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
@@ -250,6 +253,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     showCreateUserForm: "Mostrar formulario para crear usuario",
     userCreatedSuccessfully: "Usuario creado correctamente.",
     userUpdatedSuccessfully: "Usuario actualizado correctamente.",
+    inactiveAccountLoginMessage:
+      "Tu cuenta está inactiva. Contacta a un administrador.",
     validationError: "Error de validación",
     adminWeb: "Admin Web",
     goToLogin: "Ir al inicio de sesión",

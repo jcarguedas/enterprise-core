@@ -11,6 +11,7 @@ import {
   storeUser,
 } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 
 export type SessionStatus = "checking" | "ready" | "error";
 
@@ -52,6 +53,12 @@ export function useProtectedAdminSession() {
         return;
       }
 
+      if (result.status === "inactive_account") {
+        clearStoredAuth();
+        router.replace(INACTIVE_ACCOUNT_LOGIN_PATH);
+        return;
+      }
+
       setTrustedUser(null);
       setErrorMessage(result.message);
       setStatus("error");
@@ -66,15 +73,20 @@ export function useProtectedAdminSession() {
 
   async function logout() {
     const token = getStoredToken();
+    let logoutPath = "/login";
     setIsLoggingOut(true);
 
     try {
       if (token) {
-        await logoutCurrentUser(token);
+        const result = await logoutCurrentUser(token);
+
+        if (result.status === "inactive_account") {
+          logoutPath = INACTIVE_ACCOUNT_LOGIN_PATH;
+        }
       }
     } finally {
       clearStoredAuth();
-      router.push("/login");
+      router.push(logoutPath);
     }
   }
 

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { INACTIVE_ACCOUNT_LOGIN_REASON } from "@/lib/inactive-account";
 
 type LoginResponse = {
   token?: string;
@@ -32,12 +33,20 @@ function getLoginErrorMessage(response: LoginResponse) {
   return response.message ?? "Unable to sign in. Please verify your credentials.";
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inactiveRedirectMessage =
+    !hasSubmitted &&
+    searchParams.get("reason") === INACTIVE_ACCOUNT_LOGIN_REASON
+      ? t.inactiveAccountLoginMessage
+      : "";
+  const visibleErrorMessage = errorMessage || inactiveRedirectMessage;
 
   useEffect(() => {
     if (getStoredToken()) {
@@ -47,6 +56,7 @@ export default function LoginPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setHasSubmitted(true);
     setErrorMessage("");
     setIsSubmitting(true);
 
@@ -138,13 +148,13 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-              {errorMessage ? (
+            <form method="post" className="mt-6 space-y-5" onSubmit={handleSubmit}>
+              {visibleErrorMessage ? (
                 <div
                   aria-live="polite"
                   className="rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
                 >
-                  {errorMessage}
+                  {visibleErrorMessage}
                 </div>
               ) : null}
 
@@ -202,5 +212,13 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

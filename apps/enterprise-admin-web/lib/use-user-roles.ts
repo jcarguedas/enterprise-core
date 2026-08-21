@@ -13,10 +13,14 @@ import {
 import type { EnterpriseRole, EnterpriseUser } from "@/lib/users-api";
 
 type UseUserRolesOptions = {
+  onInactiveAccount: () => void;
   onUnauthorized: () => void;
 };
 
-export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
+export function useUserRoles({
+  onInactiveAccount,
+  onUnauthorized,
+}: UseUserRolesOptions) {
   const requestIdRef = useRef(0);
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
   const [roles, setRoles] = useState<EnterpriseRole[]>([]);
@@ -68,6 +72,14 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
       availableRolesResult.status === "unauthorized"
     ) {
       onUnauthorized();
+      return;
+    }
+
+    if (
+      userRolesResult.status === "inactive_account" ||
+      availableRolesResult.status === "inactive_account"
+    ) {
+      onInactiveAccount();
       return;
     }
 
@@ -135,6 +147,11 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
       return;
     }
 
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
+      return;
+    }
+
     if (result.status === "validation_error") {
       setAssignErrorMessages(result.messages);
       return;
@@ -178,6 +195,11 @@ export function useUserRoles({ onUnauthorized }: UseUserRolesOptions) {
 
     if (result.status === "unauthorized") {
       onUnauthorized();
+      return;
+    }
+
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
       return;
     }
 
