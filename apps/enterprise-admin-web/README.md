@@ -31,6 +31,20 @@ Current limitations:
 - No backend pagination or server-side user search yet; current pagination and
   search are local to the loaded user set.
 - No runtime language switcher yet.
+- No permission-aware dashboard cards yet because `/api/me` does not currently
+  expose permissions.
+
+## Dashboard
+
+The protected dashboard is available at `/dashboard`. It validates the current
+session with the Enterprise Auth API before showing protected content.
+
+The dashboard includes:
+
+- Authenticated account summary using the current user's name and email.
+- Session security card explaining that protected content depends on successful
+  session validation.
+- Quick access to User Management through a link to `/users`.
 
 ## User Status Controls
 
