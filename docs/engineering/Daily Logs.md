@@ -774,3 +774,46 @@ Completed another access-management improvement cycle across Enterprise Admin We
 - Consider backend pagination and server-side search for larger user directories.
 - Consider documenting the full access-management workflow in portfolio notes.
 - Continue hardening protected admin workflows around account lifecycle events.
+
+## 2026-08-21 - Later Update
+
+### Focus
+
+Improved the Admin Web dashboard experience and captured the next access-management planning decisions.
+
+### Completed
+
+- Improved `/dashboard` so it feels more like a real admin home page.
+- Added an authenticated account summary using the current user's name and email.
+- Added a session security card explaining that protected content is shown only after validating the session with the Auth Service.
+- Added a User Management quick action linking to `/users`.
+- Kept the dashboard implementation frontend-only.
+- Avoided inventing permission data because `/api/me` does not expose permissions yet.
+- Updated the Admin Web README to document:
+  - `/dashboard`
+  - Account summary.
+  - Session validation/security card.
+  - Quick access to user management.
+  - Current limitation around permission-aware dashboard cards.
+- Merged and pushed the dashboard feature to `develop`.
+- Merged and pushed the dashboard documentation update to `develop`.
+
+### Validation
+
+- Admin Web build passed.
+- Admin Web lint passed.
+
+### Planning Notes
+
+- Runtime EN/ES language switching should be implemented soon as a separate feature.
+- Floating toast notifications are a good next UX improvement for lower-priority success and operation messages, while critical errors should remain inline.
+- Remaining access-management improvements before moving deeply into other modules:
+  - Expose roles and permissions from `/api/me`.
+  - Make the sidebar and dashboard permission-aware.
+  - Improve access-denied UX.
+  - Expand roles management later.
+  - Eventually add audit logs.
+
+### Next Step
+
+- Start runtime language switching as a focused Admin Web feature.
