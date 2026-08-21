@@ -79,3 +79,30 @@ is not set, the app defaults to:
 ```text
 http://127.0.0.1:8000/api
 ```
+
+### Local Network Testing
+
+For mobile testing from another device on the same WiFi network, expose the
+backend on the LAN:
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Configure the Admin Web `.env.local` file to use the backend LAN URL:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=http://<LAN_IP>:8000/api
+```
+
+Do not commit `.env.local`.
+
+Run the Admin Web dev server bound to the machine LAN IP:
+
+```bash
+npm run dev -- -H <LAN_IP>
+```
+
+If files under `/_next/static` return `403`, React may not hydrate and the login
+form may fall back to plain HTML submission. In this environment, binding the
+dev server directly to `<LAN_IP>` avoids that issue.
