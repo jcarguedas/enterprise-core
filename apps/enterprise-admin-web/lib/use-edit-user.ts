@@ -7,11 +7,13 @@ import { defaultMessages as t } from "@/lib/i18n/messages";
 import { EnterpriseUser, updateUser } from "@/lib/users-api";
 
 type UseEditUserOptions = {
+  onInactiveAccount: () => void;
   onUserUpdated: (updatedUser: EnterpriseUser) => void;
   onUnauthorized: () => void;
 };
 
 export function useEditUser({
+  onInactiveAccount,
   onUserUpdated,
   onUnauthorized,
 }: UseEditUserOptions) {
@@ -86,6 +88,11 @@ export function useEditUser({
 
     if (result.status === "unauthorized") {
       onUnauthorized();
+      return;
+    }
+
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
       return;
     }
 

@@ -17,6 +17,7 @@ import type {
 } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 import { useCreateUser } from "@/lib/use-create-user";
 import { useEditUser } from "@/lib/use-edit-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
@@ -65,7 +66,12 @@ export default function UsersPage() {
     useState<UserSortDirection>("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const handleInactiveAccount = useCallback(() => {
+    clearStoredAuth();
+    router.replace(INACTIVE_ACCOUNT_LOGIN_PATH);
+  }, [router]);
   const createUserFlow = useCreateUser({
+    onInactiveAccount: handleInactiveAccount,
     onUserCreated: (createdUser) => {
       setUsers((currentUsers) => {
         const existingUserIndex = currentUsers.findIndex(
@@ -88,6 +94,7 @@ export default function UsersPage() {
     },
   });
   const editUserFlow = useEditUser({
+    onInactiveAccount: handleInactiveAccount,
     onUserUpdated: (updatedUser) => {
       setUsers((currentUsers) =>
         currentUsers.map((user) =>
@@ -101,12 +108,14 @@ export default function UsersPage() {
     },
   });
   const userRolesFlow = useUserRoles({
+    onInactiveAccount: handleInactiveAccount,
     onUnauthorized: () => {
       clearStoredAuth();
       router.replace("/login");
     },
   });
   const userStatusFlow = useUserStatus({
+    onInactiveAccount: handleInactiveAccount,
     onUserUpdated: (updatedUser) => {
       setUsers((currentUsers) =>
         currentUsers.map((user) =>
@@ -236,11 +245,16 @@ export default function UsersPage() {
         return;
       }
 
+      if (result.status === "inactive_account") {
+        handleInactiveAccount();
+        return;
+      }
+
       setUsers([]);
       setUsersErrorMessage(result.message);
       setUsersStatus("error");
     },
-    [router],
+    [handleInactiveAccount, router],
   );
 
   const refreshUsers = useCallback(() => {

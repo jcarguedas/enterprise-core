@@ -7,11 +7,13 @@ import { defaultMessages as t } from "@/lib/i18n/messages";
 import { createUser, EnterpriseUser } from "@/lib/users-api";
 
 type UseCreateUserOptions = {
+  onInactiveAccount: () => void;
   onUserCreated: (createdUser: EnterpriseUser) => void;
   onUnauthorized: () => void;
 };
 
 export function useCreateUser({
+  onInactiveAccount,
   onUserCreated,
   onUnauthorized,
 }: UseCreateUserOptions) {
@@ -84,6 +86,11 @@ export function useCreateUser({
 
     if (result.status === "unauthorized") {
       onUnauthorized();
+      return;
+    }
+
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
       return;
     }
 

@@ -1,4 +1,5 @@
 import { apiConfig } from "@/lib/api-config";
+import { isInactiveAccountApiResponse } from "@/lib/inactive-account";
 
 export type EnterpriseUser = {
   id: number;
@@ -34,6 +35,10 @@ type UserResponse = ValidationResponse & {
   user?: EnterpriseUser;
 };
 
+type InactiveAccountResult = {
+  status: "inactive_account";
+};
+
 export type CreateUserPayload = {
   name: string;
   email: string;
@@ -55,6 +60,7 @@ export type UsersResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "error";
       message: string;
@@ -68,6 +74,7 @@ export type UserRolesResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "error";
       message: string;
@@ -81,6 +88,7 @@ export type AssignUserRoleResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "validation_error";
       messages: string[];
@@ -98,6 +106,7 @@ export type RemoveUserRoleResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "error";
       message: string;
@@ -111,6 +120,7 @@ export type CreateUserResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "validation_error";
       messages: string[];
@@ -128,6 +138,7 @@ export type UpdateUserResult =
   | {
       status: "unauthorized";
     }
+  | InactiveAccountResult
   | {
       status: "validation_error";
       messages: string[];
@@ -162,6 +173,12 @@ export async function getUsers(token: string): Promise<UsersResult> {
     if (response.status === 401) {
       return {
         status: "unauthorized",
+      };
+    }
+
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
       };
     }
 
@@ -214,6 +231,12 @@ export async function getUserRoles(
       };
     }
 
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
+      };
+    }
+
     if (!response.ok) {
       return {
         status: "error",
@@ -258,6 +281,12 @@ export async function getRoles(token: string): Promise<UserRolesResult> {
     if (response.status === 401) {
       return {
         status: "unauthorized",
+      };
+    }
+
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
       };
     }
 
@@ -313,6 +342,12 @@ export async function assignUserRole(
     if (response.status === 401) {
       return {
         status: "unauthorized",
+      };
+    }
+
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
       };
     }
 
@@ -382,6 +417,12 @@ export async function removeUserRole(
       };
     }
 
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
+      };
+    }
+
     if (!response.ok) {
       return {
         status: "error",
@@ -431,6 +472,12 @@ export async function createUser(
     if (response.status === 401) {
       return {
         status: "unauthorized",
+      };
+    }
+
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
       };
     }
 
@@ -495,6 +542,12 @@ export async function updateUser(
     if (response.status === 401) {
       return {
         status: "unauthorized",
+      };
+    }
+
+    if (isInactiveAccountApiResponse(response, data)) {
+      return {
+        status: "inactive_account",
       };
     }
 
