@@ -706,3 +706,71 @@ Completed a full user access management cycle across the Enterprise Auth Service
 - Consider notification auto-dismiss or progress indicators.
 - Consider pagination, search, and sorting for the Users table.
 - Consider token revocation or request-time blocking for users deactivated after already having an active token.
+
+## 2026-08-21
+
+### Focus
+
+Completed another access-management improvement cycle across Enterprise Admin Web, Enterprise Auth Service, and local mobile testing documentation.
+
+### Completed
+
+- Improved Admin Web status messages:
+  - Added dismissible status messages.
+  - Added auto-dismiss support for success messages.
+  - Added manual dismissal for validation and operation errors.
+  - Kept critical session and users-load errors visible.
+- Improved the Admin Web Users module:
+  - Added client-side search by ID, name, email, and status.
+  - Added sortable columns for ID, Name, Email, and Status.
+  - Added client-side pagination with page size options.
+  - Ensured pagination applies after search and sorting.
+  - Added visible/total counts and filtered empty states.
+- Improved Auth Service inactive-user security:
+  - Added `active-user` middleware.
+  - Protected authenticated API routes from inactive users at request time.
+  - Blocked existing Sanctum tokens after a user becomes inactive.
+  - Returned `403` JSON responses with `Your account is inactive.`.
+  - Preserved generic invalid-credentials behavior for inactive login attempts.
+- Improved Admin Web inactive-account handling:
+  - Detected inactive-account API responses from protected endpoints.
+  - Cleared stored auth when inactive-account responses are received.
+  - Redirected inactive sessions to `/login?reason=inactive-account`.
+  - Displayed `Your account is inactive. Contact an administrator.` on login.
+  - Applied handling across protected session validation, users loading, roles, create/edit user, and status update flows.
+  - Updated the login form to use `method="post"` as a safer fallback when React hydration has not completed.
+- Documented local network and mobile testing for Admin Web:
+  - Backend LAN serving with `php artisan serve --host=0.0.0.0 --port=8000`.
+  - Frontend `.env.local` API URL using `<LAN_IP>`.
+  - Next.js LAN serving with `npm run dev -- -H <LAN_IP>`.
+  - Troubleshooting for `/_next/static` `403` chunks causing hydration failure.
+- Updated Admin Web README documentation for:
+  - Users search and sorting.
+  - Users pagination.
+  - Local network testing.
+
+### Validation
+
+- Admin Web build passed.
+- Admin Web lint passed.
+- Auth Service tests passed:
+  - `63 tests`
+  - `152 assertions`
+- Manual PC and phone testing passed:
+  - Phone login worked on the same WiFi network.
+  - Operator user could not access user management due to missing permissions.
+  - After the operator was deactivated from the PC, the phone session redirected to login with the inactive-account alert.
+- `develop` was pushed after each completed merge.
+
+### Notes
+
+- Search, sorting, and pagination are currently local to the users already loaded from the API.
+- Backend pagination and server-side user search remain future improvements.
+- The inactive-user middleware closes the gap where a previously active user could keep using an existing Sanctum token after deactivation.
+- Binding the Admin Web dev server directly to the LAN IP avoided local mobile hydration failures caused by blocked `/_next/static` chunks in this environment.
+
+### Next Step
+
+- Consider backend pagination and server-side search for larger user directories.
+- Consider documenting the full access-management workflow in portfolio notes.
+- Continue hardening protected admin workflows around account lifecycle events.
