@@ -9,7 +9,11 @@ portfolio-grade user administration workflows.
 - Authentication against the Enterprise Auth API.
 - Protected admin shell with session validation before rendering admin pages.
 - Protected dashboard entry point for authenticated administrators.
+- Permission-aware sidebar and dashboard actions based on `/api/me`
+  permissions.
 - Users module backed by real API data from `GET /api/users`.
+- Users module access gated in the UI by the `manage-users` permission, with
+  backend authorization still treated as the final enforcement layer.
 - User directory with list, refresh, create, and edit workflows.
 - Client-side user search across currently loaded ID, name, email, and status
   values.
@@ -31,8 +35,6 @@ Current limitations:
 - No backend pagination or server-side user search yet; current pagination and
   search are local to the loaded user set.
 - No runtime language switcher yet.
-- No permission-aware dashboard cards yet because `/api/me` does not currently
-  expose permissions.
 
 ## Dashboard
 
@@ -44,7 +46,23 @@ The dashboard includes:
 - Authenticated account summary using the current user's name and email.
 - Session security card explaining that protected content depends on successful
   session validation.
-- Quick access to User Management through a link to `/users`.
+- Quick access to User Management when the authenticated user has
+  `manage-users`.
+- Informational user management access card when the authenticated user does not
+  have `manage-users`.
+
+## Permission-Aware Access
+
+The admin shell validates the current session through `GET /api/me` and uses the
+returned `user.permissions` array for navigation and dashboard UX decisions.
+
+The sidebar keeps Dashboard visible for authenticated users and shows Users only
+when the trusted current user has `manage-users`.
+
+The `/users` page does not request `GET /api/users` when the trusted current
+user lacks `manage-users`; it shows an access-denied message inside the admin
+layout instead. Backend `403 Forbidden` responses remain the fallback authority
+for permission enforcement.
 
 ## User Status Controls
 

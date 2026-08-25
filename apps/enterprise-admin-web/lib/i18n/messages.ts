@@ -84,6 +84,10 @@ export type SharedMessages = {
   validationError: string;
   validatingSession: string;
   protectedWorkspacePlaceholder: string;
+  userManagementUnavailable: string;
+  userManagementUnavailableDescription: string;
+  userManagementAccessDenied: string;
+  userManagementAccessDeniedDescription: string;
 };
 
 export const messages: Record<SupportedLanguage, SharedMessages> = {
@@ -174,6 +178,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     validationError: "Validation error",
     validatingSession: "Validating session...",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
+    userManagementUnavailable: "User Management Unavailable",
+    userManagementUnavailableDescription:
+      "Your account does not currently include access to user management.",
+    userManagementAccessDenied: "Access denied",
+    userManagementAccessDeniedDescription:
+      "Your account does not currently have permission to manage users.",
   },
   es: {
     productName: "Enterprise Core",
@@ -266,6 +276,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     validatingSession: "Validando sesión...",
     protectedWorkspacePlaceholder:
       "Marcador de posición del espacio administrativo protegido.",
+    userManagementUnavailable: "Gestión de usuarios no disponible",
+    userManagementUnavailableDescription:
+      "Tu cuenta no incluye acceso a la gestión de usuarios actualmente.",
+    userManagementAccessDenied: "Acceso denegado",
+    userManagementAccessDeniedDescription:
+      "Tu cuenta no tiene permiso actualmente para administrar usuarios.",
   },
 };
 

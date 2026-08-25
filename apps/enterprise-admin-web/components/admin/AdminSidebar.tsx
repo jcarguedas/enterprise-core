@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type { StoredUser } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
+import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 
-const navigationItems = [
+type NavigationItem = {
+  label: string;
+  href: string;
+  permission?: string;
+};
+
+const navigationItems: NavigationItem[] = [
   {
     label: "Dashboard",
     href: "/dashboard",
@@ -13,6 +21,7 @@ const navigationItems = [
   {
     label: "Users",
     href: "/users",
+    permission: MANAGE_USERS_PERMISSION,
   },
   {
     label: "Roles",
@@ -24,8 +33,15 @@ const navigationItems = [
   },
 ];
 
-export function AdminSidebar() {
+type AdminSidebarProps = {
+  trustedUser: StoredUser | null;
+};
+
+export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
   const pathname = usePathname();
+  const visibleNavigationItems = navigationItems.filter(
+    (item) => !item.permission || hasPermission(trustedUser, item.permission),
+  );
 
   return (
     <aside className="border-b border-[#d8dee8] bg-[#101827] text-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
@@ -43,7 +59,7 @@ export function AdminSidebar() {
         </div>
 
         <nav className="flex gap-2 overflow-x-auto px-4 py-4 lg:flex-col lg:overflow-visible lg:px-4 lg:py-6">
-          {navigationItems.map((item) => (
+          {visibleNavigationItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}

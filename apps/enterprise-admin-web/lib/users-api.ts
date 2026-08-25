@@ -60,6 +60,9 @@ export type UsersResult =
   | {
       status: "unauthorized";
     }
+  | {
+      status: "forbidden";
+    }
   | InactiveAccountResult
   | {
       status: "error";
@@ -179,6 +182,12 @@ export async function getUsers(token: string): Promise<UsersResult> {
     if (isInactiveAccountApiResponse(response, data)) {
       return {
         status: "inactive_account",
+      };
+    }
+
+    if (response.status === 403) {
+      return {
+        status: "forbidden",
       };
     }
 

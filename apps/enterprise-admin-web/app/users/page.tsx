@@ -18,6 +18,7 @@ import type {
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
 import { defaultMessages as t } from "@/lib/i18n/messages";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
+import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 import { useCreateUser } from "@/lib/use-create-user";
 import { useEditUser } from "@/lib/use-edit-user";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
@@ -26,7 +27,7 @@ import { useUserStatus } from "@/lib/use-user-status";
 import { getUsers } from "@/lib/users-api";
 import type { EnterpriseUser } from "@/lib/users-api";
 
-type UsersLoadStatus = "idle" | "loading" | "ready" | "error";
+type UsersLoadStatus = "idle" | "loading" | "ready" | "error" | "access_denied";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
@@ -66,6 +67,10 @@ export default function UsersPage() {
     useState<UserSortDirection>("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const canManageUsers = hasPermission(trustedUser, MANAGE_USERS_PERMISSION);
+  const isAccessDenied =
+    (status === "ready" && !canManageUsers) ||
+    usersStatus === "access_denied";
   const handleInactiveAccount = useCallback(() => {
     clearStoredAuth();
     router.replace(INACTIVE_ACCOUNT_LOGIN_PATH);
@@ -216,6 +221,10 @@ export default function UsersPage() {
     ) => {
       const { isRefresh = false, shouldApplyResult = () => true } = options;
 
+      if (!canManageUsers) {
+        return;
+      }
+
       setUsersStatus("loading");
       setUsersErrorMessage("");
 
@@ -250,14 +259,24 @@ export default function UsersPage() {
         return;
       }
 
+      if (result.status === "forbidden") {
+        setUsers([]);
+        setUsersStatus("access_denied");
+        return;
+      }
+
       setUsers([]);
       setUsersErrorMessage(result.message);
       setUsersStatus("error");
     },
-    [handleInactiveAccount, router],
+    [canManageUsers, handleInactiveAccount, router],
   );
 
   const refreshUsers = useCallback(() => {
+    if (!canManageUsers) {
+      return;
+    }
+
     const token = getStoredToken();
 
     if (!token) {
@@ -267,7 +286,7 @@ export default function UsersPage() {
     }
 
     loadUsers(token, { isRefresh: true });
-  }, [loadUsers, router]);
+  }, [canManageUsers, loadUsers, router]);
 
   function handleShowCreateUserForm() {
     if (
@@ -354,6 +373,10 @@ export default function UsersPage() {
       return;
     }
 
+    if (!canManageUsers) {
+      return;
+    }
+
     let isCurrent = true;
     const token = getStoredToken();
 
@@ -374,11 +397,12 @@ export default function UsersPage() {
     return () => {
       isCurrent = false;
     };
-  }, [loadUsers, router, status]);
+  }, [canManageUsers, loadUsers, router, status]);
 
   return (
     <AdminShell
       userDisplayName={userDisplayName}
+      trustedUser={trustedUser}
       isLoggingOut={isLoggingOut}
       onLogout={logout}
     >
@@ -401,17 +425,30 @@ export default function UsersPage() {
           </StatusMessage>
         ) : null}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {usersSummaryCards.map((card) => (
-            <SummaryCard
-              key={card.title}
-              title={card.title}
-              description={card.getDescription(users)}
-            />
-          ))}
-        </div>
+        {isAccessDenied ? (
+          <section className="mt-6 rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+            <h2 className="text-base font-semibold text-[#0f172a]">
+              {t.userManagementAccessDenied}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[#475569]">
+              {t.userManagementAccessDeniedDescription}
+            </p>
+          </section>
+        ) : null}
 
-        <section className="mt-6 rounded-lg border border-[#d8dee8] bg-white shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+        {!isAccessDenied ? (
+          <>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {usersSummaryCards.map((card) => (
+                <SummaryCard
+                  key={card.title}
+                  title={card.title}
+                  description={card.getDescription(users)}
+                />
+              ))}
+            </div>
+
+            <section className="mt-6 rounded-lg border border-[#d8dee8] bg-white shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
           <div className="flex flex-col gap-2 border-b border-[#e2e8f0] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-base font-semibold text-[#0f172a]">
@@ -681,7 +718,9 @@ export default function UsersPage() {
               />
             </>
           ) : null}
-        </section>
+            </section>
+          </>
+        ) : null}
       </div>
     </AdminShell>
   );
