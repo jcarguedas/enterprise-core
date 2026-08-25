@@ -923,3 +923,50 @@ Completed a second Admin Web UX pass focused on runtime language switching, oper
 ### Next Step
 
 - Plan the next Admin Web feature independently, likely dark mode/theme switching or another focused UX improvement.
+
+## 2026-08-25 - Later Update
+
+### Focus
+
+Added runtime light/dark theme switching to Enterprise Admin Web and made the main admin surfaces theme-aware.
+
+### Completed
+
+- Added runtime Light/Dark theme switching to Admin Web.
+- Added a reusable `ThemeSelector` component.
+- Added a `useTheme` hook.
+- Stored the selected theme in `localStorage` using `enterprise_core_theme`.
+- Applied the selected theme globally through `document.documentElement.dataset.theme`.
+- Added a theme initializer script in `app/layout.tsx` to reduce theme flicker before hydration.
+- Added EN/ES i18n labels for Theme, Light, and Dark.
+- Added the theme selector next to the language selector on:
+  - `/`
+  - `/login`
+  - Protected `AdminHeader`
+- Added CSS variables in `globals.css` for light and dark theme tokens.
+- Added reusable theme-aware utility classes for backgrounds, cards, panels, buttons, inputs, badges, status messages, tables, and shell surfaces.
+- Updated public pages, dashboard, users, roles, forms, toasts, access-denied state, page headers, and summary cards for theme-aware styling.
+- Updated the Admin Web README with Theme Switching documentation.
+- Merged and pushed the completed feature to `develop`.
+
+### Validation
+
+- Manual visual check passed in dark mode for:
+  - `/`
+  - `/login`
+  - `/dashboard`
+  - `/users`
+  - `/roles`
+- EN/ES switching still worked.
+- Theme persisted after refresh.
+- Admin Web lint passed.
+- Admin Web build passed.
+
+### Planning Notes
+
+- Keep future theme changes focused on contrast, consistency, and small reusable tokens.
+- Future architecture notes should capture local-first Enterprise Core, optional cloud licensing/update network, future Electronic Invoicing CR, and an AI-ready Enterprise Command Center.
+
+### Next Step
+
+- Continue with the next focused Admin Web or architecture improvement.
