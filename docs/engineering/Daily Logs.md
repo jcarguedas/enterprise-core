@@ -872,3 +872,54 @@ Completed the current-user permissions contract in Enterprise Auth Service and m
 ### Next Step
 
 - Start runtime EN/ES language switching as the next focused Admin Web feature.
+
+## 2026-08-25 - Later Update
+
+### Focus
+
+Completed a second Admin Web UX pass focused on runtime language switching, operation feedback, reusable restricted-access states, and read-only roles visibility.
+
+### Completed
+
+- Added runtime EN/ES language switching to Admin Web.
+- Added a reusable `LanguageSelector` component.
+- Stored the selected locale in `localStorage`.
+- Added the language selector to the protected `AdminHeader`.
+- Extended i18n coverage across Admin Web pages and components.
+- Added a reusable `ToastProvider`.
+- Added floating toast notifications for non-critical successful operations:
+  - User created.
+  - User updated.
+  - User activated or deactivated.
+  - Role assigned.
+  - Role removed.
+- Kept critical session, access, load, and validation errors inline.
+- Added a reusable `AccessDeniedState` component.
+- Updated `/users` to use the reusable access-denied state.
+- Added EN/ES messages for restricted state and the back-to-dashboard action.
+- Added a read-only `/roles` page using `GET /api/roles`.
+- Protected `/roles` visually with `manage-users` and reused `AccessDeniedState`.
+- Added loading, empty, error, and access-denied states for roles.
+- Updated the sidebar Roles link to point to `/roles`.
+- Completed dashboard i18n by replacing remaining hardcoded English strings.
+- Added language switching to public pages:
+  - `/`
+  - `/login`
+- Translated the main visible landing page and login page text.
+- Preserved login behavior, including `method="post"`, inactive-account messaging, stored-token redirect, and API login handling.
+- Updated the Admin Web README for language switching, toast notifications, reusable access-denied state, and the read-only Roles page.
+- Merged and pushed each completed feature to `develop`.
+
+### Validation
+
+- Admin Web build passed after each feature.
+- Admin Web lint passed after each feature.
+
+### Planning Notes
+
+- Dark mode/theme switching should remain a separate future feature with careful contrast checks.
+- Future architecture notes should capture local-first Enterprise Core, optional cloud licensing/update network, future Electronic Invoicing CR, and an AI-ready Enterprise Command Center.
+
+### Next Step
+
+- Plan the next Admin Web feature independently, likely dark mode/theme switching or another focused UX improvement.
