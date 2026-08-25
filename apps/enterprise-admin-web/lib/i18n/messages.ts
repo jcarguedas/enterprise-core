@@ -10,6 +10,19 @@ export type SharedMessages = {
   logout: string;
   signingOut: string;
   dashboard: string;
+  dashboardDescription: string;
+  dashboardWelcome: string;
+  administratorFallback: string;
+  unavailable: string;
+  accountSummary: string;
+  signedIn: string;
+  sessionSecurity: string;
+  authenticated: string;
+  sessionSecurityDescription: string;
+  userManagement: string;
+  ready: string;
+  userManagementDescription: string;
+  manageUsers: string;
   users: string;
   roles: string;
   rolesDescription: string;
@@ -120,6 +133,22 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     logout: "Logout",
     signingOut: "Signing out...",
     dashboard: "Dashboard",
+    dashboardDescription:
+      "Protected admin workspace for Enterprise Core operations.",
+    dashboardWelcome: "Welcome, {name}.",
+    administratorFallback: "administrator",
+    unavailable: "Unavailable",
+    accountSummary: "Account Summary",
+    signedIn: "Signed in",
+    sessionSecurity: "Session Security",
+    authenticated: "Authenticated",
+    sessionSecurityDescription:
+      "This workspace validates your stored session with the Enterprise Auth Service before protected admin content is shown.",
+    userManagement: "User Management",
+    ready: "Ready",
+    userManagementDescription:
+      "Review enterprise users, manage account status, and maintain role assignments from the Users workspace.",
+    manageUsers: "Manage users",
     users: "Users",
     roles: "Roles",
     rolesDescription:
@@ -317,6 +346,22 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     logout: "Cerrar sesión",
     signingOut: "Cerrando sesión...",
     dashboard: "Dashboard",
+    dashboardDescription:
+      "Espacio administrativo protegido para operaciones de Enterprise Core.",
+    dashboardWelcome: "Bienvenido, {name}.",
+    administratorFallback: "administrador",
+    unavailable: "No disponible",
+    accountSummary: "Resumen de cuenta",
+    signedIn: "Sesión iniciada",
+    sessionSecurity: "Seguridad de sesión",
+    authenticated: "Autenticado",
+    sessionSecurityDescription:
+      "Este espacio valida tu sesión almacenada con Enterprise Auth Service antes de mostrar contenido administrativo protegido.",
+    userManagement: "Gestión de usuarios",
+    ready: "Listo",
+    userManagementDescription:
+      "Revisa usuarios empresariales, administra el estado de cuentas y mantiene asignaciones de roles desde el espacio de Usuarios.",
+    manageUsers: "Administrar usuarios",
     roles: "Roles",
     rolesDescription:
       "Revisa roles empresariales y su disponibilidad actual para flujos de acceso.",
