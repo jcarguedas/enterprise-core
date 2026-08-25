@@ -93,6 +93,8 @@ export type SharedMessages = {
   userManagementUnavailableDescription: string;
   userManagementAccessDenied: string;
   userManagementAccessDeniedDescription: string;
+  restricted: string;
+  backToDashboard: string;
   language: string;
   english: string;
   spanish: string;
@@ -199,6 +201,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementAccessDenied: "Access denied",
     userManagementAccessDeniedDescription:
       "Your account does not currently have permission to manage users.",
+    restricted: "Restricted",
+    backToDashboard: "Back to Dashboard",
     language: "Language",
     english: "English",
     spanish: "Spanish",
@@ -307,6 +311,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementAccessDenied: "Acceso denegado",
     userManagementAccessDeniedDescription:
       "Tu cuenta no tiene permiso actualmente para administrar usuarios.",
+    restricted: "Restringido",
+    backToDashboard: "Volver al Dashboard",
     language: "Idioma",
     english: "Inglés",
     spanish: "Español",

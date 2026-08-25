@@ -83,6 +83,10 @@ user lacks `manage-users`; it shows an access-denied message inside the admin
 layout instead. Backend `403 Forbidden` responses remain the fallback authority
 for permission enforcement.
 
+Access-denied states use a reusable admin component so future protected modules
+can present the same restricted-access pattern with a clear explanation and a
+return path to `/dashboard`.
+
 ## User Status Controls
 
 The Users module displays each user's active or inactive status from the
