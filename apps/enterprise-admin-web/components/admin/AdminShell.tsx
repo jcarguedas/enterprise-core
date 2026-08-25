@@ -2,10 +2,12 @@ import { ReactNode } from "react";
 
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import type { StoredUser } from "@/lib/auth-storage";
 
 type AdminShellProps = {
   children: ReactNode;
   userDisplayName: string;
+  trustedUser: StoredUser | null;
   isLoggingOut: boolean;
   onLogout: () => void;
 };
@@ -13,13 +15,14 @@ type AdminShellProps = {
 export function AdminShell({
   children,
   userDisplayName,
+  trustedUser,
   isLoggingOut,
   onLogout,
 }: AdminShellProps) {
   return (
     <main className="min-h-screen bg-[#f4f6f9] text-[#111827]">
       <div className="min-h-screen lg:flex">
-        <AdminSidebar />
+        <AdminSidebar trustedUser={trustedUser} />
         <div className="flex min-w-0 flex-1 flex-col">
           <AdminHeader
             userDisplayName={userDisplayName}

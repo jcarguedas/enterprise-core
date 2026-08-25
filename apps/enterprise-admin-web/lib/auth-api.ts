@@ -1,12 +1,15 @@
 import { apiConfig } from "@/lib/api-config";
-import { StoredUser } from "@/lib/auth-storage";
+import { normalizeStoredUser } from "@/lib/auth-storage";
+import type { StoredUser, StoredUserInput } from "@/lib/auth-storage";
 import { isInactiveAccountApiResponse } from "@/lib/inactive-account";
 
 type CurrentUserResponse = {
-  user?: StoredUser;
+  user?: StoredUserInput;
   id?: number;
   name?: string;
   email?: string;
+  roles?: StoredUserInput["roles"];
+  permissions?: StoredUserInput["permissions"];
   message?: string;
 };
 
@@ -42,15 +45,17 @@ export type LogoutResult =
 
 function getUserFromResponse(data: CurrentUserResponse): StoredUser | null {
   if (data.user) {
-    return data.user;
+    return normalizeStoredUser(data.user);
   }
 
   if (data.id && data.name && data.email) {
-    return {
+    return normalizeStoredUser({
       id: data.id,
       name: data.name,
       email: data.email,
-    };
+      roles: data.roles,
+      permissions: data.permissions,
+    });
   }
 
   return null;

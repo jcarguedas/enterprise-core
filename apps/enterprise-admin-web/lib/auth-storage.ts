@@ -2,10 +2,28 @@ export const TOKEN_STORAGE_KEY = "enterprise_core_token";
 export const USER_STORAGE_KEY = "enterprise_core_user";
 const AUTH_STORAGE_EVENT = "enterprise-core-auth-storage";
 
+export type StoredRole = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_active: boolean;
+};
+
 export type StoredUser = {
   id: number;
   name: string;
   email: string;
+  roles: StoredRole[];
+  permissions: string[];
+};
+
+export type StoredUserInput = {
+  id: number;
+  name: string;
+  email: string;
+  roles?: StoredRole[];
+  permissions?: string[];
 };
 
 function isBrowser() {
@@ -52,7 +70,7 @@ export function parseStoredUser(storedUser: string | null): StoredUser | null {
   }
 
   try {
-    return JSON.parse(storedUser) as StoredUser;
+    return normalizeStoredUser(JSON.parse(storedUser) as StoredUserInput);
   } catch {
     return null;
   }
@@ -62,22 +80,42 @@ export function getStoredUser(): StoredUser | null {
   return parseStoredUser(getStoredUserJson());
 }
 
-export function storeAuth(token: string, user: StoredUser) {
+export function normalizeStoredUser(user: StoredUserInput): StoredUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    roles: Array.isArray(user.roles) ? user.roles : [],
+    permissions: Array.isArray(user.permissions)
+      ? user.permissions.filter(
+          (permission): permission is string => typeof permission === "string",
+        )
+      : [],
+  };
+}
+
+export function storeAuth(token: string, user: StoredUserInput) {
   if (!isBrowser()) {
     return;
   }
 
   localStorage.setItem(TOKEN_STORAGE_KEY, token);
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  localStorage.setItem(
+    USER_STORAGE_KEY,
+    JSON.stringify(normalizeStoredUser(user)),
+  );
   emitAuthStorageChange();
 }
 
-export function storeUser(user: StoredUser) {
+export function storeUser(user: StoredUserInput) {
   if (!isBrowser()) {
     return;
   }
 
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  localStorage.setItem(
+    USER_STORAGE_KEY,
+    JSON.stringify(normalizeStoredUser(user)),
+  );
   emitAuthStorageChange();
 }
 
