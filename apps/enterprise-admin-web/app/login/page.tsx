@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 
+import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
@@ -21,7 +22,7 @@ type LoginResponse = {
   errors?: Record<string, string[]>;
 };
 
-function getLoginErrorMessage(response: LoginResponse) {
+function getLoginErrorMessage(response: LoginResponse, fallbackMessage: string) {
   if (response.errors) {
     const messages = Object.values(response.errors).flat();
 
@@ -30,7 +31,7 @@ function getLoginErrorMessage(response: LoginResponse) {
     }
   }
 
-  return response.message ?? "Unable to sign in. Please verify your credentials.";
+  return response.message ?? fallbackMessage;
 }
 
 function LoginContent() {
@@ -77,21 +78,19 @@ function LoginContent() {
       const data = (await response.json().catch(() => ({}))) as LoginResponse;
 
       if (!response.ok) {
-        setErrorMessage(getLoginErrorMessage(data));
+        setErrorMessage(getLoginErrorMessage(data, t.loginDefaultError));
         return;
       }
 
       if (!data.token || !data.user) {
-        setErrorMessage("The login response was incomplete. Please try again.");
+        setErrorMessage(t.loginIncompleteResponse);
         return;
       }
 
       storeAuth(data.token, data.user);
       router.push("/dashboard");
     } catch {
-      setErrorMessage(
-        "Unable to reach the auth service. Please confirm it is running and try again.",
-      );
+      setErrorMessage(t.authServiceUnavailable);
     } finally {
       setIsSubmitting(false);
     }
@@ -114,38 +113,40 @@ function LoginContent() {
               </p>
             </div>
           </div>
-          <Link
-            href="/"
-            className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
-          >
-            {t.backToOverview}
-          </Link>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <LanguageSelector />
+            <Link
+              href="/"
+              className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+            >
+              {t.backToOverview}
+            </Link>
+          </div>
         </header>
 
         <div className="grid flex-1 items-center gap-10 py-14 lg:grid-cols-[0.92fr_1fr] lg:py-16">
           <div className="max-w-xl">
             <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
-              Secure operations console
+              {t.loginEyebrow}
             </p>
             <h1 className="text-4xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-5xl">
               {t.productName}
             </h1>
             <p className="mt-4 text-2xl font-medium text-[#1f3a5f]">
-              Admin Web Access
+              {t.loginTitle}
             </p>
             <p className="mt-6 text-base leading-7 text-[#475569]">
-              Access is controlled by enterprise administrators. Use your
-              assigned credentials to enter the protected admin workspace.
+              {t.loginDescription}
             </p>
           </div>
 
           <div className="w-full max-w-md justify-self-center rounded-lg border border-[#cbd5e1] bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.10)] sm:p-8 lg:justify-self-end">
             <div className="border-b border-[#e2e8f0] pb-5">
               <p className="text-sm font-semibold text-[#0f172a]">
-                Sign in to admin
+                {t.signInToAdmin}
               </p>
               <p className="mt-1 text-sm text-[#64748b]">
-                Enterprise-controlled access portal
+                {t.accessPortal}
               </p>
             </div>
 
@@ -164,7 +165,7 @@ function LoginContent() {
                   htmlFor="email"
                   className="block text-sm font-medium text-[#334155]"
                 >
-                  Email
+                  {t.email}
                 </label>
                 <input
                   id="email"
@@ -185,7 +186,7 @@ function LoginContent() {
                   htmlFor="password"
                   className="block text-sm font-medium text-[#334155]"
                 >
-                  Password
+                  {t.password}
                 </label>
                 <input
                   id="password"
@@ -197,7 +198,7 @@ function LoginContent() {
                   onChange={(event) => setPassword(event.target.value)}
                   disabled={isSubmitting}
                   className="mt-2 block h-12 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
-                  placeholder="Enter your password"
+                  placeholder={t.passwordPlaceholder}
                 />
               </div>
 

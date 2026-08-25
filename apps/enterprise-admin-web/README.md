@@ -45,7 +45,8 @@ English is the default language. The selected locale is stored in
 `localStorage` and reused across page navigation and future sessions in the same
 browser.
 
-The language selector appears in the protected admin header.
+The language selector appears in the public landing page, login page, and
+protected admin header.
 
 ## Toast Notifications
 
