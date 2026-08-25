@@ -55,15 +55,15 @@ export function UserRolesPanel({
   );
 
   return (
-    <section className="border-b border-[#e2e8f0] bg-[#fbfcfe] px-5 py-5">
+    <section className="app-form-panel border-b px-5 py-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-[#0f172a]">
+          <h3 className="app-text text-base font-semibold">
             {t.userRoles}
           </h3>
-          <p className="mt-1 text-sm text-[#475569]">
-            <span className="font-medium text-[#172033]">{user.name}</span>
-            <span className="mx-2 text-[#94a3b8]">/</span>
+          <p className="app-muted mt-1 text-sm">
+            <span className="app-text font-medium">{user.name}</span>
+            <span className="app-subtle mx-2">/</span>
             {user.email}
           </p>
         </div>
@@ -71,7 +71,7 @@ export function UserRolesPanel({
           type="button"
           onClick={onClose}
           disabled={isLoading || isAssigningRole || removingRoleId !== null}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
         >
           {t.close}
         </button>
@@ -95,8 +95,8 @@ export function UserRolesPanel({
       ) : null}
 
       {!isLoading && !errorMessage ? (
-        <div className="mt-5 rounded-md border border-[#d8dee8] bg-white p-4">
-          <h4 className="text-sm font-semibold text-[#0f172a]">
+        <div className="app-card mt-5 rounded-md border p-4 shadow-sm">
+          <h4 className="app-text text-sm font-semibold">
             {t.assignRole}
           </h4>
 
@@ -132,7 +132,7 @@ export function UserRolesPanel({
               <div>
                 <label
                   htmlFor="assign-user-role"
-                  className="block text-sm font-medium text-[#334155]"
+                  className="app-muted block text-sm font-medium"
                 >
                   {t.availableRoles}
                 </label>
@@ -145,7 +145,7 @@ export function UserRolesPanel({
                   disabled={
                     isLoading || isAssigningRole || removingRoleId !== null
                   }
-                  className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+                  className="app-input mt-2 block h-11 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
                 >
                   <option value="">{t.selectRole}</option>
                   {assignableRoles.map((role) => (
@@ -165,7 +165,7 @@ export function UserRolesPanel({
                   removingRoleId !== null ||
                   !selectedRoleId
                 }
-                className="inline-flex h-11 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                className="app-button-primary inline-flex h-11 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
               >
                 {isAssigningRole ? t.assigningRole : t.assignRole}
               </button>
@@ -185,16 +185,16 @@ export function UserRolesPanel({
           {roles.map((role) => (
             <article
               key={role.id}
-              className="rounded-md border border-[#d8dee8] bg-white p-4 shadow-sm"
+              className="app-card rounded-md border p-4 shadow-sm"
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h4 className="text-sm font-semibold text-[#0f172a]">
+                  <h4 className="app-text text-sm font-semibold">
                     {role.name}
                   </h4>
-                  <p className="mt-1 text-xs font-medium text-[#64748b]">
+                  <p className="app-subtle mt-1 text-xs font-medium">
                     {t.roleSlug}:{" "}
-                    <span className="font-semibold text-[#334155]">
+                    <span className="app-muted font-semibold">
                       {role.slug}
                     </span>
                   </p>
@@ -202,8 +202,8 @@ export function UserRolesPanel({
                 <span
                   className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
                     role.is_active
-                      ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-                      : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
+                      ? "app-badge-success"
+                      : "app-badge-neutral"
                   }`}
                 >
                   {t.roleStatus}: {role.is_active ? t.active : t.inactive}
@@ -211,7 +211,7 @@ export function UserRolesPanel({
               </div>
 
               {role.description ? (
-                <p className="mt-3 text-sm leading-6 text-[#475569]">
+                <p className="app-muted mt-3 text-sm leading-6">
                   {role.description}
                 </p>
               ) : null}
@@ -225,7 +225,7 @@ export function UserRolesPanel({
                     isAssigningRole ||
                     (removingRoleId !== null && removingRoleId !== role.id)
                   }
-                  className="inline-flex h-9 items-center justify-center rounded-md border border-[#f1b8b8] bg-white px-3 text-xs font-semibold text-[#9b2c2c] shadow-sm transition-colors hover:bg-[#fff5f5] focus:outline-none focus:ring-2 focus:ring-[#9b2c2c] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[#e2e8f0] disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                  className="app-danger-button inline-flex h-9 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-error-text)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[var(--app-border)] disabled:bg-[var(--app-surface-muted)] disabled:text-[var(--app-text-subtle)]"
                 >
                   {removingRoleId === role.id ? t.removingRole : t.removeRole}
                 </button>

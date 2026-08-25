@@ -72,7 +72,7 @@ export function UsersTable({
         <button
           type="button"
           onClick={() => onSort(headerSortKey)}
-          className="inline-flex items-center gap-1 font-semibold uppercase text-[#64748b] transition-colors hover:text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+          className="app-subtle inline-flex items-center gap-1 font-semibold uppercase transition-colors hover:text-[var(--app-text)] focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
           aria-label={getSortButtonLabel(headerSortKey)}
         >
           <span>{label}</span>
@@ -86,8 +86,8 @@ export function UsersTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-[#e2e8f0] text-left text-sm">
-        <thead className="bg-[#f8fafc] text-xs font-semibold uppercase text-[#64748b]">
+      <table className="min-w-full divide-y divide-[var(--app-border)] text-left text-sm">
+        <thead className="app-table-head text-xs font-semibold uppercase">
           <tr>
             {renderSortableHeader("id", t.id)}
             {renderSortableHeader("name", t.name)}
@@ -98,7 +98,7 @@ export function UsersTable({
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#edf2f7] bg-white">
+        <tbody className="app-table-body divide-y">
           {users.length > 0 ? (
             users.map((user) => {
               const isOwnActiveUser =
@@ -114,21 +114,21 @@ export function UsersTable({
 
               return (
                 <tr key={user.id}>
-                  <td className="whitespace-nowrap px-5 py-4 font-medium text-[#334155]">
+                  <td className="app-muted whitespace-nowrap px-5 py-4 font-medium">
                     {user.id}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-4 font-medium text-[#0f172a]">
+                  <td className="app-text whitespace-nowrap px-5 py-4 font-medium">
                     {user.name}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-4 text-[#475569]">
+                  <td className="app-muted whitespace-nowrap px-5 py-4">
                     {user.email}
                   </td>
                   <td className="whitespace-nowrap px-5 py-4">
                     <span
                       className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
                         user.is_active
-                          ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-                          : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
+                          ? "app-badge-success"
+                          : "app-badge-neutral"
                       }`}
                     >
                       {user.is_active ? t.active : t.inactive}
@@ -140,7 +140,7 @@ export function UsersTable({
                         type="button"
                         onClick={() => onViewRoles(user)}
                         disabled={isActionsDisabled}
-                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        className="app-button-secondary inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                         aria-label={`${t.viewRoles}: ${user.name}`}
                       >
                         {t.viewRoles}
@@ -149,7 +149,7 @@ export function UsersTable({
                         type="button"
                         onClick={() => onEditUser(user)}
                         disabled={isActionsDisabled}
-                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        className="app-button-secondary inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                         aria-label={`${t.editUser}: ${user.name}`}
                       >
                         {t.edit}
@@ -163,7 +163,7 @@ export function UsersTable({
                             ? t.cannotDeactivateOwnAccount
                             : undefined
                         }
-                        className="inline-flex h-8 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-xs font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                        className="app-button-secondary inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                         aria-label={statusActionAccessibleLabel}
                       >
                         {updatingUserStatusId === user.id
@@ -181,7 +181,7 @@ export function UsersTable({
             <tr>
               <td
                 colSpan={5}
-                className="px-5 py-6 text-center text-sm text-[#64748b]"
+                className="app-subtle px-5 py-6 text-center text-sm"
               >
                 {emptyMessage}
               </td>

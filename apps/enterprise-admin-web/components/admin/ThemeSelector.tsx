@@ -3,30 +3,32 @@
 import { useId } from "react";
 
 import { useI18n } from "@/lib/i18n/use-i18n";
+import { useTheme } from "@/lib/theme/use-theme";
 
-type LanguageSelectorProps = {
+type ThemeSelectorProps = {
   className?: string;
 };
 
-export function LanguageSelector({ className = "" }: LanguageSelectorProps) {
+export function ThemeSelector({ className = "" }: ThemeSelectorProps) {
   const inputId = useId();
-  const { locale, messages: t, setLocale } = useI18n();
+  const { messages: t } = useI18n();
+  const { setTheme, theme } = useTheme();
 
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
       <label htmlFor={inputId} className="app-muted text-sm font-semibold">
-        {t.language}
+        {t.theme}
       </label>
       <select
         id={inputId}
-        value={locale}
+        value={theme}
         onChange={(event) =>
-          setLocale(event.target.value === "es" ? "es" : "en")
+          setTheme(event.target.value === "dark" ? "dark" : "light")
         }
         className="app-input h-10 rounded-md border px-3 text-sm font-semibold shadow-sm outline-none transition-colors"
       >
-        <option value="en">EN - {t.english}</option>
-        <option value="es">ES - {t.spanish}</option>
+        <option value="light">{t.light}</option>
+        <option value="dark">{t.dark}</option>
       </select>
     </div>
   );

@@ -17,11 +17,9 @@ type StatusMessageProps = {
 const DEFAULT_AUTO_DISMISS_MS = 5000;
 
 const variantClasses = {
-  info: "text-[#475569]",
-  success:
-    "rounded-md border border-[#b7dcc7] bg-[#f3fbf6] px-4 py-3 leading-6 text-[#276749]",
-  error:
-    "rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 leading-6 text-[#9b2c2c]",
+  info: "app-muted",
+  success: "app-status-success rounded-md border px-4 py-3 leading-6",
+  error: "app-status-error rounded-md border px-4 py-3 leading-6",
 };
 
 const progressClasses = {
