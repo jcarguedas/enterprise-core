@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { updateUser } from "@/lib/users-api";
 import type { EnterpriseUser } from "@/lib/users-api";
 
@@ -18,6 +18,7 @@ export function useUserStatus({
   onUnauthorized,
   onUserUpdated,
 }: UseUserStatusOptions) {
+  const { messages: t } = useI18n();
   const [updatingUserStatusId, setUpdatingUserStatusId] = useState<
     number | null
   >(null);

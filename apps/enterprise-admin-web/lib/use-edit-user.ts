@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { EnterpriseUser, updateUser } from "@/lib/users-api";
 
 type UseEditUserOptions = {
@@ -17,6 +17,7 @@ export function useEditUser({
   onUserUpdated,
   onUnauthorized,
 }: UseEditUserOptions) {
+  const { messages: t } = useI18n();
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [name, setName] = useState("");

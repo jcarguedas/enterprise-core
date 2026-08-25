@@ -1,7 +1,9 @@
+"use client";
+
 import type { FormEventHandler } from "react";
 
 import { StatusMessage } from "@/components/admin/StatusMessage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 
 type CreateUserFormProps = {
   name: string;
@@ -34,6 +36,8 @@ export function CreateUserForm({
   onCancel,
   onClearErrorMessages,
 }: CreateUserFormProps) {
+  const { messages: t } = useI18n();
+
   return (
     <form
       className="border-b border-[#e2e8f0] bg-[#fbfcfe] px-5 py-5"

@@ -6,7 +6,7 @@ import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_REASON } from "@/lib/inactive-account";
 
 type LoginResponse = {
@@ -36,6 +36,7 @@ function getLoginErrorMessage(response: LoginResponse) {
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { messages: t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -205,7 +206,7 @@ function LoginContent() {
                 disabled={isSubmitting}
                 className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
               >
-                {isSubmitting ? "Signing in..." : t.signIn}
+                {isSubmitting ? t.signingIn : t.signIn}
               </button>
             </form>
           </div>

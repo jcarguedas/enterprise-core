@@ -10,13 +10,14 @@ import {
   StoredUser,
   storeUser,
 } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 
 export type SessionStatus = "checking" | "ready" | "error";
 
 export function useProtectedAdminSession() {
   const router = useRouter();
+  const { messages: t } = useI18n();
   const [trustedUser, setTrustedUser] = useState<StoredUser | null>(null);
   const [status, setStatus] = useState<SessionStatus>("checking");
   const [errorMessage, setErrorMessage] = useState("");
@@ -93,7 +94,7 @@ export function useProtectedAdminSession() {
   const userDisplayName =
     trustedUser?.name ||
     trustedUser?.email ||
-    (status === "checking" ? t.validatingSession : "Session unavailable");
+    (status === "checking" ? t.validatingSession : t.sessionUnavailable);
 
   return {
     errorMessage,

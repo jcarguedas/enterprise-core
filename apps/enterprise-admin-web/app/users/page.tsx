@@ -16,7 +16,7 @@ import type {
   UserSortKey,
 } from "@/components/admin/users/UsersTable";
 import { clearStoredAuth, getStoredToken } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 import { useCreateUser } from "@/lib/use-create-user";
@@ -31,24 +31,9 @@ type UsersLoadStatus = "idle" | "loading" | "ready" | "error" | "access_denied";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
-const usersSummaryCards = [
-  {
-    title: t.userDirectory,
-    getDescription: (users: EnterpriseUser[]) =>
-      `${users.length} enterprise account${users.length === 1 ? "" : "s"} available.`,
-  },
-  {
-    title: t.roleAssignments,
-    getDescription: () => t.roleAssignmentsDescription,
-  },
-  {
-    title: t.accessStatus,
-    getDescription: () => t.accessStatusDescription,
-  },
-];
-
 export default function UsersPage() {
   const router = useRouter();
+  const { messages: t } = useI18n();
   const {
     errorMessage,
     isLoggingOut,
@@ -192,7 +177,14 @@ export default function UsersPage() {
         return comparison * sortMultiplier;
       })
       .map(({ user }) => user);
-  }, [normalizedSearchQuery, sortDirection, sortKey, users]);
+  }, [
+    normalizedSearchQuery,
+    sortDirection,
+    sortKey,
+    t.active,
+    t.inactive,
+    users,
+  ]);
   const usersCountMessage = t.showingUsersCount
     .replace("{visible}", displayedUsers.length.toString())
     .replace("{total}", users.length.toString());
@@ -210,6 +202,26 @@ export default function UsersPage() {
     users.length > 0 && normalizedSearchQuery
       ? t.noUsersMatchSearch
       : t.noUsersReturned;
+  const usersSummaryCards = [
+    {
+      title: t.userDirectory,
+      getDescription: (users: EnterpriseUser[]) =>
+        users.length === 1
+          ? t.enterpriseAccountAvailable
+          : t.enterpriseAccountsAvailable.replace(
+              "{count}",
+              users.length.toString(),
+            ),
+    },
+    {
+      title: t.roleAssignments,
+      getDescription: () => t.roleAssignmentsDescription,
+    },
+    {
+      title: t.accessStatus,
+      getDescription: () => t.accessStatusDescription,
+    },
+  ];
 
   const loadUsers = useCallback(
     async (

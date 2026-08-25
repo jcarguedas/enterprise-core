@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import {
   assignUserRole,
   getRoles,
@@ -21,6 +21,7 @@ export function useUserRoles({
   onInactiveAccount,
   onUnauthorized,
 }: UseUserRolesOptions) {
+  const { messages: t } = useI18n();
   const requestIdRef = useRef(0);
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
   const [roles, setRoles] = useState<EnterpriseRole[]>([]);

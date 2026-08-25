@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useRef } from "react";
 
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 
 type StatusMessageProps = {
   autoDismiss?: boolean;
@@ -39,6 +39,7 @@ export function StatusMessage({
   onDismiss,
   variant,
 }: StatusMessageProps) {
+  const { messages: t } = useI18n();
   const onDismissRef = useRef(onDismiss);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const ariaLive =
