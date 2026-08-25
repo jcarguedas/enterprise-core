@@ -1,4 +1,6 @@
-import { defaultMessages as t } from "@/lib/i18n/messages";
+"use client";
+
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { EnterpriseUser } from "@/lib/users-api";
 
 export type UserSortDirection = "asc" | "desc";
@@ -31,6 +33,8 @@ export function UsersTable({
   updatingUserStatusId,
   users,
 }: UsersTableProps) {
+  const { messages: t } = useI18n();
+
   function getSortIndicator(headerSortKey: UserSortKey) {
     if (sortKey !== headerSortKey) {
       return "";

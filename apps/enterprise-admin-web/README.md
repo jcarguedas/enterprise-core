@@ -11,6 +11,7 @@ portfolio-grade user administration workflows.
 - Protected dashboard entry point for authenticated administrators.
 - Permission-aware sidebar and dashboard actions based on `/api/me`
   permissions.
+- Runtime English/Spanish language switching stored in the browser.
 - Users module backed by real API data from `GET /api/users`.
 - Users module access gated in the UI by the `manage-users` permission, with
   backend authorization still treated as the final enforcement layer.
@@ -34,7 +35,15 @@ Current limitations:
 - No hard delete user flow yet.
 - No backend pagination or server-side user search yet; current pagination and
   search are local to the loaded user set.
-- No runtime language switcher yet.
+
+## Language Switching
+
+Admin Web supports runtime language switching between English and Spanish.
+English is the default language. The selected locale is stored in
+`localStorage` and reused across page navigation and future sessions in the same
+browser.
+
+The language selector appears in the protected admin header.
 
 ## Dashboard
 

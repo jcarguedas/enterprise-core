@@ -6,10 +6,13 @@ export type SharedMessages = {
   goToLogin: string;
   backToOverview: string;
   signIn: string;
+  signingIn: string;
   logout: string;
   signingOut: string;
   dashboard: string;
   users: string;
+  roles: string;
+  settings: string;
   usersDescription: string;
   userDirectory: string;
   userDirectoryDescription: string;
@@ -30,6 +33,8 @@ export type SharedMessages = {
   previousPage: string;
   nextPage: string;
   usersPageCount: string;
+  enterpriseAccountAvailable: string;
+  enterpriseAccountsAvailable: string;
   sortById: string;
   sortByName: string;
   sortByEmail: string;
@@ -88,6 +93,11 @@ export type SharedMessages = {
   userManagementUnavailableDescription: string;
   userManagementAccessDenied: string;
   userManagementAccessDeniedDescription: string;
+  language: string;
+  english: string;
+  spanish: string;
+  protectedWorkspace: string;
+  sessionUnavailable: string;
 };
 
 export const messages: Record<SupportedLanguage, SharedMessages> = {
@@ -97,10 +107,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     goToLogin: "Go to Login",
     backToOverview: "Back to overview",
     signIn: "Sign in",
+    signingIn: "Signing in...",
     logout: "Logout",
     signingOut: "Signing out...",
     dashboard: "Dashboard",
     users: "Users",
+    roles: "Roles",
+    settings: "Settings",
     usersDescription: "Manage enterprise users, access, and account readiness.",
     userDirectory: "User Directory",
     userDirectoryDescription: "Read-only view of enterprise-managed users.",
@@ -123,6 +136,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     previousPage: "Previous",
     nextPage: "Next",
     usersPageCount: "Page {current} of {total}",
+    enterpriseAccountAvailable: "1 enterprise account available.",
+    enterpriseAccountsAvailable: "{count} enterprise accounts available.",
     sortById: "Sort by ID",
     sortByName: "Sort by name",
     sortByEmail: "Sort by email",
@@ -184,6 +199,11 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementAccessDenied: "Access denied",
     userManagementAccessDeniedDescription:
       "Your account does not currently have permission to manage users.",
+    language: "Language",
+    english: "English",
+    spanish: "Spanish",
+    protectedWorkspace: "Protected Workspace",
+    sessionUnavailable: "Session unavailable",
   },
   es: {
     productName: "Enterprise Core",
@@ -213,6 +233,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     previousPage: "Anterior",
     nextPage: "Siguiente",
     usersPageCount: "Página {current} de {total}",
+    enterpriseAccountAvailable: "1 cuenta empresarial disponible.",
+    enterpriseAccountsAvailable: "{count} cuentas empresariales disponibles.",
     sortById: "Ordenar por ID",
     sortByName: "Ordenar por nombre",
     sortByEmail: "Ordenar por correo electrónico",
@@ -270,9 +292,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     goToLogin: "Ir al inicio de sesión",
     backToOverview: "Volver al resumen",
     signIn: "Iniciar sesión",
+    signingIn: "Iniciando sesión...",
     logout: "Cerrar sesión",
     signingOut: "Cerrando sesión...",
     dashboard: "Dashboard",
+    roles: "Roles",
+    settings: "Configuración",
     validatingSession: "Validando sesión...",
     protectedWorkspacePlaceholder:
       "Marcador de posición del espacio administrativo protegido.",
@@ -282,6 +307,11 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementAccessDenied: "Acceso denegado",
     userManagementAccessDeniedDescription:
       "Tu cuenta no tiene permiso actualmente para administrar usuarios.",
+    language: "Idioma",
+    english: "Inglés",
+    spanish: "Español",
+    protectedWorkspace: "Espacio protegido",
+    sessionUnavailable: "Sesión no disponible",
   },
 };
 

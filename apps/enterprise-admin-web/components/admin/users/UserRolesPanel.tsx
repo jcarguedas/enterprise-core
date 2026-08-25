@@ -1,5 +1,7 @@
+"use client";
+
 import { StatusMessage } from "@/components/admin/StatusMessage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { EnterpriseRole, EnterpriseUser } from "@/lib/users-api";
 
 type UserRolesPanelProps = {
@@ -41,6 +43,8 @@ export function UserRolesPanel({
   onRemoveRole,
   onClose,
 }: UserRolesPanelProps) {
+  const { messages: t } = useI18n();
+
   if (!user) {
     return null;
   }

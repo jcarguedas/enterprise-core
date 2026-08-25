@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 
 import { getStoredToken } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { createUser, EnterpriseUser } from "@/lib/users-api";
 
 type UseCreateUserOptions = {
@@ -17,6 +17,7 @@ export function useCreateUser({
   onUserCreated,
   onUnauthorized,
 }: UseCreateUserOptions) {
+  const { messages: t } = useI18n();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

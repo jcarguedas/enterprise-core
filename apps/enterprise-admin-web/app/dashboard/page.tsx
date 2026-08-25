@@ -5,11 +5,12 @@ import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusMessage } from "@/components/admin/StatusMessage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 import { useProtectedAdminSession } from "@/lib/use-protected-admin-session";
 
 export default function DashboardPage() {
+  const { messages: t } = useI18n();
   const {
     errorMessage,
     isLoggingOut,

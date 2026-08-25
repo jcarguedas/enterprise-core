@@ -4,31 +4,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import type { StoredUser } from "@/lib/auth-storage";
-import { defaultMessages as t } from "@/lib/i18n/messages";
+import type { SharedMessages } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 
 type NavigationItem = {
-  label: string;
+  labelKey: keyof Pick<
+    SharedMessages,
+    "dashboard" | "roles" | "settings" | "users"
+  >;
   href: string;
   permission?: string;
 };
 
 const navigationItems: NavigationItem[] = [
   {
-    label: "Dashboard",
+    labelKey: "dashboard",
     href: "/dashboard",
   },
   {
-    label: "Users",
+    labelKey: "users",
     href: "/users",
     permission: MANAGE_USERS_PERMISSION,
   },
   {
-    label: "Roles",
+    labelKey: "roles",
     href: "#",
   },
   {
-    label: "Settings",
+    labelKey: "settings",
     href: "#",
   },
 ];
@@ -39,6 +43,7 @@ type AdminSidebarProps = {
 
 export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
   const pathname = usePathname();
+  const { messages: t } = useI18n();
   const visibleNavigationItems = navigationItems.filter(
     (item) => !item.permission || hasPermission(trustedUser, item.permission),
   );
@@ -61,7 +66,7 @@ export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
         <nav className="flex gap-2 overflow-x-auto px-4 py-4 lg:flex-col lg:overflow-visible lg:px-4 lg:py-6">
           {visibleNavigationItems.map((item) => (
             <Link
-              key={item.label}
+              key={item.labelKey}
               href={item.href}
               aria-current={pathname === item.href ? "page" : undefined}
               className={`inline-flex h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium transition-colors ${
@@ -70,7 +75,7 @@ export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
                   : "text-[#cbd5e1] hover:bg-white/10 hover:text-white"
               }`}
             >
-              {item.label}
+              {t[item.labelKey]}
             </Link>
           ))}
         </nav>
