@@ -817,3 +817,58 @@ Improved the Admin Web dashboard experience and captured the next access-managem
 ### Next Step
 
 - Start runtime language switching as a focused Admin Web feature.
+
+## 2026-08-25
+
+### Focus
+
+Completed the current-user permissions contract in Enterprise Auth Service and made Enterprise Admin Web permission-aware for user management UX.
+
+### Completed
+
+- Updated Auth Service `GET /api/me` to include active roles and unique sorted active permission slugs.
+- Kept existing current-user fields:
+  - `id`
+  - `name`
+  - `email`
+- Filtered inactive roles and inactive permissions out of the current-user response.
+- Avoided exposing pivots, tokens, timestamps, passwords, or sensitive internal data.
+- Updated Auth Service API, manual testing, and testing documentation.
+- Added backend tests for:
+  - Existing current-user profile behavior.
+  - Active roles in `/api/me`.
+  - Unique sorted active permission slugs in `/api/me`.
+  - Inactive authenticated user token blocking.
+- Updated Admin Web current-user and auth storage types to include roles and permissions.
+- Added a permissions helper with the `manage-users` permission constant.
+- Updated `AdminShell` to pass the trusted current user into `AdminSidebar`.
+- Made Admin Web navigation permission-aware:
+  - Dashboard remains visible for authenticated users.
+  - Users is shown only when the trusted user has `manage-users`.
+- Made the dashboard permission-aware:
+  - Shows the Manage users quick action only with `manage-users`.
+  - Shows an informational restricted card without `manage-users`.
+- Updated `/users` permission behavior:
+  - Does not request `GET /api/users` when the trusted user lacks `manage-users`.
+  - Shows an access-denied message inside the admin layout.
+  - Keeps backend `403 Forbidden` responses as the fallback enforcement authority.
+- Updated the Admin Web README for permission-aware access.
+- Merged and pushed both completed features to `develop`.
+
+### Validation
+
+- Auth Service tests passed:
+  - `65 tests`
+  - `157 assertions`
+- Admin Web build passed.
+- Admin Web lint passed.
+
+### Planning Notes
+
+- After lunch, continue with runtime EN/ES language switching as a focused Admin Web feature.
+- A strong UX feature after that could be floating toast notifications.
+- Later security and enterprise improvements can include a fuller Roles module and Audit Log.
+
+### Next Step
+
+- Start runtime EN/ES language switching as the next focused Admin Web feature.
