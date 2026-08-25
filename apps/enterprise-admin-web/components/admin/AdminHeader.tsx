@@ -1,5 +1,6 @@
 "use client";
 
+import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { useI18n } from "@/lib/i18n/use-i18n";
 
 type AdminHeaderProps = {
@@ -13,7 +14,7 @@ export function AdminHeader({
   isLoggingOut,
   onLogout,
 }: AdminHeaderProps) {
-  const { locale, messages: t, setLocale } = useI18n();
+  const { messages: t } = useI18n();
 
   return (
     <header className="flex flex-col gap-4 border-b border-[#d8dee8] bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between lg:px-8">
@@ -27,23 +28,7 @@ export function AdminHeader({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label
-          htmlFor="admin-language"
-          className="text-sm font-semibold text-[#334155]"
-        >
-          {t.language}
-        </label>
-        <select
-          id="admin-language"
-          value={locale}
-          onChange={(event) =>
-            setLocale(event.target.value === "es" ? "es" : "en")
-          }
-          className="h-10 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm outline-none transition-colors focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
-        >
-          <option value="en">EN - {t.english}</option>
-          <option value="es">ES - {t.spanish}</option>
-        </select>
+        <LanguageSelector />
 
         <button
           type="button"

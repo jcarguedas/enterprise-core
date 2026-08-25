@@ -2,28 +2,35 @@
 
 import Link from "next/link";
 
+import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { useI18n } from "@/lib/i18n/use-i18n";
-
-const capabilities = [
-  {
-    title: "User Management",
-    description:
-      "Administer enterprise-controlled identities, access status, and operator workflows from a focused web console.",
-  },
-  {
-    title: "Role-Based Access Control",
-    description:
-      "Model roles, permissions, and administrative boundaries with clear visibility across protected operations.",
-  },
-  {
-    title: "Modular Enterprise Platform",
-    description:
-      "Prepare the workspace for future business modules while keeping identity and governance at the core.",
-  },
-];
 
 export default function Home() {
   const { messages: t } = useI18n();
+  const capabilities = [
+    {
+      title: t.capabilityUserManagementTitle,
+      description: t.capabilityUserManagementDescription,
+    },
+    {
+      title: t.capabilityRbacTitle,
+      description: t.capabilityRbacDescription,
+    },
+    {
+      title: t.capabilityPlatformTitle,
+      description: t.capabilityPlatformDescription,
+    },
+  ];
+  const overviewMetrics = [
+    [t.users, t.managed],
+    [t.roles, t.available],
+    [t.permissions, t.protected],
+  ];
+  const moduleRows = [
+    ["Auth Service", t.coreApi, t.active],
+    [t.rbac, t.governance, t.active],
+    [t.modules, t.roadmap, t.planned],
+  ];
 
   return (
     <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
@@ -42,27 +49,28 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="hidden items-center gap-2 text-sm text-[#64748b] sm:flex">
-            <span className="h-2 w-2 rounded-full bg-[#2f855a]" />
-            Platform foundation
+          <div className="flex flex-wrap items-center justify-end gap-4">
+            <div className="hidden items-center gap-2 text-sm text-[#64748b] sm:flex">
+              <span className="h-2 w-2 rounded-full bg-[#2f855a]" />
+              {t.platformFoundation}
+            </div>
+            <LanguageSelector />
           </div>
         </header>
 
         <div className="grid flex-1 items-center gap-12 py-14 lg:grid-cols-[1fr_0.92fr] lg:py-16">
           <div className="max-w-2xl">
             <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
-              Enterprise administration workspace
+              {t.landingEyebrow}
             </p>
             <h1 className="text-5xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-6xl">
               {t.productName}
             </h1>
             <p className="mt-5 text-2xl font-medium text-[#1f3a5f]">
-              Intelligent Business Operations Platform
+              {t.landingSubtitle}
             </p>
             <p className="mt-6 max-w-xl text-lg leading-8 text-[#475569]">
-              This admin web app will manage users, roles, permissions, and
-              future enterprise modules from a secure, API-first operations
-              console.
+              {t.landingDescription}
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -76,7 +84,7 @@ export default function Home() {
                 href="#"
                 className="inline-flex h-12 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-6 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
               >
-                View Architecture
+                {t.viewArchitecture}
               </a>
             </div>
           </div>
@@ -85,21 +93,19 @@ export default function Home() {
             <div className="mb-5 flex items-center justify-between border-b border-[#e2e8f0] pb-4">
               <div>
                 <p className="text-sm font-semibold text-[#0f172a]">
-                  Operations Overview
+                  {t.operationsOverview}
                 </p>
-                <p className="text-xs text-[#64748b]">Identity and access</p>
+                <p className="text-xs text-[#64748b]">
+                  {t.identityAndAccess}
+                </p>
               </div>
               <span className="rounded-md bg-[#e8f5ee] px-2.5 py-1 text-xs font-medium text-[#276749]">
-                Ready
+                {t.ready}
               </span>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                ["Users", "Managed"],
-                ["Roles", "Available"],
-                ["Permissions", "Protected"],
-              ].map(([label, value]) => (
+              {overviewMetrics.map(([label, value]) => (
                 <div
                   key={label}
                   className="rounded-md border border-[#e2e8f0] bg-[#f8fafc] p-4"
@@ -116,15 +122,11 @@ export default function Home() {
 
             <div className="mt-5 overflow-hidden rounded-md border border-[#e2e8f0]">
               <div className="grid grid-cols-[1fr_0.8fr_0.7fr] bg-[#f1f5f9] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#64748b]">
-                <span>Module</span>
-                <span>Scope</span>
-                <span>Status</span>
+                <span>{t.module}</span>
+                <span>{t.scope}</span>
+                <span>{t.status}</span>
               </div>
-              {[
-                ["Auth Service", "Core API", "Active"],
-                ["RBAC", "Governance", "Active"],
-                ["Modules", "Roadmap", "Planned"],
-              ].map(([module, scope, status]) => (
+              {moduleRows.map(([module, scope, status]) => (
                 <div
                   key={module}
                   className="grid grid-cols-[1fr_0.8fr_0.7fr] border-t border-[#e2e8f0] px-4 py-4 text-sm"

@@ -3,8 +3,42 @@
 export type SharedMessages = {
   productName: string;
   adminWeb: string;
+  platformFoundation: string;
+  landingEyebrow: string;
+  landingSubtitle: string;
+  landingDescription: string;
+  viewArchitecture: string;
+  operationsOverview: string;
+  identityAndAccess: string;
+  managed: string;
+  available: string;
+  protected: string;
+  permissions: string;
+  module: string;
+  scope: string;
+  coreApi: string;
+  rbac: string;
+  governance: string;
+  modules: string;
+  roadmap: string;
+  planned: string;
+  capabilityUserManagementTitle: string;
+  capabilityUserManagementDescription: string;
+  capabilityRbacTitle: string;
+  capabilityRbacDescription: string;
+  capabilityPlatformTitle: string;
+  capabilityPlatformDescription: string;
   goToLogin: string;
   backToOverview: string;
+  loginEyebrow: string;
+  loginTitle: string;
+  loginDescription: string;
+  signInToAdmin: string;
+  accessPortal: string;
+  passwordPlaceholder: string;
+  loginDefaultError: string;
+  loginIncompleteResponse: string;
+  authServiceUnavailable: string;
   signIn: string;
   signingIn: string;
   logout: string;
@@ -126,8 +160,49 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
   en: {
     productName: "Enterprise Core",
     adminWeb: "Admin Web",
+    platformFoundation: "Platform foundation",
+    landingEyebrow: "Enterprise administration workspace",
+    landingSubtitle: "Intelligent Business Operations Platform",
+    landingDescription:
+      "This admin web app will manage users, roles, permissions, and future enterprise modules from a secure, API-first operations console.",
+    viewArchitecture: "View Architecture",
+    operationsOverview: "Operations Overview",
+    identityAndAccess: "Identity and access",
+    managed: "Managed",
+    available: "Available",
+    protected: "Protected",
+    permissions: "Permissions",
+    module: "Module",
+    scope: "Scope",
+    coreApi: "Core API",
+    rbac: "RBAC",
+    governance: "Governance",
+    modules: "Modules",
+    roadmap: "Roadmap",
+    planned: "Planned",
+    capabilityUserManagementTitle: "User Management",
+    capabilityUserManagementDescription:
+      "Administer enterprise-controlled identities, access status, and operator workflows from a focused web console.",
+    capabilityRbacTitle: "Role-Based Access Control",
+    capabilityRbacDescription:
+      "Model roles, permissions, and administrative boundaries with clear visibility across protected operations.",
+    capabilityPlatformTitle: "Modular Enterprise Platform",
+    capabilityPlatformDescription:
+      "Prepare the workspace for future business modules while keeping identity and governance at the core.",
     goToLogin: "Go to Login",
     backToOverview: "Back to overview",
+    loginEyebrow: "Secure operations console",
+    loginTitle: "Admin Web Access",
+    loginDescription:
+      "Access is controlled by enterprise administrators. Use your assigned credentials to enter the protected admin workspace.",
+    signInToAdmin: "Sign in to admin",
+    accessPortal: "Enterprise-controlled access portal",
+    passwordPlaceholder: "Enter your password",
+    loginDefaultError: "Unable to sign in. Please verify your credentials.",
+    loginIncompleteResponse:
+      "The login response was incomplete. Please try again.",
+    authServiceUnavailable:
+      "Unable to reach the auth service. Please confirm it is running and try again.",
     signIn: "Sign in",
     signingIn: "Signing in...",
     logout: "Logout",
@@ -257,6 +332,36 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
   },
   es: {
     productName: "Enterprise Core",
+    adminWeb: "Admin Web",
+    platformFoundation: "Base de plataforma",
+    landingEyebrow: "Espacio de administración empresarial",
+    landingSubtitle: "Plataforma inteligente de operaciones empresariales",
+    landingDescription:
+      "Esta aplicación administrativa gestionará usuarios, roles, permisos y futuros módulos empresariales desde una consola de operaciones segura y API-first.",
+    viewArchitecture: "Ver arquitectura",
+    operationsOverview: "Resumen de operaciones",
+    identityAndAccess: "Identidad y acceso",
+    managed: "Gestionados",
+    available: "Disponibles",
+    protected: "Protegidos",
+    permissions: "Permisos",
+    module: "Módulo",
+    scope: "Alcance",
+    coreApi: "API central",
+    rbac: "RBAC",
+    governance: "Gobernanza",
+    modules: "Módulos",
+    roadmap: "Roadmap",
+    planned: "Planificado",
+    capabilityUserManagementTitle: "Gestión de usuarios",
+    capabilityUserManagementDescription:
+      "Administra identidades controladas por la empresa, estado de acceso y flujos operativos desde una consola web enfocada.",
+    capabilityRbacTitle: "Control de acceso basado en roles",
+    capabilityRbacDescription:
+      "Modela roles, permisos y límites administrativos con visibilidad clara sobre operaciones protegidas.",
+    capabilityPlatformTitle: "Plataforma empresarial modular",
+    capabilityPlatformDescription:
+      "Prepara el espacio de trabajo para futuros módulos de negocio manteniendo identidad y gobernanza en el centro.",
     users: "Usuarios",
     usersDescription:
       "Administra usuarios empresariales, acceso y preparación de cuentas.",
@@ -338,9 +443,21 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     inactiveAccountLoginMessage:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     validationError: "Error de validación",
-    adminWeb: "Admin Web",
     goToLogin: "Ir al inicio de sesión",
     backToOverview: "Volver al resumen",
+    loginEyebrow: "Consola segura de operaciones",
+    loginTitle: "Acceso a Admin Web",
+    loginDescription:
+      "El acceso es controlado por administradores empresariales. Usa tus credenciales asignadas para entrar al espacio administrativo protegido.",
+    signInToAdmin: "Iniciar sesión en admin",
+    accessPortal: "Portal de acceso controlado por la empresa",
+    passwordPlaceholder: "Ingresa tu contraseña",
+    loginDefaultError:
+      "No se pudo iniciar sesión. Verifica tus credenciales.",
+    loginIncompleteResponse:
+      "La respuesta de inicio de sesión está incompleta. Inténtalo de nuevo.",
+    authServiceUnavailable:
+      "No se pudo conectar con el servicio de autenticación. Confirma que esté en ejecución e inténtalo de nuevo.",
     signIn: "Iniciar sesión",
     signingIn: "Iniciando sesión...",
     logout: "Cerrar sesión",
