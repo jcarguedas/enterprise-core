@@ -28,6 +28,9 @@ Validates:
 Validates:
 
 - An authenticated user can retrieve their profile using `/api/me`.
+- An authenticated user receives active roles in the `/api/me` response.
+- An authenticated user receives unique sorted active permission slugs in the `/api/me` response.
+- An inactive authenticated user with an existing token cannot access `/api/me`.
 - A guest cannot access `/api/me`.
 - An authenticated user can logout using `/api/logout`.
 - A guest cannot logout.
@@ -52,12 +55,7 @@ Validates:
 
 ## Expected result
 
-Current expected result:
-
-```text
-15 tests passed
-42 assertions
-```
+The full suite should pass with `php artisan test`.
 
 ## Testing rules
 

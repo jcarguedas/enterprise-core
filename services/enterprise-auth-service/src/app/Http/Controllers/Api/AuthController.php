@@ -46,11 +46,40 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        $user->load([
+            'roles' => fn ($query) => $query
+                ->select(['roles.id', 'roles.name', 'roles.slug', 'roles.description', 'roles.is_active'])
+                ->where('roles.is_active', true)
+                ->orderBy('roles.id')
+                ->with([
+                    'permissions' => fn ($query) => $query
+                        ->select(['permissions.id', 'permissions.slug'])
+                        ->where('permissions.is_active', true)
+                        ->orderBy('permissions.slug'),
+                ]),
+        ]);
+
+        $roles = $user->roles->map(fn ($role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'slug' => $role->slug,
+            'description' => $role->description,
+            'is_active' => (bool) $role->is_active,
+        ]);
+
+        $permissions = $user->roles
+            ->flatMap(fn ($role) => $role->permissions->pluck('slug'))
+            ->unique()
+            ->sort()
+            ->values();
+
         return response()->json([
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'roles' => $roles,
+                'permissions' => $permissions,
             ],
         ]);
     }

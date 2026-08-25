@@ -94,6 +94,8 @@ Returns the authenticated user profile.
 
 Requires Bearer token.
 
+Only active roles and active permissions are included.
+
 ### Headers
 
 ```text
@@ -108,10 +110,25 @@ Accept: application/json
   "user": {
     "id": 1,
     "name": "Admin User",
-    "email": "admin@example.com"
+    "email": "admin@example.com",
+    "roles": [
+      {
+        "id": 1,
+        "name": "Administrator",
+        "slug": "administrator",
+        "description": "System administrator role",
+        "is_active": true
+      }
+    ],
+    "permissions": [
+      "manage-users",
+      "view-reports"
+    ]
   }
 }
 ```
+
+`permissions` is a unique sorted list of permission slugs collected through the user's active roles.
 
 ### Response 401
 
@@ -120,6 +137,16 @@ Returned when the token is missing or invalid.
 ```json
 {
   "message": "Unauthenticated."
+}
+```
+
+### Response 403
+
+Returned when a valid token belongs to an inactive user.
+
+```json
+{
+  "message": "Your account is inactive."
 }
 ```
 

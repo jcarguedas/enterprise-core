@@ -96,7 +96,9 @@ $response
   "user": {
     "id": 1,
     "name": "Admin User",
-    "email": "admin@example.com"
+    "email": "admin@example.com",
+    "roles": [],
+    "permissions": []
   }
 }
 ```
