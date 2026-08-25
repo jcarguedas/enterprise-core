@@ -29,7 +29,8 @@ const navigationItems: NavigationItem[] = [
   },
   {
     labelKey: "roles",
-    href: "#",
+    href: "/roles",
+    permission: MANAGE_USERS_PERMISSION,
   },
   {
     labelKey: "settings",

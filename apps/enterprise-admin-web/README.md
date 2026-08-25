@@ -16,6 +16,7 @@ portfolio-grade user administration workflows.
 - Users module backed by real API data from `GET /api/users`.
 - Users module access gated in the UI by the `manage-users` permission, with
   backend authorization still treated as the final enforcement layer.
+- Read-only Roles page backed by `GET /api/roles`.
 - User directory with list, refresh, create, and edit workflows.
 - Client-side user search across currently loaded ID, name, email, and status
   values.
@@ -83,9 +84,22 @@ user lacks `manage-users`; it shows an access-denied message inside the admin
 layout instead. Backend `403 Forbidden` responses remain the fallback authority
 for permission enforcement.
 
+The `/roles` page follows the same pattern for `GET /api/roles` and shows a
+read-only role catalog when the trusted current user has `manage-users`.
+
 Access-denied states use a reusable admin component so future protected modules
 can present the same restricted-access pattern with a clear explanation and a
 return path to `/dashboard`.
+
+## Roles
+
+The read-only Roles page is available at `/roles`. It validates the current
+session, checks the trusted current user's permissions, and loads role data from
+the Enterprise Auth API only when the user has `manage-users`.
+
+The page displays each role's ID, name, slug, description, and active/inactive
+status. Role creation, editing, and deletion are not implemented in this
+feature.
 
 ## User Status Controls
 
