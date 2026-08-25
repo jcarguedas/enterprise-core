@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
+import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { EnterpriseUser, updateUser } from "@/lib/users-api";
@@ -17,6 +18,7 @@ export function useEditUser({
   onUserUpdated,
   onUnauthorized,
 }: UseEditUserOptions) {
+  const { addToast } = useToast();
   const { messages: t } = useI18n();
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -83,7 +85,10 @@ export function useEditUser({
       setName("");
       setEmail("");
       setIsFormVisible(false);
-      setSuccessMessage(t.userUpdatedSuccessfully);
+      addToast({
+        message: t.userUpdatedSuccessfully,
+        variant: "success",
+      });
       return;
     }
 

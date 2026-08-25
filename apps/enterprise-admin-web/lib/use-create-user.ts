@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
+import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { createUser, EnterpriseUser } from "@/lib/users-api";
@@ -17,6 +18,7 @@ export function useCreateUser({
   onUserCreated,
   onUnauthorized,
 }: UseCreateUserOptions) {
+  const { addToast } = useToast();
   const { messages: t } = useI18n();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [name, setName] = useState("");
@@ -81,7 +83,10 @@ export function useCreateUser({
       onUserCreated(result.user);
       resetForm();
       setIsFormVisible(false);
-      setSuccessMessage(t.userCreatedSuccessfully);
+      addToast({
+        message: t.userCreatedSuccessfully,
+        variant: "success",
+      });
       return;
     }
 
