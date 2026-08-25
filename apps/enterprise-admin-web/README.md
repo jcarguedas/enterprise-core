@@ -12,6 +12,7 @@ portfolio-grade user administration workflows.
 - Permission-aware sidebar and dashboard actions based on `/api/me`
   permissions.
 - Runtime English/Spanish language switching stored in the browser.
+- Floating toast notifications for non-critical successful operations.
 - Users module backed by real API data from `GET /api/users`.
 - Users module access gated in the UI by the `manage-users` permission, with
   backend authorization still treated as the final enforcement layer.
@@ -44,6 +45,15 @@ English is the default language. The selected locale is stored in
 browser.
 
 The language selector appears in the protected admin header.
+
+## Toast Notifications
+
+Admin Web shows floating toast notifications for non-critical successful
+operations such as creating or updating users, changing user active status, and
+assigning or removing roles.
+
+Critical/session/access errors and form validation errors remain inline near the
+workflow that needs attention.
 
 ## Dashboard
 

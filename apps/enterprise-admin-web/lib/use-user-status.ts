@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { updateUser } from "@/lib/users-api";
@@ -18,6 +19,7 @@ export function useUserStatus({
   onUnauthorized,
   onUserUpdated,
 }: UseUserStatusOptions) {
+  const { addToast } = useToast();
   const { messages: t } = useI18n();
   const [updatingUserStatusId, setUpdatingUserStatusId] = useState<
     number | null
@@ -51,11 +53,12 @@ export function useUserStatus({
 
     if (result.status === "success") {
       onUserUpdated(result.user);
-      setSuccessMessage(
-        result.user.is_active
+      addToast({
+        message: result.user.is_active
           ? t.userReactivatedSuccessfully
           : t.userDeactivatedSuccessfully,
-      );
+        variant: "success",
+      });
       return;
     }
 

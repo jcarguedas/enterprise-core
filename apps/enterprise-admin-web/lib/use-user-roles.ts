@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 
+import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import {
@@ -21,6 +22,7 @@ export function useUserRoles({
   onInactiveAccount,
   onUnauthorized,
 }: UseUserRolesOptions) {
+  const { addToast } = useToast();
   const { messages: t } = useI18n();
   const requestIdRef = useRef(0);
   const [selectedUser, setSelectedUser] = useState<EnterpriseUser | null>(null);
@@ -139,7 +141,10 @@ export function useUserRoles({
     if (result.status === "success") {
       setRoles(result.roles);
       setSelectedRoleId("");
-      setAssignSuccessMessage(t.roleAssignedSuccessfully);
+      addToast({
+        message: t.roleAssignedSuccessfully,
+        variant: "success",
+      });
       return;
     }
 
@@ -190,7 +195,10 @@ export function useUserRoles({
 
     if (result.status === "success") {
       setRoles(result.roles);
-      setAssignSuccessMessage(t.roleRemovedSuccessfully);
+      addToast({
+        message: t.roleRemovedSuccessfully,
+        variant: "success",
+      });
       return;
     }
 
