@@ -1,6 +1,7 @@
 "use client";
 
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
+import { ThemeSelector } from "@/components/admin/ThemeSelector";
 import { useI18n } from "@/lib/i18n/use-i18n";
 
 type AdminHeaderProps = {
@@ -17,24 +18,25 @@ export function AdminHeader({
   const { messages: t } = useI18n();
 
   return (
-    <header className="flex flex-col gap-4 border-b border-[#d8dee8] bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between lg:px-8">
+    <header className="app-card flex flex-col gap-4 border-b px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between lg:px-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#64748b]">
+        <p className="app-subtle text-xs font-semibold uppercase tracking-[0.14em]">
           {t.protectedWorkspace}
         </p>
-        <p className="mt-1 text-sm font-medium text-[#172033]">
+        <p className="app-text mt-1 text-sm font-medium">
           {userDisplayName}
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <LanguageSelector />
+        <ThemeSelector />
 
         <button
           type="button"
           onClick={onLogout}
           disabled={isLoggingOut}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-[#d8dee8] disabled:text-[#64748b]"
+          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
         >
           {isLoggingOut ? t.signingOut : t.logout}
         </button>

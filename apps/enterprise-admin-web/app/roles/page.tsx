@@ -163,12 +163,12 @@ export default function RolesPage() {
         ) : null}
 
         {!isAccessDenied ? (
-          <section className="mt-6 rounded-lg border border-[#d8dee8] bg-white shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
-            <div className="border-b border-[#e2e8f0] px-5 py-4">
-              <h2 className="text-base font-semibold text-[#0f172a]">
+          <section className="app-card mt-6 rounded-lg border">
+            <div className="app-divider border-b px-5 py-4">
+              <h2 className="app-text text-base font-semibold">
                 {t.rolesCatalog}
               </h2>
-              <p className="mt-1 text-sm text-[#64748b]">
+              <p className="app-subtle mt-1 text-sm">
                 {t.rolesCatalogDescription}
               </p>
             </div>
@@ -187,8 +187,8 @@ export default function RolesPage() {
 
             {rolesStatus === "ready" ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-[#e2e8f0] text-left text-sm">
-                  <thead className="bg-[#f8fafc] text-xs font-semibold uppercase text-[#64748b]">
+                <table className="min-w-full divide-y divide-[var(--app-border)] text-left text-sm">
+                  <thead className="app-table-head text-xs font-semibold uppercase">
                     <tr>
                       <th scope="col" className="px-5 py-3">
                         {t.id}
@@ -207,28 +207,28 @@ export default function RolesPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#edf2f7] bg-white">
+                  <tbody className="app-table-body divide-y">
                     {roles.length > 0 ? (
                       roles.map((role) => (
                         <tr key={role.id}>
-                          <td className="whitespace-nowrap px-5 py-4 font-medium text-[#334155]">
+                          <td className="app-muted whitespace-nowrap px-5 py-4 font-medium">
                             {role.id}
                           </td>
-                          <td className="whitespace-nowrap px-5 py-4 font-medium text-[#0f172a]">
+                          <td className="app-text whitespace-nowrap px-5 py-4 font-medium">
                             {role.name}
                           </td>
-                          <td className="whitespace-nowrap px-5 py-4 text-[#475569]">
+                          <td className="app-muted whitespace-nowrap px-5 py-4">
                             {role.slug}
                           </td>
-                          <td className="min-w-64 px-5 py-4 text-[#475569]">
+                          <td className="app-muted min-w-64 px-5 py-4">
                             {role.description ?? ""}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4">
                             <span
                               className={`inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-semibold ${
                                 role.is_active
-                                  ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-                                  : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]"
+                                  ? "app-badge-success"
+                                  : "app-badge-neutral"
                               }`}
                             >
                               {role.is_active ? t.active : t.inactive}
@@ -240,7 +240,7 @@ export default function RolesPage() {
                       <tr>
                         <td
                           colSpan={5}
-                          className="px-5 py-6 text-center text-sm text-[#64748b]"
+                          className="app-subtle px-5 py-6 text-center text-sm"
                         >
                           {t.noRolesReturned}
                         </td>

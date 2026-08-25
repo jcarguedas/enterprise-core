@@ -457,13 +457,13 @@ export default function UsersPage() {
               ))}
             </div>
 
-            <section className="mt-6 rounded-lg border border-[#d8dee8] bg-white shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
-          <div className="flex flex-col gap-2 border-b border-[#e2e8f0] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <section className="app-card mt-6 rounded-lg border">
+          <div className="app-divider flex flex-col gap-2 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-base font-semibold text-[#0f172a]">
+              <h2 className="app-text text-base font-semibold">
                 {t.userDirectory}
               </h2>
-              <p className="mt-1 text-sm text-[#64748b]">
+              <p className="app-subtle mt-1 text-sm">
                 {t.userDirectoryDescription}
               </p>
             </div>
@@ -477,7 +477,7 @@ export default function UsersPage() {
                   editUserFlow.isSubmitting ||
                   isUserStatusUpdating
                 }
-                className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
               >
                 {t.refresh}
               </button>
@@ -490,7 +490,7 @@ export default function UsersPage() {
                   editUserFlow.isSubmitting ||
                   isUserStatusUpdating
                 }
-                className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                className="app-button-primary inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                 aria-label={t.showCreateUserForm}
               >
                 {t.createUser}
@@ -619,12 +619,12 @@ export default function UsersPage() {
 
           {usersStatus === "ready" ? (
             <>
-              <div className="border-b border-[#e2e8f0] px-5 py-4">
+              <div className="app-divider border-b px-5 py-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                   <div className="min-w-0 flex-1">
                     <label
                       htmlFor="users-search"
-                      className="block text-sm font-medium text-[#334155]"
+                      className="app-muted block text-sm font-medium"
                     >
                       {t.searchUsers}
                     </label>
@@ -637,13 +637,13 @@ export default function UsersPage() {
                           handleSearchQueryChange(event.target.value)
                         }
                         placeholder={t.searchUsersPlaceholder}
-                        className="block h-10 min-w-0 flex-1 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                        className="app-input block h-10 min-w-0 flex-1 rounded-md border px-3 text-sm shadow-sm outline-none transition-colors"
                       />
                       {searchQuery ? (
                         <button
                           type="button"
                           onClick={() => handleSearchQueryChange("")}
-                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-3 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
                           aria-label={t.clearSearch}
                         >
                           {t.clearSearch}
@@ -652,14 +652,14 @@ export default function UsersPage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-3 md:items-end">
-                    <p className="text-sm font-medium text-[#64748b]">
+                    <p className="app-subtle text-sm font-medium">
                       {usersCountMessage}
                     </p>
                     {displayedUsers.length > 0 ? (
                       <div className="flex flex-wrap items-center gap-2">
                         <label
                           htmlFor="users-page-size"
-                          className="text-sm font-medium text-[#334155]"
+                          className="app-muted text-sm font-medium"
                         >
                           {t.usersPerPage}
                         </label>
@@ -669,7 +669,7 @@ export default function UsersPage() {
                           onChange={(event) =>
                             handlePageSizeChange(Number(event.target.value))
                           }
-                          className="h-10 rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                          className="app-input h-10 rounded-md border px-3 text-sm shadow-sm outline-none transition-colors"
                         >
                           {PAGE_SIZE_OPTIONS.map((option) => (
                             <option key={option} value={option}>
@@ -683,11 +683,11 @@ export default function UsersPage() {
                             setCurrentPage((page) => Math.max(1, page - 1))
                           }
                           disabled={safeCurrentPage === 1}
-                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-3 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                         >
                           {t.previousPage}
                         </button>
-                        <span className="text-sm font-medium text-[#64748b]">
+                        <span className="app-subtle text-sm font-medium">
                           {usersPageCountMessage}
                         </span>
                         <button
@@ -698,7 +698,7 @@ export default function UsersPage() {
                             )
                           }
                           disabled={safeCurrentPage === totalPages}
-                          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-3 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+                          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-3 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
                         >
                           {t.nextPage}
                         </button>

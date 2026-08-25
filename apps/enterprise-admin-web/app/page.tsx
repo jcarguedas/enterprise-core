@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
+import { ThemeSelector } from "@/components/admin/ThemeSelector";
 import { useI18n } from "@/lib/i18n/use-i18n";
 
 export default function Home() {
@@ -33,73 +34,74 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
+    <main className="app-bg min-h-screen">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 sm:px-8 lg:px-10">
-        <header className="flex items-center justify-between border-b border-[#d8dee8] pb-6">
+        <header className="app-divider flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-[#172033] text-sm font-semibold text-white">
+            <div className="app-brand-mark flex size-10 items-center justify-center rounded-md text-sm font-semibold">
               EC
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#111827]">
+              <p className="app-text text-sm font-semibold">
                 {t.productName}
               </p>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
+              <p className="app-subtle text-xs uppercase tracking-[0.18em]">
                 {t.adminWeb}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-4">
-            <div className="hidden items-center gap-2 text-sm text-[#64748b] sm:flex">
+            <div className="app-subtle hidden items-center gap-2 text-sm sm:flex">
               <span className="h-2 w-2 rounded-full bg-[#2f855a]" />
               {t.platformFoundation}
             </div>
             <LanguageSelector />
+            <ThemeSelector />
           </div>
         </header>
 
         <div className="grid flex-1 items-center gap-12 py-14 lg:grid-cols-[1fr_0.92fr] lg:py-16">
           <div className="max-w-2xl">
-            <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
+            <p className="app-button-secondary mb-5 inline-flex rounded-md border px-3 py-1 text-sm font-medium shadow-sm">
               {t.landingEyebrow}
             </p>
-            <h1 className="text-5xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-6xl">
+            <h1 className="app-text text-5xl font-semibold leading-tight tracking-normal sm:text-6xl">
               {t.productName}
             </h1>
-            <p className="mt-5 text-2xl font-medium text-[#1f3a5f]">
+            <p className="app-muted mt-5 text-2xl font-medium">
               {t.landingSubtitle}
             </p>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-[#475569]">
+            <p className="app-muted mt-6 max-w-xl text-lg leading-8">
               {t.landingDescription}
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/login"
-                className="inline-flex h-12 items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2"
+                className="app-button-primary inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
               >
                 {t.goToLogin}
               </Link>
               <a
                 href="#"
-                className="inline-flex h-12 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-6 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+                className="app-button-secondary inline-flex h-12 items-center justify-center rounded-md border px-6 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
               >
                 {t.viewArchitecture}
               </a>
             </div>
           </div>
 
-          <div className="rounded-lg border border-[#cbd5e1] bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.10)]">
-            <div className="mb-5 flex items-center justify-between border-b border-[#e2e8f0] pb-4">
+          <div className="app-card-lg rounded-lg border p-5">
+            <div className="app-divider mb-5 flex items-center justify-between border-b pb-4">
               <div>
-                <p className="text-sm font-semibold text-[#0f172a]">
+                <p className="app-text text-sm font-semibold">
                   {t.operationsOverview}
                 </p>
-                <p className="text-xs text-[#64748b]">
+                <p className="app-subtle text-xs">
                   {t.identityAndAccess}
                 </p>
               </div>
-              <span className="rounded-md bg-[#e8f5ee] px-2.5 py-1 text-xs font-medium text-[#276749]">
+              <span className="app-badge-success rounded-md border px-2.5 py-1 text-xs font-medium">
                 {t.ready}
               </span>
             </div>
@@ -108,20 +110,20 @@ export default function Home() {
               {overviewMetrics.map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-md border border-[#e2e8f0] bg-[#f8fafc] p-4"
+                  className="app-panel rounded-md border p-4"
                 >
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#64748b]">
+                  <p className="app-subtle text-xs font-medium uppercase tracking-[0.14em]">
                     {label}
                   </p>
-                  <p className="mt-3 text-2xl font-semibold text-[#0f172a]">
+                  <p className="app-text mt-3 text-2xl font-semibold">
                     {value}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-5 overflow-hidden rounded-md border border-[#e2e8f0]">
-              <div className="grid grid-cols-[1fr_0.8fr_0.7fr] bg-[#f1f5f9] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#64748b]">
+            <div className="app-divider mt-5 overflow-hidden rounded-md border">
+              <div className="app-table-head grid grid-cols-[1fr_0.8fr_0.7fr] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em]">
                 <span>{t.module}</span>
                 <span>{t.scope}</span>
                 <span>{t.status}</span>
@@ -129,11 +131,11 @@ export default function Home() {
               {moduleRows.map(([module, scope, status]) => (
                 <div
                   key={module}
-                  className="grid grid-cols-[1fr_0.8fr_0.7fr] border-t border-[#e2e8f0] px-4 py-4 text-sm"
+                  className="app-divider grid grid-cols-[1fr_0.8fr_0.7fr] border-t px-4 py-4 text-sm"
                 >
-                  <span className="font-medium text-[#0f172a]">{module}</span>
-                  <span className="text-[#64748b]">{scope}</span>
-                  <span className="font-medium text-[#1f3a5f]">{status}</span>
+                  <span className="app-text font-medium">{module}</span>
+                  <span className="app-subtle">{scope}</span>
+                  <span className="app-muted font-medium">{status}</span>
                 </div>
               ))}
             </div>
@@ -144,12 +146,12 @@ export default function Home() {
           {capabilities.map((capability) => (
             <article
               key={capability.title}
-              className="rounded-lg border border-[#d8dee8] bg-white p-6 shadow-sm"
+              className="app-card rounded-lg border p-6 shadow-sm"
             >
-              <h2 className="text-lg font-semibold text-[#0f172a]">
+              <h2 className="app-text text-lg font-semibold">
                 {capability.title}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-[#526174]">
+              <p className="app-muted mt-3 text-sm leading-6">
                 {capability.description}
               </p>
             </article>

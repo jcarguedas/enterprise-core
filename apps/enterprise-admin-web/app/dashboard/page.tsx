@@ -39,7 +39,7 @@ export default function DashboardPage() {
           title={t.dashboard}
           description={t.dashboardDescription}
         >
-          <p className="mt-4 text-lg font-medium text-[#1f3a5f]">
+          <p className="app-muted mt-4 text-lg font-medium">
             {status === "ready"
               ? t.dashboardWelcome.replace("{name}", welcomeName)
               : t.validatingSession}
@@ -53,80 +53,80 @@ export default function DashboardPage() {
         ) : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <section className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+          <section className="app-card rounded-lg border p-5">
             <div className="flex items-start justify-between gap-3">
-              <h2 className="text-base font-semibold text-[#0f172a]">
+              <h2 className="app-text text-base font-semibold">
                 {t.accountSummary}
               </h2>
-              <span className="inline-flex shrink-0 rounded-md border border-[#bbf7d0] bg-[#f0fdf4] px-2 py-1 text-xs font-semibold text-[#166534]">
+              <span className="app-badge-success inline-flex shrink-0 rounded-md border px-2 py-1 text-xs font-semibold">
                 {t.signedIn}
               </span>
             </div>
             <dl className="mt-5 space-y-4">
               <div>
-                <dt className="text-xs font-semibold uppercase text-[#64748b]">
+                <dt className="app-subtle text-xs font-semibold uppercase">
                   {t.name}
                 </dt>
-                <dd className="mt-1 text-sm font-semibold text-[#0f172a]">
+                <dd className="app-text mt-1 text-sm font-semibold">
                   {accountName}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase text-[#64748b]">
+                <dt className="app-subtle text-xs font-semibold uppercase">
                   {t.email}
                 </dt>
-                <dd className="mt-1 break-all text-sm font-medium text-[#475569]">
+                <dd className="app-muted mt-1 break-all text-sm font-medium">
                   {accountEmail}
                 </dd>
               </div>
             </dl>
           </section>
 
-          <section className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+          <section className="app-card rounded-lg border p-5">
             <div className="flex items-start justify-between gap-3">
-              <h2 className="text-base font-semibold text-[#0f172a]">
+              <h2 className="app-text text-base font-semibold">
                 {t.sessionSecurity}
               </h2>
-              <span className="inline-flex shrink-0 rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
+              <span className="app-badge-neutral inline-flex shrink-0 rounded-md border px-2 py-1 text-xs font-semibold">
                 {t.authenticated}
               </span>
             </div>
-            <p className="mt-4 text-sm leading-6 text-[#475569]">
+            <p className="app-muted mt-4 text-sm leading-6">
               {t.sessionSecurityDescription}
             </p>
           </section>
 
           {canManageUsers ? (
-            <section className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+            <section className="app-card rounded-lg border p-5">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-base font-semibold text-[#0f172a]">
+                <h2 className="app-text text-base font-semibold">
                   {t.userManagement}
                 </h2>
-                <span className="inline-flex shrink-0 rounded-md border border-[#cbd5e1] bg-[#f8fafc] px-2 py-1 text-xs font-semibold text-[#334155]">
+                <span className="app-badge-neutral inline-flex shrink-0 rounded-md border px-2 py-1 text-xs font-semibold">
                   {t.ready}
                 </span>
               </div>
-              <p className="mt-4 text-sm leading-6 text-[#475569]">
+              <p className="app-muted mt-4 text-sm leading-6">
                 {t.userManagementDescription}
               </p>
               <Link
                 href="/users"
-                className="mt-5 inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2"
+                className="app-button-primary mt-5 inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
               >
                 {t.manageUsers}
               </Link>
             </section>
           ) : (
-            <section className="rounded-lg border border-[#d8dee8] bg-white p-5 shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
+            <section className="app-card rounded-lg border p-5">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-base font-semibold text-[#0f172a]">
+                <h2 className="app-text text-base font-semibold">
                   {t.userManagementUnavailable}
                 </h2>
-                <span className="inline-flex shrink-0 rounded-md border border-[#fde68a] bg-[#fffbeb] px-2 py-1 text-xs font-semibold text-[#92400e]">
+                <span className="app-badge-warning inline-flex shrink-0 rounded-md border px-2 py-1 text-xs font-semibold">
                   {t.restricted}
                 </span>
               </div>
-              <p className="mt-4 text-sm leading-6 text-[#475569]">
+              <p className="app-muted mt-4 text-sm leading-6">
                 {t.userManagementUnavailableDescription}
               </p>
             </section>

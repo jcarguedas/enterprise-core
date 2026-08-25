@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
+import { ThemeSelector } from "@/components/admin/ThemeSelector";
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
@@ -97,27 +98,28 @@ function LoginContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] text-[#111827]">
+    <main className="app-bg min-h-screen">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 sm:px-8 lg:px-10">
-        <header className="flex items-center justify-between border-b border-[#d8dee8] pb-6">
+        <header className="app-divider flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-[#172033] text-sm font-semibold text-white">
+            <div className="app-brand-mark flex size-10 items-center justify-center rounded-md text-sm font-semibold">
               EC
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#111827]">
+              <p className="app-text text-sm font-semibold">
                 {t.productName}
               </p>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#64748b]">
+              <p className="app-subtle text-xs uppercase tracking-[0.18em]">
                 {t.adminWeb}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-3">
             <LanguageSelector />
+            <ThemeSelector />
             <Link
               href="/"
-              className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2"
+              className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
             >
               {t.backToOverview}
             </Link>
@@ -126,26 +128,26 @@ function LoginContent() {
 
         <div className="grid flex-1 items-center gap-10 py-14 lg:grid-cols-[0.92fr_1fr] lg:py-16">
           <div className="max-w-xl">
-            <p className="mb-5 inline-flex rounded-md border border-[#c9d3e2] bg-white px-3 py-1 text-sm font-medium text-[#334155] shadow-sm">
+            <p className="app-button-secondary mb-5 inline-flex rounded-md border px-3 py-1 text-sm font-medium shadow-sm">
               {t.loginEyebrow}
             </p>
-            <h1 className="text-4xl font-semibold leading-tight tracking-normal text-[#0f172a] sm:text-5xl">
+            <h1 className="app-text text-4xl font-semibold leading-tight tracking-normal sm:text-5xl">
               {t.productName}
             </h1>
-            <p className="mt-4 text-2xl font-medium text-[#1f3a5f]">
+            <p className="app-muted mt-4 text-2xl font-medium">
               {t.loginTitle}
             </p>
-            <p className="mt-6 text-base leading-7 text-[#475569]">
+            <p className="app-muted mt-6 text-base leading-7">
               {t.loginDescription}
             </p>
           </div>
 
-          <div className="w-full max-w-md justify-self-center rounded-lg border border-[#cbd5e1] bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.10)] sm:p-8 lg:justify-self-end">
-            <div className="border-b border-[#e2e8f0] pb-5">
-              <p className="text-sm font-semibold text-[#0f172a]">
+          <div className="app-card-lg w-full max-w-md justify-self-center rounded-lg border p-6 sm:p-8 lg:justify-self-end">
+            <div className="app-divider border-b pb-5">
+              <p className="app-text text-sm font-semibold">
                 {t.signInToAdmin}
               </p>
-              <p className="mt-1 text-sm text-[#64748b]">
+              <p className="app-subtle mt-1 text-sm">
                 {t.accessPortal}
               </p>
             </div>
@@ -154,7 +156,7 @@ function LoginContent() {
               {visibleErrorMessage ? (
                 <div
                   aria-live="polite"
-                  className="rounded-md border border-[#f1b8b8] bg-[#fff5f5] px-4 py-3 text-sm leading-6 text-[#9b2c2c]"
+                  className="app-status-error rounded-md border px-4 py-3 text-sm leading-6"
                 >
                   {visibleErrorMessage}
                 </div>
@@ -163,7 +165,7 @@ function LoginContent() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-[#334155]"
+                  className="app-muted block text-sm font-medium"
                 >
                   {t.email}
                 </label>
@@ -176,7 +178,7 @@ function LoginContent() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   disabled={isSubmitting}
-                  className="mt-2 block h-12 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                  className="app-input mt-2 block h-12 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -184,7 +186,7 @@ function LoginContent() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-[#334155]"
+                  className="app-muted block text-sm font-medium"
                 >
                   {t.password}
                 </label>
@@ -197,7 +199,7 @@ function LoginContent() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   disabled={isSubmitting}
-                  className="mt-2 block h-12 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15"
+                  className="app-input mt-2 block h-12 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors"
                   placeholder={t.passwordPlaceholder}
                 />
               </div>
@@ -205,7 +207,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#172033] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+                className="app-button-primary inline-flex h-12 w-full items-center justify-center rounded-md px-6 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? t.signingIn : t.signIn}
               </button>

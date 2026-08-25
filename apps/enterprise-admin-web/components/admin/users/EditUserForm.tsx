@@ -32,7 +32,7 @@ export function EditUserForm({
 
   return (
     <form
-      className="border-b border-[#e2e8f0] bg-[#fbfcfe] px-5 py-5"
+      className="app-form-panel border-b px-5 py-5"
       onSubmit={onSubmit}
     >
       {errorMessages.length > 0 ? (
@@ -51,7 +51,7 @@ export function EditUserForm({
         <div>
           <label
             htmlFor="edit-user-name"
-            className="block text-sm font-medium text-[#334155]"
+            className="app-muted block text-sm font-medium"
           >
             {t.name}
           </label>
@@ -64,14 +64,14 @@ export function EditUserForm({
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
             disabled={isSubmitting}
-            className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+            className="app-input mt-2 block h-11 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
           />
         </div>
 
         <div>
           <label
             htmlFor="edit-user-email"
-            className="block text-sm font-medium text-[#334155]"
+            className="app-muted block text-sm font-medium"
           >
             {t.email}
           </label>
@@ -84,7 +84,7 @@ export function EditUserForm({
             value={email}
             onChange={(event) => onEmailChange(event.target.value)}
             disabled={isSubmitting}
-            className="mt-2 block h-11 w-full rounded-md border border-[#b8c2d2] bg-white px-3 text-sm text-[#0f172a] shadow-sm outline-none transition-colors placeholder:text-[#94a3b8] focus:border-[#172033] focus:ring-2 focus:ring-[#172033]/15 disabled:cursor-not-allowed disabled:bg-[#eef2f7]"
+            className="app-input mt-2 block h-11 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
           />
         </div>
       </div>
@@ -93,7 +93,7 @@ export function EditUserForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-10 items-center justify-center rounded-md bg-[#172033] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#24324d] focus:outline-none focus:ring-2 focus:ring-[#172033] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#526174]"
+          className="app-button-primary inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
         >
           {isSubmitting ? t.updatingUser : t.saveChanges}
         </button>
@@ -101,7 +101,7 @@ export function EditUserForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-[#b8c2d2] bg-white px-4 text-sm font-semibold text-[#172033] shadow-sm transition-colors hover:border-[#8796ac] hover:bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#64748b] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#eef2f7] disabled:text-[#64748b]"
+          className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
         >
           {t.cancel}
         </button>

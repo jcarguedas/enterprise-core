@@ -12,6 +12,7 @@ portfolio-grade user administration workflows.
 - Permission-aware sidebar and dashboard actions based on `/api/me`
   permissions.
 - Runtime English/Spanish language switching stored in the browser.
+- Runtime light/dark theme switching stored in the browser.
 - Floating toast notifications for non-critical successful operations.
 - Users module backed by real API data from `GET /api/users`.
 - Users module access gated in the UI by the `manage-users` permission, with
@@ -47,6 +48,15 @@ browser.
 
 The language selector appears in the public landing page, login page, and
 protected admin header.
+
+## Theme Switching
+
+Admin Web supports runtime light/dark theme switching. Light is the default
+theme. The selected theme is stored in `localStorage`, applied on the document
+root, and reused across page navigation and future sessions in the same browser.
+
+The theme selector appears next to the language selector on the public landing
+page, login page, and protected admin header.
 
 ## Toast Notifications
 

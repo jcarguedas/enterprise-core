@@ -152,6 +152,9 @@ export type SharedMessages = {
   language: string;
   english: string;
   spanish: string;
+  theme: string;
+  light: string;
+  dark: string;
   protectedWorkspace: string;
   sessionUnavailable: string;
 };
@@ -327,6 +330,9 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     language: "Language",
     english: "English",
     spanish: "Spanish",
+    theme: "Theme",
+    light: "Light",
+    dark: "Dark",
     protectedWorkspace: "Protected Workspace",
     sessionUnavailable: "Session unavailable",
   },
@@ -505,6 +511,9 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     language: "Idioma",
     english: "Inglés",
     spanish: "Español",
+    theme: "Tema",
+    light: "Claro",
+    dark: "Oscuro",
     protectedWorkspace: "Espacio protegido",
     sessionUnavailable: "Sesión no disponible",
   },

@@ -20,7 +20,7 @@ export function AdminShell({
   onLogout,
 }: AdminShellProps) {
   return (
-    <main className="min-h-screen bg-[#f4f6f9] text-[#111827]">
+    <main className="app-bg min-h-screen">
       <div className="min-h-screen lg:flex">
         <AdminSidebar trustedUser={trustedUser} />
         <div className="flex min-w-0 flex-1 flex-col">

@@ -38,9 +38,9 @@ const TOAST_AUTO_DISMISS_MS = 5000;
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const variantClasses: Record<ToastVariant, string> = {
-  success: "border-[#b7dcc7] bg-[#f3fbf6] text-[#276749]",
-  error: "border-[#f1b8b8] bg-[#fff5f5] text-[#9b2c2c]",
-  info: "border-[#cbd5e1] bg-[#f8fafc] text-[#334155]",
+  success: "app-status-success",
+  error: "app-status-error",
+  info: "app-badge-neutral",
 };
 
 function ToastItem({
