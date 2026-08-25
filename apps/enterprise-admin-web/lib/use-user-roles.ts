@@ -86,7 +86,9 @@ export function useUserRoles({
       return;
     }
 
-    if (userRolesResult.status === "success") {
+    if (userRolesResult.status === "forbidden") {
+      setErrorMessage(t.rolesAccessDeniedDescription);
+    } else if (userRolesResult.status === "success") {
       setRoles(userRolesResult.roles);
     } else {
       setErrorMessage(userRolesResult.message);
@@ -94,6 +96,11 @@ export function useUserRoles({
 
     if (availableRolesResult.status === "success") {
       setAvailableRoles(availableRolesResult.roles);
+      return;
+    }
+
+    if (availableRolesResult.status === "forbidden") {
+      setAssignErrorMessages([t.rolesAccessDeniedDescription]);
       return;
     }
 

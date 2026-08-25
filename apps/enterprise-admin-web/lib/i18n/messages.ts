@@ -12,6 +12,13 @@ export type SharedMessages = {
   dashboard: string;
   users: string;
   roles: string;
+  rolesDescription: string;
+  rolesCatalog: string;
+  rolesCatalogDescription: string;
+  noRolesReturned: string;
+  rolesAccessDenied: string;
+  rolesAccessDeniedDescription: string;
+  roleDescription: string;
   settings: string;
   usersDescription: string;
   userDirectory: string;
@@ -115,6 +122,16 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     dashboard: "Dashboard",
     users: "Users",
     roles: "Roles",
+    rolesDescription:
+      "Review enterprise roles and their current availability for access workflows.",
+    rolesCatalog: "Roles Catalog",
+    rolesCatalogDescription:
+      "Read-only view of roles managed by the Enterprise Auth Service.",
+    noRolesReturned: "No roles were returned by the API.",
+    rolesAccessDenied: "Access denied",
+    rolesAccessDeniedDescription:
+      "Your account does not currently have permission to view roles.",
+    roleDescription: "Description",
     settings: "Settings",
     usersDescription: "Manage enterprise users, access, and account readiness.",
     userDirectory: "User Directory",
@@ -301,6 +318,16 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     signingOut: "Cerrando sesión...",
     dashboard: "Dashboard",
     roles: "Roles",
+    rolesDescription:
+      "Revisa roles empresariales y su disponibilidad actual para flujos de acceso.",
+    rolesCatalog: "Catálogo de roles",
+    rolesCatalogDescription:
+      "Vista de solo lectura de roles administrados por Enterprise Auth Service.",
+    noRolesReturned: "La API no devolvió roles.",
+    rolesAccessDenied: "Acceso denegado",
+    rolesAccessDeniedDescription:
+      "Tu cuenta no tiene permiso actualmente para ver roles.",
+    roleDescription: "Descripción",
     settings: "Configuración",
     validatingSession: "Validando sesión...",
     protectedWorkspacePlaceholder:

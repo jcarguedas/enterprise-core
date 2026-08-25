@@ -77,6 +77,9 @@ export type UserRolesResult =
   | {
       status: "unauthorized";
     }
+  | {
+      status: "forbidden";
+    }
   | InactiveAccountResult
   | {
       status: "error";
@@ -246,6 +249,12 @@ export async function getUserRoles(
       };
     }
 
+    if (response.status === 403) {
+      return {
+        status: "forbidden",
+      };
+    }
+
     if (!response.ok) {
       return {
         status: "error",
@@ -296,6 +305,12 @@ export async function getRoles(token: string): Promise<UserRolesResult> {
     if (isInactiveAccountApiResponse(response, data)) {
       return {
         status: "inactive_account",
+      };
+    }
+
+    if (response.status === 403) {
+      return {
+        status: "forbidden",
       };
     }
 
