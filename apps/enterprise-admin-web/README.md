@@ -16,6 +16,7 @@ The product brand is displayed with the current release label:
   deployment direction, and update strategy status.
 - Protected System Events page with read-only chronological activity from the
   Enterprise Auth Service.
+- Protected read-only Customers page backed by `GET /api/customers`.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -53,6 +54,8 @@ Current limitations:
 - No hard delete user flow yet.
 - No backend pagination or server-side user search yet; current pagination and
   search are local to the loaded user set.
+- No Admin Web customer create/edit/delete/export flows yet; the Customers page
+  is read-only in this foundation.
 
 ## Language Switching
 
@@ -103,14 +106,20 @@ The admin shell validates the current session through `GET /api/me` and uses the
 returned `user.permissions` array for navigation and dashboard UX decisions.
 
 The sidebar keeps Dashboard, System, and Settings visible for authenticated
-users, shows Users and Roles only when the trusted current user has
-`manage-users`. System Events remains a System subpage and is not shown as a
-top-level sidebar item.
+users, shows Customers only when the trusted current user has `view-customers`,
+and shows Users and Roles only when the trusted current user has `manage-users`.
+System Events remains a System subpage and is not shown as a top-level sidebar
+item.
 
 The `/users` page does not request `GET /api/users` when the trusted current
 user lacks `manage-users`; it shows an access-denied message inside the admin
 layout instead. Backend `403 Forbidden` responses remain the fallback authority
 for permission enforcement.
+
+The `/customers` page lists customers from `GET /api/customers`. It requires
+`view-customers`, is read-only, includes local search across currently loaded
+customer fields, and does not create, edit, delete, deactivate, export, or
+mutate customers.
 
 The `/roles` page follows the same pattern for `GET /api/roles` and shows a
 read-only role catalog when the trusted current user has `manage-users`.
@@ -142,9 +151,9 @@ Command+K on macOS
 ```
 
 The current command palette is a safe navigation and typed intent foundation
-only. It includes known destinations for Dashboard, Users, Roles, System,
-System Events, and Settings, with localized aliases such as `home`, `usuarios`,
-`permisos`, `activity log`, and `configuracion`.
+only. It includes known destinations for Dashboard, Customers, Users, Roles,
+System, System Events, and Settings, with localized aliases such as `home`,
+`clientes`, `usuarios`, `permisos`, `activity log`, and `configuracion`.
 
 The palette also includes a future-safe Create User intent that navigates to
 `/users?intent=create-user`. The Users page responds by opening and preparing
@@ -161,6 +170,11 @@ Safe edit-user phrases such as `edit user Jean`, `update user Jean`,
 `editar usuario Jean`, and `actualizar usuario Jean` navigate to
 `/users?intent=edit-user&search=Jean`. The Users page applies the search and
 opens the existing edit form only when exactly one local user matches.
+
+The palette also supports safe customer search phrases such as
+`search customer Acme`, `find customer Acme`, `buscar cliente Acme`, and
+`cliente Acme`. These navigate to `/customers?search=Acme`, where the Customers
+page fills the local search input and filters the currently loaded customers.
 
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.

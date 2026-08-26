@@ -17,6 +17,7 @@ import { useI18n } from "@/lib/i18n/use-i18n";
 import {
   hasPermission,
   MANAGE_USERS_PERMISSION,
+  VIEW_CUSTOMERS_PERMISSION,
   VIEW_SYSTEM_EVENTS_PERMISSION,
 } from "@/lib/permissions";
 
@@ -30,6 +31,7 @@ type CommandItem = {
   labelKey: keyof Pick<
     SharedMessages,
     | "createUser"
+    | "customers"
     | "dashboard"
     | "roles"
     | "settings"
@@ -56,6 +58,16 @@ const commandItems: CommandItem[] = [
     href: "/dashboard",
     icon: DashboardIcon,
     labelKey: "dashboard",
+  },
+  {
+    aliases: {
+      en: ["customers", "open customers", "customer list"],
+      es: ["clientes", "abrir clientes", "lista de clientes"],
+    },
+    href: "/customers",
+    icon: UsersIcon,
+    labelKey: "customers",
+    permission: VIEW_CUSTOMERS_PERMISSION,
   },
   {
     aliases: {
@@ -155,6 +167,15 @@ const userSearchPrefixes = [
   "usuario",
 ];
 
+const customerSearchPrefixes = [
+  "search customer",
+  "find customer",
+  "customer",
+  "buscar cliente",
+  "ver cliente",
+  "cliente",
+];
+
 const editUserPrefixes = [
   "edit user",
   "update user",
@@ -185,6 +206,10 @@ function parseUserSearchTerm(value: string) {
   return parsePrefixedTerm(value, userSearchPrefixes);
 }
 
+function parseCustomerSearchTerm(value: string) {
+  return parsePrefixedTerm(value, customerSearchPrefixes);
+}
+
 function parseEditUserTerm(value: string) {
   return parsePrefixedTerm(value, editUserPrefixes);
 }
@@ -197,6 +222,10 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [shortcutHint] = useState(getShortcutHint);
   const canManageUsers = hasPermission(trustedUser, MANAGE_USERS_PERMISSION);
+  const canViewCustomers = hasPermission(
+    trustedUser,
+    VIEW_CUSTOMERS_PERMISSION,
+  );
   const visibleCommands = useMemo(
     () => {
       const staticCommands = commandItems
@@ -216,8 +245,23 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
             ...command.aliases.es,
           ],
         }));
+      const customerSearchTerm = parseCustomerSearchTerm(query);
       const editUserTerm = parseEditUserTerm(query);
       const userSearchTerm = parseUserSearchTerm(query);
+
+      if (canViewCustomers && customerSearchTerm.length >= 2) {
+        staticCommands.unshift({
+          href: `/customers?search=${encodeURIComponent(customerSearchTerm)}`,
+          icon: UsersIcon,
+          label: t.customerSearchFor.replace("{query}", customerSearchTerm),
+          searchValues: [
+            query,
+            t.customerSearchFor,
+            t.customers,
+            customerSearchTerm,
+          ],
+        });
+      }
 
       if (canManageUsers && editUserTerm.length >= 2) {
         staticCommands.unshift({
@@ -241,7 +285,7 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
 
       return staticCommands;
     },
-    [canManageUsers, query, t, trustedUser],
+    [canManageUsers, canViewCustomers, query, t, trustedUser],
   );
   const filteredCommands = useMemo(() => {
     const normalizedQuery = normalizeSearchValue(query.trim());

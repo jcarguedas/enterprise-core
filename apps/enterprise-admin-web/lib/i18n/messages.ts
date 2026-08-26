@@ -62,10 +62,18 @@ export type SharedMessages = {
   commandPaletteDescription: string;
   editUserCommand: string;
   editUserFor: string;
+  customerSearchFor: string;
   searchUser: string;
   searchUsersFor: string;
   searchCommands: string;
   noCommandsFound: string;
+  customers: string;
+  customerManagement: string;
+  customersDescription: string;
+  customersReadOnlyDescription: string;
+  customersAccessDenied: string;
+  customersAccessDeniedDescription: string;
+  customersLoadError: string;
   closeCommandPalette: string;
   dashboard: string;
   dashboardDescription: string;
@@ -150,7 +158,11 @@ export type SharedMessages = {
   createUser: string;
   editUser: string;
   refresh: string;
+  refreshCustomers: string;
+  refreshingCustomers: string;
   refreshingUsers: string;
+  searchCustomers: string;
+  searchCustomersPlaceholder: string;
   searchUsers: string;
   searchUsersPlaceholder: string;
   clearSearch: string;
@@ -170,7 +182,10 @@ export type SharedMessages = {
   crudComingNext: string;
   comingNext: string;
   readOnly: string;
+  loadingCustomers: string;
   loadingUsers: string;
+  noCustomersFound: string;
+  noCustomersMatchSearch: string;
   noUsersReturned: string;
   actions: string;
   status: string;
@@ -202,8 +217,10 @@ export type SharedMessages = {
   cannotDeactivateOwnAccount: string;
   edit: string;
   id: string;
+  identification: string;
   name: string;
   email: string;
+  phone: string;
   password: string;
   passwordConfirmation: string;
   cancel: string;
@@ -307,10 +324,21 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Search and open known Admin Web destinations. This palette only supports safe navigation commands.",
     editUserCommand: "Edit user",
     editUserFor: 'Edit user "{query}"',
+    customerSearchFor: 'Search customers for "{query}"',
     searchUser: "Search user",
     searchUsersFor: 'Search users for "{query}"',
     searchCommands: "Search commands",
     noCommandsFound: "No matching commands were found.",
+    customers: "Customers",
+    customerManagement: "Customer Management",
+    customersDescription: "View and search business customers.",
+    customersReadOnlyDescription:
+      "This first business module view is read-only. Create, edit, delete, export, and status changes are not implemented here yet.",
+    customersAccessDenied: "Customers access denied",
+    customersAccessDeniedDescription:
+      "You do not have permission to view customers.",
+    customersLoadError:
+      "Unable to load customers. Please try again shortly.",
     closeCommandPalette: "Close command palette",
     dashboard: "Dashboard",
     dashboardDescription:
@@ -419,7 +447,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     createUser: "Create User",
     editUser: "Edit User",
     refresh: "Refresh",
+    refreshCustomers: "Refresh customers",
+    refreshingCustomers: "Refreshing customers...",
     refreshingUsers: "Refreshing users...",
+    searchCustomers: "Search customers",
+    searchCustomersPlaceholder:
+      "Search by ID, name, email, phone, identification, or status",
     searchUsers: "Search users",
     searchUsersPlaceholder: "Search by ID, name, email, or status",
     clearSearch: "Clear search",
@@ -439,7 +472,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
     readOnly: "Read only",
+    loadingCustomers: "Loading customers...",
     loadingUsers: "Loading users...",
+    noCustomersFound: "No customers found.",
+    noCustomersMatchSearch: "No customers match your search.",
     noUsersReturned: "No users were returned by the API.",
     actions: "Actions",
     status: "Status",
@@ -471,8 +507,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     cannotDeactivateOwnAccount: "You cannot deactivate your own account.",
     edit: "Edit",
     id: "ID",
+    identification: "Identification",
     name: "Name",
     email: "Email",
+    phone: "Phone",
     password: "Password",
     passwordConfirmation: "Password Confirmation",
     cancel: "Cancel",
@@ -550,7 +588,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     createUser: "Crear usuario",
     editUser: "Editar usuario",
     refresh: "Actualizar",
+    refreshCustomers: "Actualizar clientes",
+    refreshingCustomers: "Actualizando clientes...",
     refreshingUsers: "Actualizando usuarios...",
+    searchCustomers: "Buscar clientes",
+    searchCustomersPlaceholder:
+      "Busca por ID, nombre, correo, teléfono, identificación o estado",
     searchUsers: "Buscar usuarios",
     searchUsersPlaceholder:
       "Busca por ID, nombre, correo electrónico o estado",
@@ -571,7 +614,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
     readOnly: "Solo lectura",
+    loadingCustomers: "Cargando clientes...",
     loadingUsers: "Cargando usuarios...",
+    noCustomersFound: "No se encontraron clientes.",
+    noCustomersMatchSearch: "Ningún cliente coincide con tu búsqueda.",
     noUsersReturned: "La API no devolvió usuarios.",
     actions: "Acciones",
     status: "Estado",
@@ -603,8 +649,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     cannotDeactivateOwnAccount: "No puedes desactivar tu propia cuenta.",
     edit: "Editar",
     id: "ID",
+    identification: "Identificación",
     name: "Nombre",
     email: "Correo electrónico",
+    phone: "Teléfono",
     password: "Contraseña",
     passwordConfirmation: "Confirmación de contraseña",
     cancel: "Cancelar",
@@ -660,10 +708,21 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Busca y abre destinos conocidos de Admin Web. Esta paleta solo permite comandos seguros de navegación.",
     editUserCommand: "Editar usuario",
     editUserFor: 'Editar usuario "{query}"',
+    customerSearchFor: 'Buscar clientes por "{query}"',
     searchUser: "Buscar usuario",
     searchUsersFor: 'Buscar usuarios por "{query}"',
     searchCommands: "Buscar comandos",
     noCommandsFound: "No se encontraron comandos coincidentes.",
+    customers: "Clientes",
+    customerManagement: "Gestión de clientes",
+    customersDescription: "Consulta y busca clientes del negocio.",
+    customersReadOnlyDescription:
+      "Esta primera vista del módulo de negocio es de solo lectura. Crear, editar, eliminar, exportar y cambiar estados aún no están implementados aquí.",
+    customersAccessDenied: "Acceso a clientes denegado",
+    customersAccessDeniedDescription:
+      "No tienes permiso para ver clientes.",
+    customersLoadError:
+      "No se pudieron cargar los clientes. Inténtalo de nuevo pronto.",
     closeCommandPalette: "Cerrar paleta de comandos",
     dashboard: "Dashboard",
     dashboardDescription:
