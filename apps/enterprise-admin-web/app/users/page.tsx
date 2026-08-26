@@ -474,6 +474,22 @@ function UsersContent() {
     }, 0);
   }, [createUserFlow.isFormVisible, shouldFocusCreateUserForm]);
 
+  useEffect(() => {
+    const search = searchParams.get("search");
+
+    if (status !== "ready" || !canManageUsers || search === null) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      handleSearchQueryChange(search);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [canManageUsers, searchParams, status]);
+
   return (
     <AdminShell
       userDisplayName={userDisplayName}

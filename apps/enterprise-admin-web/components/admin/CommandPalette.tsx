@@ -30,6 +30,13 @@ type CommandItem = {
   permission?: string;
 };
 
+type VisibleCommand = {
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  searchValues: string[];
+};
+
 const commandItems: CommandItem[] = [
   {
     aliases: {
@@ -114,6 +121,34 @@ function normalizeSearchValue(value: string) {
     .toLowerCase();
 }
 
+const userSearchPrefixes = [
+  "search user",
+  "find user",
+  "user",
+  "buscar usuario",
+  "ver usuario",
+  "usuario",
+];
+
+function parseUserSearchTerm(value: string) {
+  const normalizedValue = normalizeSearchValue(value.trim()).replace(
+    /\s+/g,
+    " ",
+  );
+  const matchedPrefix = userSearchPrefixes.find(
+    (prefix) =>
+      normalizedValue === prefix || normalizedValue.startsWith(`${prefix} `),
+  );
+
+  if (!matchedPrefix) {
+    return "";
+  }
+
+  const searchTerm = value.trim().slice(matchedPrefix.length).trim();
+
+  return searchTerm.replace(/\s+/g, " ");
+}
+
 export function CommandPalette({ trustedUser }: CommandPaletteProps) {
   const router = useRouter();
   const { messages: t } = useI18n();
@@ -121,13 +156,40 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [shortcutHint] = useState(getShortcutHint);
+  const canManageUsers = hasPermission(trustedUser, MANAGE_USERS_PERMISSION);
   const visibleCommands = useMemo(
-    () =>
-      commandItems.filter(
-        (command) =>
-          !command.permission || hasPermission(trustedUser, command.permission),
-      ),
-    [trustedUser],
+    () => {
+      const staticCommands = commandItems
+        .filter(
+          (command) =>
+            !command.permission ||
+            hasPermission(trustedUser, command.permission),
+        )
+        .map((command) => ({
+          href: command.href,
+          icon: command.icon,
+          label: t[command.labelKey],
+          searchValues: [
+            t[command.labelKey],
+            command.href,
+            ...command.aliases.en,
+            ...command.aliases.es,
+          ],
+        }));
+      const userSearchTerm = parseUserSearchTerm(query);
+
+      if (canManageUsers && userSearchTerm.length >= 2) {
+        staticCommands.unshift({
+          href: `/users?search=${encodeURIComponent(userSearchTerm)}`,
+          icon: UsersIcon,
+          label: t.searchUsersFor.replace("{query}", userSearchTerm),
+          searchValues: [query, t.searchUser, t.searchUsersFor, userSearchTerm],
+        });
+      }
+
+      return staticCommands;
+    },
+    [canManageUsers, query, t, trustedUser],
   );
   const filteredCommands = useMemo(() => {
     const normalizedQuery = normalizeSearchValue(query.trim());
@@ -137,18 +199,11 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
     }
 
     return visibleCommands.filter((command) => {
-      const searchableValues = [
-        t[command.labelKey],
-        command.href,
-        ...command.aliases.en,
-        ...command.aliases.es,
-      ];
-
-      return searchableValues.some((value) =>
+      return command.searchValues.some((value) =>
         normalizeSearchValue(value).includes(normalizedQuery),
       );
     });
-  }, [query, t, visibleCommands]);
+  }, [query, visibleCommands]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -259,7 +314,7 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
               <div className="mt-4 overflow-hidden rounded-md border border-[var(--app-border)]">
                 {filteredCommands.length > 0 ? (
                   <ul className="divide-y divide-[var(--app-border)]">
-                    {filteredCommands.map((command) => {
+                    {filteredCommands.map((command: VisibleCommand) => {
                       const Icon = command.icon;
 
                       return (
@@ -270,7 +325,7 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
                             className="app-button-secondary flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--app-focus)]"
                           >
                             <Icon className="size-4 shrink-0" />
-                            <span>{t[command.labelKey]}</span>
+                            <span>{command.label}</span>
                           </button>
                         </li>
                       );

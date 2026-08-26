@@ -32,6 +32,7 @@ Close it with:
 | System | `/system` | Visible to authenticated users |
 | Settings | `/settings` | Visible to authenticated users |
 | Create User | `/users?intent=create-user` | Requires `manage-users` |
+| Search Users | `/users?search=<query>` | Requires `manage-users` |
 
 ## Typed Aliases
 
@@ -48,6 +49,14 @@ Examples:
 - `crear usuario`
 - `nuevo usuario`
 
+Safe user search phrases are also supported:
+
+- `search user Jean Carlos`
+- `find user Jean Carlos`
+- `buscar usuario Jean Carlos`
+- `ver usuario Jean Carlos`
+- `usuario Jean Carlos`
+
 ## Permission Behavior
 
 The palette respects frontend permission visibility.
@@ -57,6 +66,7 @@ Commands that require `manage-users` are hidden when the trusted current user do
 - Users.
 - Roles.
 - Create User.
+- Search Users.
 
 Frontend visibility improves usability, but backend authorization remains the final enforcement layer for protected API behavior.
 
@@ -77,6 +87,35 @@ This command does not:
 - Bypass validation.
 - Bypass permissions.
 - Add new backend calls beyond the existing Users page behavior.
+
+## User Search Intent
+
+The command palette can detect simple typed user search phrases and navigate to:
+
+```text
+/users?search=<query>
+```
+
+For example:
+
+```text
+search user Jean Carlos
+```
+
+navigates to:
+
+```text
+/users?search=Jean%20Carlos
+```
+
+The Users page fills the existing search input with the query and reuses its current local filtering behavior.
+
+This intent does not:
+
+- Call the backend from the command palette.
+- Open edit mode automatically.
+- Create, update, deactivate, or delete users.
+- Bypass `manage-users`.
 
 ## Safety Boundaries
 

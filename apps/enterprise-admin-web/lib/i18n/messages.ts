@@ -59,6 +59,8 @@ export type SharedMessages = {
   command: string;
   commandPalette: string;
   commandPaletteDescription: string;
+  searchUser: string;
+  searchUsersFor: string;
   searchCommands: string;
   noCommandsFound: string;
   closeCommandPalette: string;
@@ -280,6 +282,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     commandPalette: "Command Palette",
     commandPaletteDescription:
       "Search and open known Admin Web destinations. This palette only supports safe navigation commands.",
+    searchUser: "Search user",
+    searchUsersFor: 'Search users for "{query}"',
     searchCommands: "Search commands",
     noCommandsFound: "No matching commands were found.",
     closeCommandPalette: "Close command palette",
@@ -603,6 +607,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     commandPalette: "Paleta de comandos",
     commandPaletteDescription:
       "Busca y abre destinos conocidos de Admin Web. Esta paleta solo permite comandos seguros de navegación.",
+    searchUser: "Buscar usuario",
+    searchUsersFor: 'Buscar usuarios por "{query}"',
     searchCommands: "Buscar comandos",
     noCommandsFound: "No se encontraron comandos coincidentes.",
     closeCommandPalette: "Cerrar paleta de comandos",
