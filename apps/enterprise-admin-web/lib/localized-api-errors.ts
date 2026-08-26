@@ -24,6 +24,17 @@ export function localizeApiErrorMessage(
   return messageKey ? messages[messageKey] : rawMessage;
 }
 
+export function localizeKnownApiErrorMessage(
+  rawMessage: string,
+  messages: SharedMessages,
+) {
+  const normalizedMessage = rawMessage.trim();
+  const messageKey =
+    knownApiErrorKeys[normalizedMessage as keyof typeof knownApiErrorKeys];
+
+  return messageKey ? messages[messageKey] : null;
+}
+
 export function localizeApiErrorMessages(
   rawMessages: string[],
   messages: SharedMessages,
@@ -31,4 +42,52 @@ export function localizeApiErrorMessages(
   return rawMessages.map((message) =>
     localizeApiErrorMessage(message, messages),
   );
+}
+
+export function getSafeLoginApiErrorMessage({
+  messages,
+  rawMessages,
+  status,
+}: {
+  messages: SharedMessages;
+  rawMessages: string[];
+  status: number;
+}) {
+  if (status >= 500 || rawMessages.some(looksLikeInternalError)) {
+    return messages.loginGenericError;
+  }
+
+  const localizedMessages = rawMessages.map((message) =>
+    localizeKnownApiErrorMessage(message, messages),
+  );
+
+  if (
+    localizedMessages.length === 0 ||
+    localizedMessages.some((message) => message === null)
+  ) {
+    return messages.loginGenericError;
+  }
+
+  return localizedMessages.join(" ");
+}
+
+function looksLikeInternalError(rawMessage: string) {
+  const normalizedMessage = rawMessage.toLowerCase();
+
+  return [
+    "sqlstate",
+    "pdoexception",
+    "queryexception",
+    "stack trace",
+    "stacktrace",
+    "illuminate\\",
+    "vendor\\",
+    "database",
+    "table",
+    "column",
+    "select ",
+    "insert into",
+    "update ",
+    "delete from",
+  ].some((pattern) => normalizedMessage.includes(pattern));
 }

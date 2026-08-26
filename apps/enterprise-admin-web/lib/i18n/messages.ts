@@ -37,6 +37,7 @@ export type SharedMessages = {
   accessPortal: string;
   passwordPlaceholder: string;
   loginDefaultError: string;
+  loginGenericError: string;
   loginIncompleteResponse: string;
   authServiceUnavailable: string;
   apiErrorInvalidCredentials: string;
@@ -71,6 +72,25 @@ export type SharedMessages = {
   dashboardWelcome: string;
   system: string;
   systemDescription: string;
+  systemEvents: string;
+  systemEventsDescription: string;
+  systemEventsSummaryDescription: string;
+  systemEventsReadOnlyStatus: string;
+  systemEventsPermissionDescription: string;
+  viewSystemEvents: string;
+  refreshEvents: string;
+  refreshingEvents: string;
+  loadingSystemEvents: string;
+  noSystemEventsFound: string;
+  eventType: string;
+  severity: string;
+  actor: string;
+  target: string;
+  message: string;
+  dateTime: string;
+  systemEventsAccessDenied: string;
+  systemEventsAccessDeniedDescription: string;
+  systemEventsLoadError: string;
   systemInformation: string;
   systemInformationDescription: string;
   productDisplayNameLabel: string;
@@ -255,6 +275,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     accessPortal: "Enterprise-controlled access portal",
     passwordPlaceholder: "Enter your password",
     loginDefaultError: "Unable to sign in. Please verify your credentials.",
+    loginGenericError: "Unable to sign in. Please try again shortly.",
     loginIncompleteResponse:
       "The login response was incomplete. Please try again.",
     authServiceUnavailable:
@@ -298,6 +319,30 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     system: "System",
     systemDescription:
       "Read-only product, deployment, and update strategy information for this Admin Web instance.",
+    systemEvents: "System Events",
+    systemEventsDescription:
+      "View chronological system activity and security events.",
+    systemEventsSummaryDescription:
+      "Open the read-only activity log for authentication, access, and user administration events.",
+    systemEventsReadOnlyStatus: "Read only",
+    systemEventsPermissionDescription:
+      "This page requires the view-system-events permission.",
+    viewSystemEvents: "View System Events",
+    refreshEvents: "Refresh events",
+    refreshingEvents: "Refreshing events...",
+    loadingSystemEvents: "Loading system events...",
+    noSystemEventsFound: "No system events found.",
+    eventType: "Event type",
+    severity: "Severity",
+    actor: "Actor",
+    target: "Target",
+    message: "Message",
+    dateTime: "Date/time",
+    systemEventsAccessDenied: "System events access denied",
+    systemEventsAccessDeniedDescription:
+      "You do not have permission to view system events.",
+    systemEventsLoadError:
+      "Unable to load system events. Please try again shortly.",
     systemInformation: "System Information",
     systemInformationDescription:
       "Current runtime details for the protected administration interface.",
@@ -582,6 +627,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     passwordPlaceholder: "Ingresa tu contraseña",
     loginDefaultError:
       "No se pudo iniciar sesión. Verifica tus credenciales.",
+    loginGenericError:
+      "No se pudo iniciar sesión. Inténtalo de nuevo pronto.",
     loginIncompleteResponse:
       "La respuesta de inicio de sesión está incompleta. Inténtalo de nuevo.",
     authServiceUnavailable:
@@ -625,6 +672,30 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     system: "Sistema",
     systemDescription:
       "Información de solo lectura sobre producto, despliegue y estrategia de actualizaciones para esta instancia de Admin Web.",
+    systemEvents: "Eventos del sistema",
+    systemEventsDescription:
+      "Consulta la actividad cronológica del sistema y eventos de seguridad.",
+    systemEventsSummaryDescription:
+      "Abre el registro de actividad de solo lectura para eventos de autenticación, acceso y administración de usuarios.",
+    systemEventsReadOnlyStatus: "Solo lectura",
+    systemEventsPermissionDescription:
+      "Esta página requiere el permiso view-system-events.",
+    viewSystemEvents: "Ver eventos del sistema",
+    refreshEvents: "Actualizar eventos",
+    refreshingEvents: "Actualizando eventos...",
+    loadingSystemEvents: "Cargando eventos del sistema...",
+    noSystemEventsFound: "No se encontraron eventos del sistema.",
+    eventType: "Tipo de evento",
+    severity: "Severidad",
+    actor: "Actor",
+    target: "Destino",
+    message: "Mensaje",
+    dateTime: "Fecha/hora",
+    systemEventsAccessDenied: "Acceso a eventos del sistema denegado",
+    systemEventsAccessDeniedDescription:
+      "No tienes permiso para ver eventos del sistema.",
+    systemEventsLoadError:
+      "No se pudieron cargar los eventos del sistema. Inténtalo de nuevo pronto.",
     systemInformation: "Información del sistema",
     systemInformationDescription:
       "Detalles actuales de ejecución para la interfaz administrativa protegida.",

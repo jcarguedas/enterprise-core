@@ -14,7 +14,11 @@ import {
 import type { StoredUser } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
-import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
+import {
+  hasPermission,
+  MANAGE_USERS_PERMISSION,
+  VIEW_SYSTEM_EVENTS_PERMISSION,
+} from "@/lib/permissions";
 
 type CommandItem = {
   aliases: {
@@ -25,7 +29,13 @@ type CommandItem = {
   icon: ComponentType<{ className?: string }>;
   labelKey: keyof Pick<
     SharedMessages,
-    "createUser" | "dashboard" | "roles" | "settings" | "system" | "users"
+    | "createUser"
+    | "dashboard"
+    | "roles"
+    | "settings"
+    | "system"
+    | "systemEvents"
+    | "users"
   >;
   permission?: string;
 };
@@ -80,6 +90,21 @@ const commandItems: CommandItem[] = [
     href: "/system",
     icon: SystemIcon,
     labelKey: "system",
+  },
+  {
+    aliases: {
+      en: ["system events", "activity log", "audit log"],
+      es: [
+        "eventos del sistema",
+        "actividad del sistema",
+        "auditoria",
+        "auditoría",
+      ],
+    },
+    href: "/system/events",
+    icon: SystemIcon,
+    labelKey: "systemEvents",
+    permission: VIEW_SYSTEM_EVENTS_PERMISSION,
   },
   {
     aliases: {
