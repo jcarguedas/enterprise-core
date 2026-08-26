@@ -1,7 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { AccessDeniedState } from "@/components/admin/AccessDeniedState";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -32,8 +39,9 @@ type UsersLoadStatus = "idle" | "loading" | "ready" | "error" | "access_denied";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
-export default function UsersPage() {
+function UsersContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { messages: t } = useI18n();
   const {
     errorMessage,
@@ -53,6 +61,10 @@ export default function UsersPage() {
     useState<UserSortDirection>("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [shouldFocusCreateUserForm, setShouldFocusCreateUserForm] =
+    useState(false);
+  const createUserFormRef = useRef<HTMLDivElement>(null);
+  const hasAppliedCreateUserIntentRef = useRef(false);
   const canManageUsers = hasPermission(trustedUser, MANAGE_USERS_PERMISSION);
   const isAccessDenied =
     (status === "ready" && !canManageUsers) ||
@@ -301,7 +313,7 @@ export default function UsersPage() {
     loadUsers(token, { isRefresh: true });
   }, [canManageUsers, loadUsers, router]);
 
-  function handleShowCreateUserForm() {
+  const handleShowCreateUserForm = useCallback(() => {
     if (
       createUserFlow.isSubmitting ||
       editUserFlow.isSubmitting ||
@@ -314,7 +326,13 @@ export default function UsersPage() {
     editUserFlow.cancelEditing();
     userRolesFlow.closeRolesPanel();
     createUserFlow.showForm();
-  }
+  }, [
+    createUserFlow,
+    editUserFlow,
+    isUserStatusUpdating,
+    userRolesFlow,
+    userStatusFlow,
+  ]);
 
   function handleEditUser(user: EnterpriseUser) {
     if (
@@ -411,6 +429,50 @@ export default function UsersPage() {
       isCurrent = false;
     };
   }, [canManageUsers, loadUsers, router, status]);
+
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+
+    if (intent !== "create-user") {
+      hasAppliedCreateUserIntentRef.current = false;
+      return;
+    }
+
+    if (
+      hasAppliedCreateUserIntentRef.current ||
+      status !== "ready" ||
+      !canManageUsers
+    ) {
+      return;
+    }
+
+    hasAppliedCreateUserIntentRef.current = true;
+    setShouldFocusCreateUserForm(true);
+    handleShowCreateUserForm();
+  }, [
+    canManageUsers,
+    createUserFlow.isFormVisible,
+    createUserFlow.isSubmitting,
+    editUserFlow.isSubmitting,
+    handleShowCreateUserForm,
+    isUserStatusUpdating,
+    searchParams,
+    status,
+  ]);
+
+  useEffect(() => {
+    if (!createUserFlow.isFormVisible || !shouldFocusCreateUserForm) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      createUserFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setShouldFocusCreateUserForm(false);
+    }, 0);
+  }, [createUserFlow.isFormVisible, shouldFocusCreateUserForm]);
 
   return (
     <AdminShell
@@ -546,23 +608,26 @@ export default function UsersPage() {
           ) : null}
 
           {createUserFlow.isFormVisible ? (
-            <CreateUserForm
-              name={createUserFlow.name}
-              email={createUserFlow.email}
-              password={createUserFlow.password}
-              passwordConfirmation={createUserFlow.passwordConfirmation}
-              isSubmitting={createUserFlow.isSubmitting}
-              errorMessages={createUserFlow.errorMessages}
-              onNameChange={createUserFlow.setName}
-              onEmailChange={createUserFlow.setEmail}
-              onPasswordChange={createUserFlow.setPassword}
-              onPasswordConfirmationChange={
-                createUserFlow.setPasswordConfirmation
-              }
-              onSubmit={createUserFlow.submit}
-              onCancel={createUserFlow.cancelForm}
-              onClearErrorMessages={createUserFlow.clearErrorMessages}
-            />
+            <div ref={createUserFormRef}>
+              <CreateUserForm
+                name={createUserFlow.name}
+                email={createUserFlow.email}
+                password={createUserFlow.password}
+                passwordConfirmation={createUserFlow.passwordConfirmation}
+                shouldAutoFocusName={shouldFocusCreateUserForm}
+                isSubmitting={createUserFlow.isSubmitting}
+                errorMessages={createUserFlow.errorMessages}
+                onNameChange={createUserFlow.setName}
+                onEmailChange={createUserFlow.setEmail}
+                onPasswordChange={createUserFlow.setPassword}
+                onPasswordConfirmationChange={
+                  createUserFlow.setPasswordConfirmation
+                }
+                onSubmit={createUserFlow.submit}
+                onCancel={createUserFlow.cancelForm}
+                onClearErrorMessages={createUserFlow.clearErrorMessages}
+              />
+            </div>
           ) : null}
 
           {editUserFlow.isFormVisible ? (
@@ -732,5 +797,13 @@ export default function UsersPage() {
         ) : null}
       </div>
     </AdminShell>
+  );
+}
+
+export default function UsersPage() {
+  return (
+    <Suspense fallback={null}>
+      <UsersContent />
+    </Suspense>
   );
 }

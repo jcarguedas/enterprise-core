@@ -12,6 +12,7 @@ type CreateUserFormProps = {
   email: string;
   password: string;
   passwordConfirmation: string;
+  shouldAutoFocusName?: boolean;
   isSubmitting: boolean;
   errorMessages: string[];
   onNameChange: (value: string) => void;
@@ -28,6 +29,7 @@ export function CreateUserForm({
   email,
   password,
   passwordConfirmation,
+  shouldAutoFocusName = false,
   isSubmitting,
   errorMessages,
   onNameChange,
@@ -73,6 +75,7 @@ export function CreateUserForm({
             name="name"
             type="text"
             autoComplete="name"
+            autoFocus={shouldAutoFocusName}
             required
             value={name}
             onChange={(event) => onNameChange(event.target.value)}

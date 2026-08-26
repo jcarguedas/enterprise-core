@@ -137,9 +137,10 @@ Settings, with localized aliases such as `home`, `usuarios`, `permisos`, and
 `configuracion`.
 
 The palette also includes a future-safe Create User intent that navigates to
-`/users?intent=create-user`. The Users page does not react to that query
-parameter yet; it is reserved as a future UI hook. Users, Roles, and Create User
-are hidden when the trusted current user does not have `manage-users`.
+`/users?intent=create-user`. The Users page responds by opening and preparing
+the existing Create User form without submitting anything automatically. Users,
+Roles, and Create User are hidden when the trusted current user does not have
+`manage-users`.
 
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
