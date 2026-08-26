@@ -156,7 +156,8 @@ AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
 
 See [Command Palette](docs/Command-Palette.md) for the Admin Web command
-palette manual.
+palette manual and [Command Center Roadmap](docs/Command-Center-Roadmap.md)
+for the phased product direction.
 
 ## Roles
 
