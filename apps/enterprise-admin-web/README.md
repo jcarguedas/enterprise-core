@@ -142,6 +142,11 @@ the existing Create User form without submitting anything automatically. Users,
 Roles, and Create User are hidden when the trusted current user does not have
 `manage-users`.
 
+The palette also supports safe user search phrases such as `search user Jean`,
+`find user Jean`, `buscar usuario Jean`, and `usuario Jean`. These navigate to
+`/users?search=Jean`, where the Users page fills the existing search input and
+reuses the current local filtering behavior.
+
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
 
