@@ -5,6 +5,10 @@ import { FormEvent, useState } from "react";
 import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
+import {
+  localizeApiErrorMessage,
+  localizeApiErrorMessages,
+} from "@/lib/localized-api-errors";
 import { createUser, EnterpriseUser } from "@/lib/users-api";
 
 type UseCreateUserOptions = {
@@ -101,11 +105,11 @@ export function useCreateUser({
     }
 
     if (result.status === "validation_error") {
-      setErrorMessages(result.messages);
+      setErrorMessages(localizeApiErrorMessages(result.messages, t));
       return;
     }
 
-    setErrorMessages([result.message]);
+    setErrorMessages([localizeApiErrorMessage(result.message, t)]);
   }
 
   return {

@@ -7,6 +7,7 @@ import type { StoredUser } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
+import { productDisplayName } from "@/lib/product-info";
 
 type NavigationItem = {
   labelKey: keyof Pick<
@@ -57,7 +58,9 @@ export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
             EC
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{t.productName}</p>
+            <p className="truncate text-sm font-semibold">
+              {productDisplayName}
+            </p>
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--app-sidebar-muted)]">
               {t.adminWeb}
             </p>

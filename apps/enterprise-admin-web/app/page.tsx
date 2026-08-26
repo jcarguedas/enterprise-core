@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { ThemeSelector } from "@/components/admin/ThemeSelector";
 import { useI18n } from "@/lib/i18n/use-i18n";
+import { productDisplayName } from "@/lib/product-info";
 
 export default function Home() {
   const { messages: t } = useI18n();
@@ -43,7 +44,7 @@ export default function Home() {
             </div>
             <div>
               <p className="app-text text-sm font-semibold">
-                {t.productName}
+                {productDisplayName}
               </p>
               <p className="app-subtle text-xs uppercase tracking-[0.18em]">
                 {t.adminWeb}
@@ -66,7 +67,7 @@ export default function Home() {
               {t.landingEyebrow}
             </p>
             <h1 className="app-text text-5xl font-semibold leading-tight tracking-normal sm:text-6xl">
-              {t.productName}
+              {productDisplayName}
             </h1>
             <p className="app-muted mt-5 text-2xl font-medium">
               {t.landingSubtitle}

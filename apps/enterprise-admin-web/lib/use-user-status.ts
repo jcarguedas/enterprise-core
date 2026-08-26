@@ -5,6 +5,10 @@ import { useState } from "react";
 import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
+import {
+  localizeApiErrorMessage,
+  localizeApiErrorMessages,
+} from "@/lib/localized-api-errors";
 import { updateUser } from "@/lib/users-api";
 import type { EnterpriseUser } from "@/lib/users-api";
 
@@ -73,11 +77,11 @@ export function useUserStatus({
     }
 
     if (result.status === "validation_error") {
-      setErrorMessages(result.messages);
+      setErrorMessages(localizeApiErrorMessages(result.messages, t));
       return;
     }
 
-    setErrorMessages([result.message]);
+    setErrorMessages([localizeApiErrorMessage(result.message, t)]);
   }
 
   function clearMessages() {

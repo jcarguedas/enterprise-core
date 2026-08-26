@@ -4,6 +4,9 @@ Enterprise Admin Web is the protected Next.js administration interface for the
 Enterprise Core platform. It connects to the auth API and provides the first
 portfolio-grade user administration workflows.
 
+The product brand is displayed with the current release label:
+`Enterprise Core v1.0.1`.
+
 ## Current Capabilities
 
 - Authentication against the Enterprise Auth API.
@@ -14,6 +17,8 @@ portfolio-grade user administration workflows.
 - Runtime English/Spanish language switching stored in the browser.
 - Runtime light/dark theme switching stored in the browser.
 - Floating toast notifications for non-critical successful operations.
+- Localized known backend/API error messages for login and user validation
+  workflows.
 - Users module backed by real API data from `GET /api/users`.
 - Users module access gated in the UI by the `manage-users` permission, with
   backend authorization still treated as the final enforcement layer.
