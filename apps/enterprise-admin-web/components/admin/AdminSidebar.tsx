@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ComponentType } from "react";
 
+import {
+  DashboardIcon,
+  RolesIcon,
+  SettingsIcon,
+  SystemIcon,
+  UsersIcon,
+} from "@/components/icons";
 import type { StoredUser } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
@@ -15,6 +23,7 @@ type NavigationItem = {
     "dashboard" | "roles" | "settings" | "system" | "users"
   >;
   href: string;
+  icon: ComponentType<{ className?: string }>;
   permission?: string;
 };
 
@@ -22,24 +31,29 @@ const navigationItems: NavigationItem[] = [
   {
     labelKey: "dashboard",
     href: "/dashboard",
+    icon: DashboardIcon,
   },
   {
     labelKey: "users",
     href: "/users",
+    icon: UsersIcon,
     permission: MANAGE_USERS_PERMISSION,
   },
   {
     labelKey: "roles",
     href: "/roles",
+    icon: RolesIcon,
     permission: MANAGE_USERS_PERMISSION,
   },
   {
     labelKey: "system",
     href: "/system",
+    icon: SystemIcon,
   },
   {
     labelKey: "settings",
     href: "/settings",
+    icon: SettingsIcon,
   },
 ];
 
@@ -72,20 +86,25 @@ export function AdminSidebar({ trustedUser }: AdminSidebarProps) {
         </div>
 
         <nav className="flex gap-2 overflow-x-auto px-4 py-4 lg:flex-col lg:overflow-visible lg:px-4 lg:py-6">
-          {visibleNavigationItems.map((item) => (
-            <Link
-              key={item.labelKey}
-              href={item.href}
-              aria-current={pathname === item.href ? "page" : undefined}
-              className={`inline-flex h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium transition-colors ${
-                pathname === item.href
-                  ? "bg-white text-[#101827] shadow-sm"
-                  : "text-[var(--app-sidebar-text)] hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {t[item.labelKey]}
-            </Link>
-          ))}
+          {visibleNavigationItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.labelKey}
+                href={item.href}
+                aria-current={pathname === item.href ? "page" : undefined}
+                className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors ${
+                  pathname === item.href
+                    ? "bg-white text-[#101827] shadow-sm"
+                    : "text-[var(--app-sidebar-text)] hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <Icon className="size-4 shrink-0" />
+                <span>{t[item.labelKey]}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </aside>
