@@ -41,8 +41,23 @@ Validates:
 
 - Initial roles are created.
 - Initial permissions are created.
-- The `view-system-events` permission is assigned to the Administrator role.
+- Administrator permissions are assigned, including `view-system-events`, `view-customers`, and `manage-customers`.
 - Seeders are idempotent and do not duplicate records when executed multiple times.
+
+### CustomerManagementTest
+
+Validates:
+
+- A user with `view-customers` can list customers.
+- A user without `view-customers` cannot list customers.
+- A user with `view-customers` can view customer detail.
+- A user with `manage-customers` can create and update customers.
+- A user without `manage-customers` cannot create or update customers.
+- Customer creation validates required `name`.
+- New customers default to active.
+- Customer activation and deactivation create system events.
+- Customer creation and update create system events.
+- Guest and inactive authenticated users cannot access customer routes.
 
 ### SystemEventsTest
 

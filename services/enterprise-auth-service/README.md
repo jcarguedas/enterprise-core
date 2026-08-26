@@ -133,6 +133,50 @@ The current REST API documentation is available at:
 
 ---
 
+# Customers
+
+Enterprise Auth Service now includes the first business-domain module foundation: Customers.
+
+Current customer routes:
+
+```text
+GET    /api/customers
+POST   /api/customers
+GET    /api/customers/{customer}
+PATCH  /api/customers/{customer}
+```
+
+Customer read routes require:
+
+```text
+auth:sanctum
+active-user
+permission:view-customers
+```
+
+Customer create and update routes require:
+
+```text
+auth:sanctum
+active-user
+permission:manage-customers
+```
+
+The `view-customers` and `manage-customers` permissions are seeded and assigned to the Administrator role by the permission seeder.
+
+Customer actions write safe system events:
+
+- `customers.created`
+- `customers.updated`
+- `customers.activated`
+- `customers.deactivated`
+
+Customer event metadata is limited to safe summaries such as customer name and email. It must not store full request bodies, credentials, tokens, or customer notes.
+
+This is a foundation only. Customer deletion, advanced search, exports, invoicing, and Admin Web customer screens are not implemented yet.
+
+---
+
 # System Events
 
 Enterprise Auth Service includes a backend foundation for chronological system events.
@@ -164,6 +208,10 @@ Current event types:
 - `users.deactivated`
 - `users.roles.assigned`
 - `users.roles.removed`
+- `customers.created`
+- `customers.updated`
+- `customers.activated`
+- `customers.deactivated`
 
 System events are intentionally limited to safe operational metadata. They must not store passwords, Sanctum tokens, raw credentials, or full request bodies.
 

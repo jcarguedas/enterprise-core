@@ -208,6 +208,88 @@ System events must not contain passwords, Sanctum tokens, raw credentials, or fu
 
 ---
 
+## Customers
+
+Customers are protected by `auth:sanctum` and `active-user`.
+
+Read routes require `view-customers`. Create and update routes require `manage-customers`.
+
+Use an Administrator account seeded with the current permissions, or assign the required customer permissions to the role used by the test account.
+
+### Create Customer
+
+```powershell
+$customerResponse = Invoke-RestMethod -Method Post `
+  -Uri "http://127.0.0.1:8000/api/customers" `
+  -ContentType "application/json" `
+  -Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer $token"
+  } `
+  -Body '{"name":"Acme Corporation","email":"billing@acme.test","phone":"+506 2222 3333"}'
+
+$customerResponse
+```
+
+Expected result:
+
+```json
+{
+  "customer": {
+    "id": 1,
+    "name": "Acme Corporation",
+    "email": "billing@acme.test",
+    "phone": "+506 2222 3333",
+    "identification_type": null,
+    "identification_number": null,
+    "address": null,
+    "notes": null,
+    "is_active": true,
+    "created_by_user_id": 1,
+    "updated_by_user_id": 1,
+    "created_at": "2026-08-26T15:30:00.000000Z",
+    "updated_at": "2026-08-26T15:30:00.000000Z"
+  }
+}
+```
+
+### List Customers
+
+```powershell
+Invoke-RestMethod -Method Get `
+  -Uri "http://127.0.0.1:8000/api/customers" `
+  -Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer $token"
+  }
+```
+
+### Update Customer
+
+```powershell
+Invoke-RestMethod -Method Patch `
+  -Uri "http://127.0.0.1:8000/api/customers/1" `
+  -ContentType "application/json" `
+  -Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer $token"
+  } `
+  -Body '{"name":"Acme Corporation Updated","is_active":false}'
+```
+
+Customer create and update actions write system events:
+
+```text
+customers.created
+customers.updated
+customers.activated
+customers.deactivated
+```
+
+Customer event metadata stores safe summaries only. It does not store full request bodies or customer notes.
+
+---
+
 ## Unauthorized Request Example
 
 Calling a protected endpoint without a Bearer token should return `401 Unauthorized`.
@@ -235,4 +317,5 @@ Expected result:
 - Test users created manually are only for local development.
 - User management responses include `is_active`; new users default to active, and inactive users cannot login.
 - System Events are read-only through the API and require `view-system-events`.
+- Customer routes require `view-customers` for reads and `manage-customers` for create/update.
 - Automated tests remain the source of truth for expected API behavior.
