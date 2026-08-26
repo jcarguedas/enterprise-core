@@ -161,6 +161,53 @@ Invoke-RestMethod -Method Post `
 
 ---
 
+## System Events
+
+System events are protected by `auth:sanctum`, `active-user`, and the `view-system-events` permission.
+
+Use an Administrator account seeded with the current permissions, or assign `view-system-events` to the role used by the test account.
+
+### Request
+
+```powershell
+Invoke-RestMethod -Method Get `
+  -Uri "http://127.0.0.1:8000/api/system-events?limit=25" `
+  -Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer $token"
+  }
+```
+
+### Expected Response
+
+```json
+{
+  "events": [
+    {
+      "id": 1,
+      "event_type": "auth.login.succeeded",
+      "severity": "info",
+      "message": "User logged in successfully.",
+      "actor_user_id": 1,
+      "actor_email": "admin@example.com",
+      "target_type": null,
+      "target_id": null,
+      "ip_address": "127.0.0.1",
+      "user_agent": "Example Client",
+      "metadata": null,
+      "created_at": "2026-08-26T15:30:00.000000Z"
+    }
+  ],
+  "limit": 25
+}
+```
+
+Current events include login, logout, user creation, user updates, user activation/deactivation, and user role assignment/removal.
+
+System events must not contain passwords, Sanctum tokens, raw credentials, or full request bodies. Failed login events may include the attempted email only.
+
+---
+
 ## Unauthorized Request Example
 
 Calling a protected endpoint without a Bearer token should return `401 Unauthorized`.
@@ -187,4 +234,5 @@ Expected result:
 - The `.env` file must not be committed.
 - Test users created manually are only for local development.
 - User management responses include `is_active`; new users default to active, and inactive users cannot login.
+- System Events are read-only through the API and require `view-system-events`.
 - Automated tests remain the source of truth for expected API behavior.

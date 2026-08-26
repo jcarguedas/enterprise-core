@@ -133,6 +133,42 @@ The current REST API documentation is available at:
 
 ---
 
+# System Events
+
+Enterprise Auth Service includes a backend foundation for chronological system events.
+
+The current read-only endpoint is:
+
+```text
+GET /api/system-events
+```
+
+It requires:
+
+```text
+auth:sanctum
+active-user
+permission:view-system-events
+```
+
+The `view-system-events` permission is seeded and assigned to the Administrator role by the permission seeder.
+
+Current event types:
+
+- `auth.login.succeeded`
+- `auth.login.failed`
+- `auth.logout`
+- `users.created`
+- `users.updated`
+- `users.activated`
+- `users.deactivated`
+- `users.roles.assigned`
+- `users.roles.removed`
+
+System events are intentionally limited to safe operational metadata. They must not store passwords, Sanctum tokens, raw credentials, or full request bodies.
+
+---
+
 # Testing Documentation
 
 The current automated testing documentation is available at:
