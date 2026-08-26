@@ -39,7 +39,7 @@ const navigationItems: NavigationItem[] = [
   },
   {
     labelKey: "settings",
-    href: "#",
+    href: "/settings",
   },
 ];
 

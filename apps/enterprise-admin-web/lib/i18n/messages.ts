@@ -98,6 +98,18 @@ export type SharedMessages = {
   rolesAccessDeniedDescription: string;
   roleDescription: string;
   settings: string;
+  settingsDescription: string;
+  settingsInformationalNotice: string;
+  workspacePreferences: string;
+  workspacePreferencesDescription: string;
+  localizationSettings: string;
+  localizationSettingsDescription: string;
+  appearanceSettings: string;
+  appearanceSettingsDescription: string;
+  securitySettings: string;
+  securitySettingsDescription: string;
+  browserRuntime: string;
+  future: string;
   usersDescription: string;
   userDirectory: string;
   userDirectoryDescription: string;
@@ -311,6 +323,24 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Your account does not currently have permission to view roles.",
     roleDescription: "Description",
     settings: "Settings",
+    settingsDescription:
+      "Protected area for future workspace, localization, security, and system preferences.",
+    settingsInformationalNotice:
+      "This page is informational only. Settings are not persisted from this page yet.",
+    workspacePreferences: "Workspace Preferences",
+    workspacePreferencesDescription:
+      "Future configurable company and workspace settings will be managed here.",
+    localizationSettings: "Localization",
+    localizationSettingsDescription:
+      "The current language is handled at runtime in the browser and can be changed from the language selector.",
+    appearanceSettings: "Appearance",
+    appearanceSettingsDescription:
+      "The current theme is handled at runtime in the browser and can be changed from the theme selector.",
+    securitySettings: "Security Settings",
+    securitySettingsDescription:
+      "Future password, session, and security policy settings may be managed here.",
+    browserRuntime: "Browser runtime",
+    future: "Future",
     usersDescription: "Manage enterprise users, access, and account readiness.",
     userDirectory: "User Directory",
     userDirectoryDescription: "Read-only view of enterprise-managed users.",
@@ -608,6 +638,24 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Tu cuenta no tiene permiso actualmente para ver roles.",
     roleDescription: "Descripción",
     settings: "Configuración",
+    settingsDescription:
+      "Área protegida para futuras preferencias de espacio de trabajo, localización, seguridad y sistema.",
+    settingsInformationalNotice:
+      "Esta página es solo informativa. Todavía no persiste configuraciones.",
+    workspacePreferences: "Preferencias del espacio de trabajo",
+    workspacePreferencesDescription:
+      "Las futuras configuraciones de empresa y espacio de trabajo se administrarán aquí.",
+    localizationSettings: "Localización",
+    localizationSettingsDescription:
+      "El idioma actual se maneja en tiempo de ejecución en el navegador y puede cambiarse desde el selector de idioma.",
+    appearanceSettings: "Apariencia",
+    appearanceSettingsDescription:
+      "El tema actual se maneja en tiempo de ejecución en el navegador y puede cambiarse desde el selector de tema.",
+    securitySettings: "Configuración de seguridad",
+    securitySettingsDescription:
+      "Las futuras políticas de contraseña, sesión y seguridad podrían administrarse aquí.",
+    browserRuntime: "Runtime del navegador",
+    future: "Futuro",
     validatingSession: "Validando sesión...",
     protectedWorkspacePlaceholder:
       "Marcador de posición del espacio administrativo protegido.",
