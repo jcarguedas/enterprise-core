@@ -42,6 +42,7 @@ export type SharedMessages = {
   authServiceUnavailable: string;
   apiErrorInvalidCredentials: string;
   apiErrorEmailAlreadyTaken: string;
+  apiErrorEmailInvalid: string;
   apiErrorInactiveAccount: string;
   apiErrorEmailRequired: string;
   apiErrorPasswordRequired: string;
@@ -62,6 +63,8 @@ export type SharedMessages = {
   commandPaletteDescription: string;
   editUserCommand: string;
   editUserFor: string;
+  editCustomerCommand: string;
+  editCustomerFor: string;
   customerSearchFor: string;
   searchUser: string;
   searchUsersFor: string;
@@ -74,6 +77,8 @@ export type SharedMessages = {
   customersAccessDenied: string;
   customersAccessDeniedDescription: string;
   customersLoadError: string;
+  customersManageDescription: string;
+  customersManageAccessDeniedDescription: string;
   closeCommandPalette: string;
   dashboard: string;
   dashboardDescription: string;
@@ -126,6 +131,7 @@ export type SharedMessages = {
   ready: string;
   userManagementDescription: string;
   manageUsers: string;
+  manageCustomers: string;
   users: string;
   roles: string;
   rolesDescription: string;
@@ -157,6 +163,8 @@ export type SharedMessages = {
   accessStatusDescription: string;
   createUser: string;
   editUser: string;
+  createCustomer: string;
+  editCustomer: string;
   refresh: string;
   refreshCustomers: string;
   refreshingCustomers: string;
@@ -179,6 +187,13 @@ export type SharedMessages = {
   sortByEmail: string;
   sortByStatus: string;
   saveChanges: string;
+  saveCustomer: string;
+  updateCustomer: string;
+  customerDetails: string;
+  address: string;
+  notes: string;
+  identificationType: string;
+  identificationNumber: string;
   crudComingNext: string;
   comingNext: string;
   readOnly: string;
@@ -226,9 +241,13 @@ export type SharedMessages = {
   cancel: string;
   creatingUser: string;
   updatingUser: string;
+  creatingCustomer: string;
+  updatingCustomer: string;
   showCreateUserForm: string;
   userCreatedSuccessfully: string;
   userUpdatedSuccessfully: string;
+  customerCreatedSuccessfully: string;
+  customerUpdatedSuccessfully: string;
   inactiveAccountLoginMessage: string;
   validationError: string;
   validatingSession: string;
@@ -299,6 +318,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Unable to reach the auth service. Please confirm it is running and try again.",
     apiErrorInvalidCredentials: "Invalid credentials.",
     apiErrorEmailAlreadyTaken: "The email has already been taken.",
+    apiErrorEmailInvalid: "The email field must be a valid email address.",
     apiErrorInactiveAccount:
       "Your account is inactive. Contact an administrator.",
     apiErrorEmailRequired: "The email field is required.",
@@ -324,6 +344,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Search and open known Admin Web destinations. This palette only supports safe navigation commands.",
     editUserCommand: "Edit user",
     editUserFor: 'Edit user "{query}"',
+    editCustomerCommand: "Edit customer",
+    editCustomerFor: 'Edit customer "{query}"',
     customerSearchFor: 'Search customers for "{query}"',
     searchUser: "Search user",
     searchUsersFor: 'Search users for "{query}"',
@@ -331,14 +353,19 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     noCommandsFound: "No matching commands were found.",
     customers: "Customers",
     customerManagement: "Customer Management",
-    customersDescription: "View and search business customers.",
+    customersDescription:
+      "View, search, and manage business customers when permitted.",
     customersReadOnlyDescription:
-      "This first business module view is read-only. Create, edit, delete, export, and status changes are not implemented here yet.",
+      "This account can view and search customers. Creating and editing require manage-customers.",
     customersAccessDenied: "Customers access denied",
     customersAccessDeniedDescription:
       "You do not have permission to view customers.",
     customersLoadError:
       "Unable to load customers. Please try again shortly.",
+    customersManageDescription:
+      "Create and edit customer records when the manage-customers permission is available. Delete, export, and bulk actions are not implemented.",
+    customersManageAccessDeniedDescription:
+      "You do not have permission to manage customers.",
     closeCommandPalette: "Close command palette",
     dashboard: "Dashboard",
     dashboardDescription:
@@ -404,6 +431,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementDescription:
       "Review enterprise users, manage account status, and maintain role assignments from the Users workspace.",
     manageUsers: "Manage users",
+    manageCustomers: "Manage customers",
     users: "Users",
     roles: "Roles",
     rolesDescription:
@@ -446,6 +474,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Access readiness tracking is planned for the user management module.",
     createUser: "Create User",
     editUser: "Edit User",
+    createCustomer: "Create Customer",
+    editCustomer: "Edit Customer",
     refresh: "Refresh",
     refreshCustomers: "Refresh customers",
     refreshingCustomers: "Refreshing customers...",
@@ -469,6 +499,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     sortByEmail: "Sort by email",
     sortByStatus: "Sort by status",
     saveChanges: "Save changes",
+    saveCustomer: "Save customer",
+    updateCustomer: "Update customer",
+    customerDetails: "Customer details",
+    address: "Address",
+    notes: "Notes",
+    identificationType: "Identification type",
+    identificationNumber: "Identification number",
     crudComingNext: "CRUD coming next",
     comingNext: "Coming next",
     readOnly: "Read only",
@@ -516,9 +553,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     cancel: "Cancel",
     creatingUser: "Creating user...",
     updatingUser: "Updating user...",
+    creatingCustomer: "Creating customer...",
+    updatingCustomer: "Updating customer...",
     showCreateUserForm: "Show create user form",
     userCreatedSuccessfully: "User created successfully.",
     userUpdatedSuccessfully: "User updated successfully.",
+    customerCreatedSuccessfully: "Customer created successfully.",
+    customerUpdatedSuccessfully: "Customer updated successfully.",
     inactiveAccountLoginMessage:
       "Your account is inactive. Contact an administrator.",
     validationError: "Validation error",
@@ -587,6 +628,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "El seguimiento de preparación de acceso está planificado para el módulo de gestión de usuarios.",
     createUser: "Crear usuario",
     editUser: "Editar usuario",
+    createCustomer: "Crear cliente",
+    editCustomer: "Editar cliente",
     refresh: "Actualizar",
     refreshCustomers: "Actualizar clientes",
     refreshingCustomers: "Actualizando clientes...",
@@ -611,6 +654,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     sortByEmail: "Ordenar por correo electrónico",
     sortByStatus: "Ordenar por estado",
     saveChanges: "Guardar cambios",
+    saveCustomer: "Guardar cliente",
+    updateCustomer: "Actualizar cliente",
+    customerDetails: "Detalles del cliente",
+    address: "Dirección",
+    notes: "Notas",
+    identificationType: "Tipo de identificación",
+    identificationNumber: "Número de identificación",
     crudComingNext: "CRUD próximamente",
     comingNext: "Próximamente",
     readOnly: "Solo lectura",
@@ -658,9 +708,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     cancel: "Cancelar",
     creatingUser: "Creando usuario...",
     updatingUser: "Actualizando usuario...",
+    creatingCustomer: "Creando cliente...",
+    updatingCustomer: "Actualizando cliente...",
     showCreateUserForm: "Mostrar formulario para crear usuario",
     userCreatedSuccessfully: "Usuario creado correctamente.",
     userUpdatedSuccessfully: "Usuario actualizado correctamente.",
+    customerCreatedSuccessfully: "Cliente creado correctamente.",
+    customerUpdatedSuccessfully: "Cliente actualizado correctamente.",
     inactiveAccountLoginMessage:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     validationError: "Error de validación",
@@ -683,6 +737,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "No se pudo conectar con el servicio de autenticación. Confirma que esté en ejecución e inténtalo de nuevo.",
     apiErrorInvalidCredentials: "Credenciales inválidas.",
     apiErrorEmailAlreadyTaken: "El correo electrónico ya está en uso.",
+    apiErrorEmailInvalid:
+      "El correo electrónico debe ser una dirección válida.",
     apiErrorInactiveAccount:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     apiErrorEmailRequired: "El correo electrónico es obligatorio.",
@@ -708,6 +764,8 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Busca y abre destinos conocidos de Admin Web. Esta paleta solo permite comandos seguros de navegación.",
     editUserCommand: "Editar usuario",
     editUserFor: 'Editar usuario "{query}"',
+    editCustomerCommand: "Editar cliente",
+    editCustomerFor: 'Editar cliente "{query}"',
     customerSearchFor: 'Buscar clientes por "{query}"',
     searchUser: "Buscar usuario",
     searchUsersFor: 'Buscar usuarios por "{query}"',
@@ -715,14 +773,19 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     noCommandsFound: "No se encontraron comandos coincidentes.",
     customers: "Clientes",
     customerManagement: "Gestión de clientes",
-    customersDescription: "Consulta y busca clientes del negocio.",
+    customersDescription:
+      "Consulta, busca y administra clientes del negocio cuando tengas permiso.",
     customersReadOnlyDescription:
-      "Esta primera vista del módulo de negocio es de solo lectura. Crear, editar, eliminar, exportar y cambiar estados aún no están implementados aquí.",
+      "Esta cuenta puede ver y buscar clientes. Crear y editar requiere manage-customers.",
     customersAccessDenied: "Acceso a clientes denegado",
     customersAccessDeniedDescription:
       "No tienes permiso para ver clientes.",
     customersLoadError:
       "No se pudieron cargar los clientes. Inténtalo de nuevo pronto.",
+    customersManageDescription:
+      "Crea y edita registros de clientes cuando el permiso manage-customers está disponible. Eliminar, exportar y acciones masivas no están implementadas.",
+    customersManageAccessDeniedDescription:
+      "No tienes permiso para administrar clientes.",
     closeCommandPalette: "Cerrar paleta de comandos",
     dashboard: "Dashboard",
     dashboardDescription:
@@ -788,6 +851,7 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     userManagementDescription:
       "Revisa usuarios empresariales, administra el estado de cuentas y mantiene asignaciones de roles desde el espacio de Usuarios.",
     manageUsers: "Administrar usuarios",
+    manageCustomers: "Administrar clientes",
     roles: "Roles",
     rolesDescription:
       "Revisa roles empresariales y su disponibilidad actual para flujos de acceso.",

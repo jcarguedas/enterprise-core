@@ -3,6 +3,7 @@ import type { SharedMessages } from "@/lib/i18n/messages";
 const knownApiErrorKeys = {
   "Invalid credentials.": "apiErrorInvalidCredentials",
   "The email has already been taken.": "apiErrorEmailAlreadyTaken",
+  "The email field must be a valid email address.": "apiErrorEmailInvalid",
   "Your account is inactive.": "apiErrorInactiveAccount",
   "The email field is required.": "apiErrorEmailRequired",
   "The password field is required.": "apiErrorPasswordRequired",

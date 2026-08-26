@@ -16,7 +16,8 @@ The product brand is displayed with the current release label:
   deployment direction, and update strategy status.
 - Protected System Events page with read-only chronological activity from the
   Enterprise Auth Service.
-- Protected read-only Customers page backed by `GET /api/customers`.
+- Protected Customers page backed by `GET /api/customers`, with create/edit
+  workflows available to users with `manage-customers`.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -54,8 +55,7 @@ Current limitations:
 - No hard delete user flow yet.
 - No backend pagination or server-side user search yet; current pagination and
   search are local to the loaded user set.
-- No Admin Web customer create/edit/delete/export flows yet; the Customers page
-  is read-only in this foundation.
+- No Admin Web customer delete/export/bulk flows yet.
 
 ## Language Switching
 
@@ -117,9 +117,12 @@ layout instead. Backend `403 Forbidden` responses remain the fallback authority
 for permission enforcement.
 
 The `/customers` page lists customers from `GET /api/customers`. It requires
-`view-customers`, is read-only, includes local search across currently loaded
-customer fields, and does not create, edit, delete, deactivate, export, or
-mutate customers.
+`view-customers` and includes local search across currently loaded customer
+fields. Users with `manage-customers` can create customers through
+`POST /api/customers` and edit customers through `PATCH /api/customers/{customer}`.
+Users with `view-customers` but without `manage-customers` can only view and
+search. Customer delete, export, bulk actions, and quick status toggles are not
+implemented.
 
 The `/roles` page follows the same pattern for `GET /api/roles` and shows a
 read-only role catalog when the trusted current user has `manage-users`.
@@ -175,6 +178,16 @@ The palette also supports safe customer search phrases such as
 `search customer Acme`, `find customer Acme`, `buscar cliente Acme`, and
 `cliente Acme`. These navigate to `/customers?search=Acme`, where the Customers
 page fills the local search input and filters the currently loaded customers.
+
+The palette also includes a safe Create Customer intent that navigates to
+`/customers?intent=create-customer`. The Customers page responds by opening and
+preparing the Create Customer form without submitting anything automatically.
+
+Safe edit-customer phrases such as `edit customer Acme`, `update customer Acme`,
+`editar cliente Acme`, and `actualizar cliente Acme` navigate to
+`/customers?intent=edit-customer&search=Acme`. The Customers page applies the
+search and opens the existing edit form only when exactly one local customer
+matches.
 
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
