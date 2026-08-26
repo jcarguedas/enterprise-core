@@ -970,3 +970,173 @@ Added runtime light/dark theme switching to Enterprise Admin Web and made the ma
 ### Next Step
 
 - Continue with the next focused Admin Web or architecture improvement.
+
+## 2026-08-26 - Command Center, System Events, and Customers foundation
+
+### Summary
+
+Advanced Enterprise Core from an admin foundation toward a command-ready business platform.
+
+This work strengthened the Admin Web command experience, added a backend/frontend system activity log, and introduced Customers as the first business-domain module.
+
+### Completed
+
+#### Command Center foundation
+
+- Added safe create-user command intent:
+  - `/users?intent=create-user`
+  - Opens and prepares the existing Create User form.
+  - Does not submit automatically.
+- Added safe user search command intent:
+  - `/users?search=<query>`
+  - Fills the existing Users search input and filters locally.
+- Added safe edit-user preparation intent:
+  - `/users?intent=edit-user&search=<query>`
+  - Opens edit mode only when exactly one local user matches.
+  - Does not save automatically.
+- Added Admin Web Command Palette manual:
+  - `apps/enterprise-admin-web/docs/Command-Palette.md`
+- Added Command Registry Standard:
+  - `docs/architecture/Command Registry Standard.md`
+- Added Command Center Roadmap:
+  - `apps/enterprise-admin-web/docs/Command-Center-Roadmap.md`
+
+#### System Events / Activity Log
+
+- Added backend System Events foundation.
+- Created `system_events` table.
+- Added `SystemEvent` model.
+- Added `SystemEventLogger` service.
+- Added protected endpoint:
+  - `GET /api/system-events`
+- Added permission:
+  - `view-system-events`
+- Assigned `view-system-events` to Administrator through seeding.
+- Logged events for:
+  - successful login
+  - failed login
+  - logout
+  - user created
+  - user updated
+  - user activated/deactivated
+  - role assigned/removed
+- Added frontend System Events page:
+  - `/system/events`
+- Kept System Events as a System subpage, not a top-level sidebar item.
+- Added access from:
+  - `/system`
+  - Command Palette
+  - direct URL `/system/events`
+- Added safe login error sanitization to prevent raw SQL/internal backend errors from being displayed in the UI.
+
+#### Customers foundation
+
+- Added backend Customers foundation.
+- Created `customers` table.
+- Added `Customer` model.
+- Added `CustomerController`.
+- Added protected routes:
+  - `GET /api/customers`
+  - `GET /api/customers/{customer}`
+  - `POST /api/customers`
+  - `PATCH /api/customers/{customer}`
+- Added permissions:
+  - `view-customers`
+  - `manage-customers`
+- Assigned customer permissions to Administrator through seeding.
+- Added customer system events:
+  - `customers.created`
+  - `customers.updated`
+  - `customers.activated`
+  - `customers.deactivated`
+- Added frontend Customers page:
+  - `/customers`
+- Added local customer search.
+- Added Customers sidebar item visible with `view-customers`.
+- Added Command Palette support:
+  - open customers
+  - search customer
+  - create customer
+  - edit customer
+- Added customer create and edit flows in Admin Web.
+- Added reusable Customer form.
+- Added create/update success toasts.
+- Kept Customers safe boundaries:
+  - no delete
+  - no export
+  - no bulk actions
+  - no automatic mutation from Command Palette
+
+### Validation
+
+Backend:
+
+- `php artisan test` passed after System Events foundation.
+- `php artisan test` passed after Customers foundation.
+- Latest backend validation:
+  - `89 passed`
+  - `257 assertions`
+
+Frontend:
+
+- `npm run lint` passed after System Events page.
+- `npm run build` passed after System Events page.
+- `npm run lint` passed after readonly Customers page.
+- `npm run build` passed after readonly Customers page.
+- `npm run lint` passed after customer create/edit flows.
+- `npm run build` passed after customer create/edit flows.
+
+Manual validation:
+
+- Login works after applying migrations.
+- System Events page loads for authorized administrator.
+- System Events is accessible from `/system` and Command Palette.
+- System Events is not shown as a top-level sidebar item.
+- Customers appears for users with `view-customers`.
+- Customers page loads.
+- Customer creation works.
+- Customer editing works.
+- Customer search works.
+- Command Palette customer intents work.
+- Raw SQL/internal login errors are no longer shown directly to the user.
+
+### Published develop commits
+
+- `5030c82` merge: handle admin web create user command intent
+- `1f62515` docs(architecture): add command registry standard
+- `dd3b6b8` merge: add admin web command palette manual
+- `9010640` merge: add admin web user search command intent
+- `199dbb7` merge: add admin web edit user command intent
+- `8547ba5` merge: add admin web command center roadmap
+- `0d8fbbd` merge: add auth service system events foundation
+- `1c6b057` merge: add admin web system events page
+- `1765fce` merge: add auth service customers foundation
+- `6a338a0` merge: add admin web readonly customers page
+- `1d34ad9` merge: add admin web customer create and edit flows
+
+### Notes
+
+- Command Palette remains a safe navigation and preparation layer.
+- Command Palette does not execute sensitive mutations automatically.
+- Sensitive future commands should require backend authorization, confirmation, audit logging, and clear result feedback.
+- Permissions are assigned to roles, not directly to users as the main design model.
+- Current customer permissions are seeded to Administrator only until business roles are formally defined.
+- Customers is now the first usable business-domain module in Enterprise Core.
+
+### Next
+
+- Define business roles more clearly:
+  - Administrator
+  - Manager
+  - Operator
+- Add role-permission management later.
+- Continue Customers improvements:
+  - better detail view
+  - status handling
+  - optional pagination
+  - stronger validation localization
+- Start planning the next business module after Customers:
+  - Products
+  - Inventory
+  - Sales
+  - Reports
