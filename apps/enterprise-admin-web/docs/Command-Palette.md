@@ -34,9 +34,11 @@ Close it with:
 | System Events | `/system/events` | Requires `view-system-events` |
 | Settings | `/settings` | Visible to authenticated users |
 | Create User | `/users?intent=create-user` | Requires `manage-users` |
+| Create Customer | `/customers?intent=create-customer` | Requires `manage-customers` |
 | Search Customers | `/customers?search=<query>` | Requires `view-customers` |
 | Search Users | `/users?search=<query>` | Requires `manage-users` |
 | Edit User | `/users?intent=edit-user&search=<query>` | Requires `manage-users` |
+| Edit Customer | `/customers?intent=edit-customer&search=<query>` | Requires `manage-customers` |
 
 ## Typed Aliases
 
@@ -56,6 +58,8 @@ Examples:
 - `configuracion`
 - `crear usuario`
 - `nuevo usuario`
+- `crear cliente`
+- `nuevo cliente`
 
 Safe user search phrases are also supported:
 
@@ -81,6 +85,13 @@ Safe edit-user preparation phrases are supported:
 - `editar usuario Jean Carlos`
 - `actualizar usuario Jean Carlos`
 
+Safe edit-customer preparation phrases are supported:
+
+- `edit customer Acme`
+- `update customer Acme`
+- `editar cliente Acme`
+- `actualizar cliente Acme`
+
 ## Permission Behavior
 
 The palette respects frontend permission visibility.
@@ -96,6 +107,8 @@ Commands that require `manage-users` are hidden when the trusted current user do
 The System Events command requires `view-system-events` and is hidden when that permission is missing.
 
 Customers and Search Customers require `view-customers` and are hidden when that permission is missing.
+
+Create Customer and Edit Customer require `manage-customers` and are hidden when that permission is missing.
 
 Frontend visibility improves usability, but backend authorization remains the final enforcement layer for protected API behavior.
 
@@ -146,6 +159,24 @@ This intent does not:
 - Create, update, deactivate, or delete users.
 - Bypass `manage-users`.
 
+## Create Customer Intent
+
+The Create Customer command navigates to:
+
+```text
+/customers?intent=create-customer
+```
+
+The Customers page responds by opening and preparing the existing Create Customer form.
+
+This command does not:
+
+- Create a customer automatically.
+- Submit the form automatically.
+- Bypass validation.
+- Bypass permissions.
+- Add new backend calls beyond the existing Customers page behavior.
+
 ## Customer Search Intent
 
 The command palette can detect simple typed customer search phrases and navigate to:
@@ -174,6 +205,37 @@ This intent does not:
 - Open edit mode automatically.
 - Create, update, deactivate, delete, or export customers.
 - Bypass `view-customers`.
+
+## Edit Customer Intent
+
+The command palette can detect simple typed edit-customer phrases and navigate to:
+
+```text
+/customers?intent=edit-customer&search=<query>
+```
+
+For example:
+
+```text
+edit customer Acme
+```
+
+navigates to:
+
+```text
+/customers?intent=edit-customer&search=Acme
+```
+
+The Customers page applies the existing search filter. If exactly one customer matches after filtering, it opens the existing edit form for that customer.
+
+If zero or multiple customers match, the page leaves the search filter applied and does not open edit mode automatically.
+
+This intent does not:
+
+- Submit customer changes automatically.
+- Update, deactivate, delete, create, or export customers.
+- Call the backend from the command palette.
+- Bypass `manage-customers`.
 
 ## Edit User Intent
 
