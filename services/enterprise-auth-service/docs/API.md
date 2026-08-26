@@ -200,6 +200,10 @@ GET   /api/users/{user}
 PATCH /api/users/{user}
 GET   /api/roles
 GET   /api/system-events
+GET   /api/customers
+POST  /api/customers
+GET   /api/customers/{customer}
+PATCH /api/customers/{customer}
 GET   /api/users/{user}/roles
 POST  /api/users/{user}/roles
 DELETE /api/users/{user}/roles/{role}
@@ -232,6 +236,22 @@ System event endpoints are protected with:
 auth:sanctum
 active-user
 permission:view-system-events
+```
+
+Customer read endpoints are protected with:
+
+```text
+auth:sanctum
+active-user
+permission:view-customers
+```
+
+Customer create and update endpoints are protected with:
+
+```text
+auth:sanctum
+active-user
+permission:manage-customers
 ```
 
 ---
@@ -937,6 +957,156 @@ Requested user or role does not exist:
 
 ---
 
+## Customers
+
+Customers are the first business-domain module foundation in Enterprise Auth Service.
+
+The module is intentionally small and API-first. It supports listing, detail, creation, and partial updates for customer records. It does not yet implement customer deletion, advanced search, exports, invoicing, or Admin Web screens.
+
+### List Customers
+
+```http
+GET /api/customers
+```
+
+Requires `view-customers`.
+
+Example response:
+
+```json
+{
+  "customers": [
+    {
+      "id": 1,
+      "name": "Acme Corporation",
+      "email": "billing@acme.test",
+      "phone": "+506 2222 3333",
+      "identification_type": "tax_id",
+      "identification_number": "123456789",
+      "address": "San Jose",
+      "notes": "Preferred billing contact.",
+      "is_active": true,
+      "created_by_user_id": 1,
+      "updated_by_user_id": 1,
+      "created_at": "2026-08-26T15:30:00.000000Z",
+      "updated_at": "2026-08-26T15:30:00.000000Z"
+    }
+  ]
+}
+```
+
+### View Customer
+
+```http
+GET /api/customers/{customer}
+```
+
+Requires `view-customers`.
+
+Example response:
+
+```json
+{
+  "customer": {
+    "id": 1,
+    "name": "Acme Corporation",
+    "email": "billing@acme.test",
+    "phone": "+506 2222 3333",
+    "identification_type": "tax_id",
+    "identification_number": "123456789",
+    "address": "San Jose",
+    "notes": "Preferred billing contact.",
+    "is_active": true,
+    "created_by_user_id": 1,
+    "updated_by_user_id": 1,
+    "created_at": "2026-08-26T15:30:00.000000Z",
+    "updated_at": "2026-08-26T15:30:00.000000Z"
+  }
+}
+```
+
+### Create Customer
+
+```http
+POST /api/customers
+```
+
+Requires `manage-customers`.
+
+Example request:
+
+```json
+{
+  "name": "Acme Corporation",
+  "email": "billing@acme.test",
+  "phone": "+506 2222 3333",
+  "identification_type": "tax_id",
+  "identification_number": "123456789",
+  "address": "San Jose",
+  "notes": "Preferred billing contact.",
+  "is_active": true
+}
+```
+
+Validation rules:
+
+| Field | Rules |
+|---|---|
+| `name` | required, string, max 255 |
+| `email` | nullable, email, max 255 |
+| `phone` | nullable, string, max 50 |
+| `identification_type` | nullable, string, max 50 |
+| `identification_number` | nullable, string, max 100 |
+| `address` | nullable, string, max 500 |
+| `notes` | nullable, string, max 2000 |
+| `is_active` | nullable, boolean |
+
+New customers default to active when `is_active` is omitted.
+
+Successful response:
+
+```http
+201 Created
+```
+
+### Update Customer
+
+```http
+PATCH /api/customers/{customer}
+```
+
+Requires `manage-customers`.
+
+Allows partial updates using the same field limits as create. `updated_by_user_id` is set to the current authenticated user.
+
+Example request:
+
+```json
+{
+  "name": "Acme Corporation Updated",
+  "is_active": false
+}
+```
+
+Successful response:
+
+```http
+200 OK
+```
+
+### Customer Event Types
+
+```text
+customers.created
+customers.updated
+customers.activated
+customers.deactivated
+```
+
+Customer event metadata stores safe summaries such as `target_name` and `target_email`. It does not store full request bodies or customer notes.
+
+---
+
 ## System Events
 
 ```http
@@ -1011,6 +1181,10 @@ users.activated
 users.deactivated
 users.roles.assigned
 users.roles.removed
+customers.created
+customers.updated
+customers.activated
+customers.deactivated
 ```
 
 ### Safety Boundary

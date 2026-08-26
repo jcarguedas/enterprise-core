@@ -49,6 +49,20 @@ class PermissionSeeder extends Seeder
                 'description' => 'Allows viewing system activity events.',
                 'is_active' => true,
             ],
+            [
+                'name' => 'View Customers',
+                'slug' => 'view-customers',
+                'module' => 'customers',
+                'description' => 'Allows viewing customers.',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Manage Customers',
+                'slug' => 'manage-customers',
+                'module' => 'customers',
+                'description' => 'Allows creating and updating customers.',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($permissions as $permission) {
@@ -59,10 +73,14 @@ class PermissionSeeder extends Seeder
         }
 
         $administratorRole = Role::where('slug', 'administrator')->first();
-        $viewSystemEvents = Permission::where('slug', 'view-system-events')->first();
+        $administratorPermissions = Permission::whereIn('slug', [
+            'view-system-events',
+            'view-customers',
+            'manage-customers',
+        ])->pluck('id');
 
-        if ($administratorRole && $viewSystemEvents) {
-            $administratorRole->permissions()->syncWithoutDetaching([$viewSystemEvents->id]);
+        if ($administratorRole && $administratorPermissions->isNotEmpty()) {
+            $administratorRole->permissions()->syncWithoutDetaching($administratorPermissions->all());
         }
     }
 }

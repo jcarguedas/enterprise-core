@@ -77,10 +77,24 @@ class DatabaseSeedersTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->assertSame(5, Permission::count());
+        $this->assertDatabaseHas('permissions', [
+            'slug' => 'view-customers',
+            'name' => 'View Customers',
+            'module' => 'customers',
+            'is_active' => true,
+        ]);
+
+        $this->assertDatabaseHas('permissions', [
+            'slug' => 'manage-customers',
+            'name' => 'Manage Customers',
+            'module' => 'customers',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame(7, Permission::count());
     }
 
-    public function test_permission_seeder_assigns_system_events_permission_to_administrator(): void
+    public function test_permission_seeder_assigns_administrator_permissions(): void
     {
         $this->seed(RoleSeeder::class);
         $this->seed(PermissionSeeder::class);
@@ -88,6 +102,8 @@ class DatabaseSeedersTest extends TestCase
         $administratorRole = Role::where('slug', 'administrator')->firstOrFail();
 
         $this->assertTrue($administratorRole->hasPermission('view-system-events'));
+        $this->assertTrue($administratorRole->hasPermission('view-customers'));
+        $this->assertTrue($administratorRole->hasPermission('manage-customers'));
     }
 
     public function test_database_seeders_are_idempotent(): void
@@ -99,6 +115,6 @@ class DatabaseSeedersTest extends TestCase
         $this->seed(PermissionSeeder::class);
 
         $this->assertSame(3, Role::count());
-        $this->assertSame(5, Permission::count());
+        $this->assertSame(7, Permission::count());
     }
 }
