@@ -93,6 +93,7 @@ Enterprise Core is being documented as a modular platform with two important arc
 
 - [Local-First Enterprise Core](docs/architecture/Local-First%20Enterprise%20Core.md): describes a future local-first deployment model where each customer can run its own local instance and database, with cloud services limited to licensing, subscription status, update metadata, and product distribution.
 - [Enterprise Command Center](docs/architecture/Enterprise%20Command%20Center.md): describes a future command-ready and AI-ready operational dashboard architecture built around safe known commands, permissions, confirmation flows, application services, and audit logs.
+- [Release and Update Strategy](docs/architecture/Release%20and%20Update%20Strategy.md): describes future versioning, release metadata, customer-controlled local updates, migration safety, and the relationship between updates and licensing.
 
 These documents describe direction, not completed implementation.
 
