@@ -27,12 +27,14 @@ Close it with:
 | Command | Destination | Visibility |
 | --- | --- | --- |
 | Dashboard | `/dashboard` | Visible to authenticated users |
+| Customers | `/customers` | Requires `view-customers` |
 | Users | `/users` | Requires `manage-users` |
 | Roles | `/roles` | Requires `manage-users` |
 | System | `/system` | Visible to authenticated users |
 | System Events | `/system/events` | Requires `view-system-events` |
 | Settings | `/settings` | Visible to authenticated users |
 | Create User | `/users?intent=create-user` | Requires `manage-users` |
+| Search Customers | `/customers?search=<query>` | Requires `view-customers` |
 | Search Users | `/users?search=<query>` | Requires `manage-users` |
 | Edit User | `/users?intent=edit-user&search=<query>` | Requires `manage-users` |
 
@@ -45,6 +47,8 @@ Aliases are matched in English and Spanish. Accents are normalized, so both `con
 Examples:
 
 - `home`
+- `clientes`
+- `customer list`
 - `usuarios`
 - `permisos`
 - `audit log`
@@ -60,6 +64,15 @@ Safe user search phrases are also supported:
 - `buscar usuario Jean Carlos`
 - `ver usuario Jean Carlos`
 - `usuario Jean Carlos`
+
+Safe customer search phrases are supported:
+
+- `search customer Acme`
+- `find customer Acme`
+- `customer Acme`
+- `buscar cliente Acme`
+- `ver cliente Acme`
+- `cliente Acme`
 
 Safe edit-user preparation phrases are supported:
 
@@ -81,6 +94,8 @@ Commands that require `manage-users` are hidden when the trusted current user do
 - Edit User.
 
 The System Events command requires `view-system-events` and is hidden when that permission is missing.
+
+Customers and Search Customers require `view-customers` and are hidden when that permission is missing.
 
 Frontend visibility improves usability, but backend authorization remains the final enforcement layer for protected API behavior.
 
@@ -130,6 +145,35 @@ This intent does not:
 - Open edit mode automatically.
 - Create, update, deactivate, or delete users.
 - Bypass `manage-users`.
+
+## Customer Search Intent
+
+The command palette can detect simple typed customer search phrases and navigate to:
+
+```text
+/customers?search=<query>
+```
+
+For example:
+
+```text
+search customer Acme
+```
+
+navigates to:
+
+```text
+/customers?search=Acme
+```
+
+The Customers page fills the existing local search input with the query and filters the currently loaded customer list.
+
+This intent does not:
+
+- Call the backend from the command palette.
+- Open edit mode automatically.
+- Create, update, deactivate, delete, or export customers.
+- Bypass `view-customers`.
 
 ## Edit User Intent
 

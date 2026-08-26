@@ -14,13 +14,17 @@ import {
 import type { StoredUser } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
-import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
+import {
+  hasPermission,
+  MANAGE_USERS_PERMISSION,
+  VIEW_CUSTOMERS_PERMISSION,
+} from "@/lib/permissions";
 import { productDisplayName } from "@/lib/product-info";
 
 type NavigationItem = {
   labelKey: keyof Pick<
     SharedMessages,
-    "dashboard" | "roles" | "settings" | "system" | "users"
+    "customers" | "dashboard" | "roles" | "settings" | "system" | "users"
   >;
   href: string;
   icon: ComponentType<{ className?: string }>;
@@ -32,6 +36,12 @@ const navigationItems: NavigationItem[] = [
     labelKey: "dashboard",
     href: "/dashboard",
     icon: DashboardIcon,
+  },
+  {
+    labelKey: "customers",
+    href: "/customers",
+    icon: UsersIcon,
+    permission: VIEW_CUSTOMERS_PERMISSION,
   },
   {
     labelKey: "users",
