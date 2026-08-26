@@ -147,6 +147,11 @@ The palette also supports safe user search phrases such as `search user Jean`,
 `/users?search=Jean`, where the Users page fills the existing search input and
 reuses the current local filtering behavior.
 
+Safe edit-user phrases such as `edit user Jean`, `update user Jean`,
+`editar usuario Jean`, and `actualizar usuario Jean` navigate to
+`/users?intent=edit-user&search=Jean`. The Users page applies the search and
+opens the existing edit form only when exactly one local user matches.
+
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
 

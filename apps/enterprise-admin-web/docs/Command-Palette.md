@@ -33,6 +33,7 @@ Close it with:
 | Settings | `/settings` | Visible to authenticated users |
 | Create User | `/users?intent=create-user` | Requires `manage-users` |
 | Search Users | `/users?search=<query>` | Requires `manage-users` |
+| Edit User | `/users?intent=edit-user&search=<query>` | Requires `manage-users` |
 
 ## Typed Aliases
 
@@ -57,6 +58,13 @@ Safe user search phrases are also supported:
 - `ver usuario Jean Carlos`
 - `usuario Jean Carlos`
 
+Safe edit-user preparation phrases are supported:
+
+- `edit user Jean Carlos`
+- `update user Jean Carlos`
+- `editar usuario Jean Carlos`
+- `actualizar usuario Jean Carlos`
+
 ## Permission Behavior
 
 The palette respects frontend permission visibility.
@@ -67,6 +75,7 @@ Commands that require `manage-users` are hidden when the trusted current user do
 - Roles.
 - Create User.
 - Search Users.
+- Edit User.
 
 Frontend visibility improves usability, but backend authorization remains the final enforcement layer for protected API behavior.
 
@@ -115,6 +124,37 @@ This intent does not:
 - Call the backend from the command palette.
 - Open edit mode automatically.
 - Create, update, deactivate, or delete users.
+- Bypass `manage-users`.
+
+## Edit User Intent
+
+The command palette can detect simple typed edit-user phrases and navigate to:
+
+```text
+/users?intent=edit-user&search=<query>
+```
+
+For example:
+
+```text
+edit user Jean Carlos
+```
+
+navigates to:
+
+```text
+/users?intent=edit-user&search=Jean%20Carlos
+```
+
+The Users page applies the existing search filter. If exactly one user matches after filtering, it opens the existing edit form for that user.
+
+If zero or multiple users match, the page leaves the search filter applied and does not open edit mode automatically.
+
+This intent does not:
+
+- Submit user changes automatically.
+- Update, deactivate, delete, or create users.
+- Call the backend from the command palette.
 - Bypass `manage-users`.
 
 ## Safety Boundaries
