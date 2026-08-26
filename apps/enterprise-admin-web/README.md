@@ -145,6 +145,9 @@ Roles, and Create User are hidden when the trusted current user does not have
 AI, mutation commands, confirmations, and audit logging are not implemented in
 this foundation.
 
+See [Command Palette](docs/Command-Palette.md) for the Admin Web command
+palette manual.
+
 ## Roles
 
 The read-only Roles page is available at `/roles`. It validates the current
