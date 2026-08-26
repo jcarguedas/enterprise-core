@@ -56,6 +56,12 @@ export type SharedMessages = {
   signingIn: string;
   logout: string;
   signingOut: string;
+  command: string;
+  commandPalette: string;
+  commandPaletteDescription: string;
+  searchCommands: string;
+  noCommandsFound: string;
+  closeCommandPalette: string;
   dashboard: string;
   dashboardDescription: string;
   dashboardWelcome: string;
@@ -270,6 +276,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     signingIn: "Signing in...",
     logout: "Logout",
     signingOut: "Signing out...",
+    command: "Command",
+    commandPalette: "Command Palette",
+    commandPaletteDescription:
+      "Search and open known Admin Web destinations. This palette only supports safe navigation commands.",
+    searchCommands: "Search commands",
+    noCommandsFound: "No matching commands were found.",
+    closeCommandPalette: "Close command palette",
     dashboard: "Dashboard",
     dashboardDescription:
       "Protected admin workspace for Enterprise Core operations.",
@@ -586,6 +599,13 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     signingIn: "Iniciando sesión...",
     logout: "Cerrar sesión",
     signingOut: "Cerrando sesión...",
+    command: "Comando",
+    commandPalette: "Paleta de comandos",
+    commandPaletteDescription:
+      "Busca y abre destinos conocidos de Admin Web. Esta paleta solo permite comandos seguros de navegación.",
+    searchCommands: "Buscar comandos",
+    noCommandsFound: "No se encontraron comandos coincidentes.",
+    closeCommandPalette: "Cerrar paleta de comandos",
     dashboard: "Dashboard",
     dashboardDescription:
       "Espacio administrativo protegido para operaciones de Enterprise Core.",

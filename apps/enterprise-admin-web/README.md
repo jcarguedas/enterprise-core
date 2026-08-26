@@ -16,6 +16,8 @@ The product brand is displayed with the current release label:
   deployment direction, and update strategy status.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
+- Protected command palette foundation with safe known navigation commands and
+  permission-aware command visibility.
 - Permission-aware sidebar and dashboard actions based on `/api/me`
   permissions.
 - Runtime English/Spanish language switching stored in the browser.
@@ -118,6 +120,23 @@ The `/settings` page is available to authenticated users without requiring
 Access-denied states use a reusable admin component so future protected modules
 can present the same restricted-access pattern with a clear explanation and a
 return path to `/dashboard`.
+
+## Command Palette
+
+Protected admin pages include a command palette button in the admin header and a
+keyboard shortcut:
+
+```text
+Ctrl+K on Windows/Linux
+Command+K on macOS
+```
+
+The current command palette is a safe navigation foundation only. It includes
+known destinations for Dashboard, Users, Roles, System, and Settings. Users and
+Roles are hidden when the trusted current user does not have `manage-users`.
+
+AI, mutation commands, confirmations, and audit logging are not implemented in
+this foundation.
 
 ## Roles
 
