@@ -97,6 +97,10 @@ Enterprise Core is being documented as a modular platform with two important arc
 
 These documents describe direction, not completed implementation.
 
+## Release Notes
+
+- [Enterprise Core v1.0.1](docs/releases/v1.0.1.md)
+
 ## Validation
 
 Backend validation:
