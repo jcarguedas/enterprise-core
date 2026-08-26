@@ -1,65 +1,146 @@
 # Enterprise Core
 
-Enterprise Core es una plataforma empresarial inteligente diseñada para ayudar a pequeñas y medianas empresas a reducir su carga operativa mediante automatización, análisis de datos e inteligencia artificial.
+Enterprise Core is a portfolio-grade foundation for a modular business operations platform.
 
-La plataforma busca transformar datos operativos en recomendaciones útiles para la gestión de inventarios, compras, ventas y recursos empresariales, manteniendo siempre el criterio humano como parte central de la toma de decisiones.
+The project is evolving from an admin web and authentication system into a broader enterprise platform architecture. The current implementation focuses on authentication, role-based access control, protected administration workflows, and a Next.js admin experience.
 
-## Propósito
+Enterprise Core is currently a platform foundation, not a complete ERP. Business modules such as customers, inventory, sales, reporting, invoicing, and AI-assisted operations are roadmap directions and should not be treated as implemented features.
 
-Enterprise Core tiene un doble propósito:
+## Current Status
 
-1. Construir una plataforma SaaS modular inspirada en problemas reales de operación empresarial.
-2. Servir como laboratorio profesional para aplicar prácticas modernas de ingeniería de software.
+Enterprise Core currently provides a working authentication and administration foundation:
 
-## Capacidades previstas
+- Laravel Enterprise Auth Service.
+- PostgreSQL database.
+- Laravel Sanctum authentication.
+- Active and inactive user support.
+- Roles and permissions.
+- Protected API endpoints.
+- Next.js Admin Web.
+- Public landing page.
+- Login page.
+- Protected dashboard.
+- Users module.
+- Read-only Roles page.
+- Permission-aware sidebar and dashboard actions.
+- Runtime English and Spanish language switching.
+- Runtime light and dark theme switching.
+- Toast notifications.
+- Reusable access-denied state.
 
-- Gestión de empresas y sucursales.
-- Usuarios, roles y permisos.
-- Catálogo e inventario.
-- Compras y ventas.
-- Seguimiento de movimientos de productos.
-- Reportes operativos.
-- Recomendaciones asistidas por inteligencia artificial.
-- Identificación de tendencias y riesgos operativos.
-- Integración con servicios externos mediante APIs.
+The current focus is to keep the foundation clean, testable, and reviewable before expanding into business operations modules.
 
-## Stack inicial
+## Repository Structure
 
-- PHP 8.4
-- Laravel
-- PostgreSQL 17
-- Node.js 22 LTS
-- REST APIs
-- OpenAPI / Swagger
-- Git y GitHub
+```text
+services/
+  enterprise-auth-service/
+    src/
 
-## Principios del proyecto
+apps/
+  enterprise-admin-web/
 
-- Aprender mediante implementación práctica.
-- Comprender el porqué antes del cómo.
-- Mantener el código documentado y verificable.
-- Introducir herramientas únicamente cuando resuelvan una necesidad real.
-- Usar inteligencia artificial como apoyo, sin sustituir el criterio del ingeniero.
-- Registrar las decisiones técnicas relevantes mediante ADR.
+docs/
+  architecture/
+```
 
-## Estado
+Key areas:
 
-El proyecto se encuentra actualmente en su fase inicial de diseño y configuración.
+- `services/enterprise-auth-service`: Laravel backend service for authentication, users, roles, permissions, and protected API behavior.
+- `apps/enterprise-admin-web`: Next.js admin frontend for login, dashboard, user management, roles visibility, theming, localization, and permission-aware navigation.
+- `docs/architecture`: Architecture documents for platform direction and future system design.
 
-## Roadmap inicial
+## Implemented Foundation
 
-- [x] Definir visión, misión y público objetivo.
-- [x] Preparar el entorno moderno de desarrollo.
-- [ ] Crear la estructura base del proyecto.
-- [ ] Implementar autenticación.
-- [ ] Implementar gestión de empresas y usuarios.
-- [ ] Incorporar inventario y catálogo.
-- [ ] Introducir pruebas automatizadas.
-- [ ] Documentar la API.
-- [ ] Contenerizar el entorno con Docker.
-- [ ] Incorporar capacidades de inteligencia artificial.
+### Backend
 
-## Autor
+The backend foundation includes:
+
+- Laravel API service.
+- PostgreSQL persistence.
+- Sanctum token authentication.
+- Active and inactive user state.
+- User management endpoints.
+- Roles and permissions model.
+- Permission middleware for administrative routes.
+- Protected API endpoints.
+- Feature tests for core API behavior.
+
+Administrative endpoints should remain protected by explicit permissions. User management actions currently require the relevant RBAC checks and must not depend on authentication alone.
+
+### Frontend
+
+The frontend foundation includes:
+
+- Next.js Admin Web application.
+- Public landing page.
+- Login flow.
+- Protected dashboard.
+- Users module.
+- Read-only Roles page.
+- Permission-aware sidebar navigation.
+- Permission-aware dashboard actions.
+- Runtime EN/ES language switching.
+- Runtime light/dark theme switching.
+- Toast notifications.
+- Reusable access-denied UI state.
+
+The frontend is intended to grow into an operational admin experience while keeping access control visible and consistent.
+
+## Architecture Vision
+
+Enterprise Core is being documented as a modular platform with two important architecture directions:
+
+- [Local-First Enterprise Core](docs/architecture/Local-First%20Enterprise%20Core.md): describes a future local-first deployment model where each customer can run its own local instance and database, with cloud services limited to licensing, subscription status, update metadata, and product distribution.
+- [Enterprise Command Center](docs/architecture/Enterprise%20Command%20Center.md): describes a future command-ready and AI-ready operational dashboard architecture built around safe known commands, permissions, confirmation flows, application services, and audit logs.
+
+These documents describe direction, not completed implementation.
+
+## Validation
+
+Backend validation:
+
+```bash
+cd services/enterprise-auth-service/src
+php artisan test
+```
+
+Frontend validation:
+
+```bash
+cd apps/enterprise-admin-web
+npm run lint
+npm run build
+```
+
+## Roadmap Direction
+
+Future roadmap areas may include:
+
+- Customer management.
+- Inventory management.
+- Sales and orders.
+- Reporting.
+- Audit logging.
+- Backup, export, and import workflows.
+- Local-first deployment tooling.
+- Licensing and update metadata services.
+- Command palette before AI-assisted commands.
+- Safe AI intent mapping through a command registry.
+- Costa Rica Electronic Invoicing as a future module.
+
+These areas are intentionally described as future work. They should be implemented incrementally with tests, documentation, and explicit authorization rules.
+
+## Notes
+
+- This repository is documentation- and test-conscious by design.
+- The project should remain modular and reviewable.
+- New backend behavior should include or update tests.
+- New administrative actions should enforce RBAC permissions.
+- Public registration should not be added unless explicitly approved.
+- Documentation should clearly distinguish implemented behavior from architecture direction.
+
+## Author
 
 Jean Carlos Arguedas  
 Software Engineer
