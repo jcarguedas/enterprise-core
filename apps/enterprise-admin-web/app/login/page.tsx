@@ -8,8 +8,11 @@ import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { ThemeSelector } from "@/components/admin/ThemeSelector";
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
+import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_REASON } from "@/lib/inactive-account";
+import { localizeApiErrorMessages } from "@/lib/localized-api-errors";
+import { productDisplayName } from "@/lib/product-info";
 
 type LoginResponse = {
   token?: string;
@@ -23,16 +26,18 @@ type LoginResponse = {
   errors?: Record<string, string[]>;
 };
 
-function getLoginErrorMessage(response: LoginResponse, fallbackMessage: string) {
+function getLoginErrorMessage(response: LoginResponse, messages: SharedMessages) {
   if (response.errors) {
-    const messages = Object.values(response.errors).flat();
+    const errorMessages = Object.values(response.errors).flat();
 
-    if (messages.length > 0) {
-      return messages.join(" ");
+    if (errorMessages.length > 0) {
+      return localizeApiErrorMessages(errorMessages, messages).join(" ");
     }
   }
 
-  return response.message ?? fallbackMessage;
+  return response.message
+    ? localizeApiErrorMessages([response.message], messages).join(" ")
+    : messages.loginDefaultError;
 }
 
 function LoginContent() {
@@ -41,6 +46,7 @@ function LoginContent() {
   const { messages: t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,7 +85,7 @@ function LoginContent() {
       const data = (await response.json().catch(() => ({}))) as LoginResponse;
 
       if (!response.ok) {
-        setErrorMessage(getLoginErrorMessage(data, t.loginDefaultError));
+        setErrorMessage(getLoginErrorMessage(data, t));
         return;
       }
 
@@ -107,7 +113,7 @@ function LoginContent() {
             </div>
             <div>
               <p className="app-text text-sm font-semibold">
-                {t.productName}
+                {productDisplayName}
               </p>
               <p className="app-subtle text-xs uppercase tracking-[0.18em]">
                 {t.adminWeb}
@@ -132,7 +138,7 @@ function LoginContent() {
               {t.loginEyebrow}
             </p>
             <h1 className="app-text text-4xl font-semibold leading-tight tracking-normal sm:text-5xl">
-              {t.productName}
+              {productDisplayName}
             </h1>
             <p className="app-muted mt-4 text-2xl font-medium">
               {t.loginTitle}
@@ -190,18 +196,33 @@ function LoginContent() {
                 >
                   {t.password}
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  disabled={isSubmitting}
-                  className="app-input mt-2 block h-12 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors"
-                  placeholder={t.passwordPlaceholder}
-                />
+                <div className="relative mt-2">
+                  <input
+                    id="password"
+                    name="password"
+                    type={isPasswordVisible ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    disabled={isSubmitting}
+                    className="app-input block h-12 w-full rounded-md border px-3 pr-20 text-sm shadow-sm outline-none transition-colors"
+                    placeholder={t.passwordPlaceholder}
+                  />
+                  <button
+                    type="button"
+                    aria-label={
+                      isPasswordVisible ? t.hidePassword : t.showPassword
+                    }
+                    disabled={isSubmitting}
+                    onClick={() =>
+                      setIsPasswordVisible((currentValue) => !currentValue)
+                    }
+                    className="app-button-secondary absolute right-2 top-1/2 inline-flex h-8 -translate-y-1/2 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] disabled:cursor-not-allowed"
+                  >
+                    {isPasswordVisible ? t.hide : t.show}
+                  </button>
+                </div>
               </div>
 
               <button

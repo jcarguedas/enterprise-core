@@ -6,6 +6,10 @@ import { useToast } from "@/components/admin/ToastProvider";
 import { getStoredToken } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import {
+  localizeApiErrorMessage,
+  localizeApiErrorMessages,
+} from "@/lib/localized-api-errors";
+import {
   assignUserRole,
   getRoles,
   getUserRoles,
@@ -91,7 +95,7 @@ export function useUserRoles({
     } else if (userRolesResult.status === "success") {
       setRoles(userRolesResult.roles);
     } else {
-      setErrorMessage(userRolesResult.message);
+      setErrorMessage(localizeApiErrorMessage(userRolesResult.message, t));
     }
 
     if (availableRolesResult.status === "success") {
@@ -104,7 +108,9 @@ export function useUserRoles({
       return;
     }
 
-    setAssignErrorMessages([availableRolesResult.message]);
+    setAssignErrorMessages([
+      localizeApiErrorMessage(availableRolesResult.message, t),
+    ]);
   }
 
   async function assignSelectedRole() {
@@ -166,11 +172,11 @@ export function useUserRoles({
     }
 
     if (result.status === "validation_error") {
-      setAssignErrorMessages(result.messages);
+      setAssignErrorMessages(localizeApiErrorMessages(result.messages, t));
       return;
     }
 
-    setAssignErrorMessages([result.message]);
+    setAssignErrorMessages([localizeApiErrorMessage(result.message, t)]);
   }
 
   async function removeRole(roleId: number) {
@@ -219,7 +225,7 @@ export function useUserRoles({
       return;
     }
 
-    setAssignErrorMessages([result.message]);
+    setAssignErrorMessages([localizeApiErrorMessage(result.message, t)]);
   }
 
   function closeRolesPanel() {

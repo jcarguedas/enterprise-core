@@ -39,6 +39,19 @@ export type SharedMessages = {
   loginDefaultError: string;
   loginIncompleteResponse: string;
   authServiceUnavailable: string;
+  apiErrorInvalidCredentials: string;
+  apiErrorEmailAlreadyTaken: string;
+  apiErrorInactiveAccount: string;
+  apiErrorEmailRequired: string;
+  apiErrorPasswordRequired: string;
+  apiErrorNameRequired: string;
+  apiErrorPasswordMinLength: string;
+  apiErrorPasswordConfirmationMismatch: string;
+  apiErrorPasswordConfirmationRequired: string;
+  show: string;
+  hide: string;
+  showPassword: string;
+  hidePassword: string;
   signIn: string;
   signingIn: string;
   logout: string;
@@ -206,6 +219,23 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "The login response was incomplete. Please try again.",
     authServiceUnavailable:
       "Unable to reach the auth service. Please confirm it is running and try again.",
+    apiErrorInvalidCredentials: "Invalid credentials.",
+    apiErrorEmailAlreadyTaken: "The email has already been taken.",
+    apiErrorInactiveAccount:
+      "Your account is inactive. Contact an administrator.",
+    apiErrorEmailRequired: "The email field is required.",
+    apiErrorPasswordRequired: "The password field is required.",
+    apiErrorNameRequired: "The name field is required.",
+    apiErrorPasswordMinLength:
+      "The password field must be at least 8 characters.",
+    apiErrorPasswordConfirmationMismatch:
+      "The password confirmation field does not match.",
+    apiErrorPasswordConfirmationRequired:
+      "The password confirmation field is required.",
+    show: "Show",
+    hide: "Hide",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
     signIn: "Sign in",
     signingIn: "Signing in...",
     logout: "Logout",
@@ -464,6 +494,23 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "La respuesta de inicio de sesión está incompleta. Inténtalo de nuevo.",
     authServiceUnavailable:
       "No se pudo conectar con el servicio de autenticación. Confirma que esté en ejecución e inténtalo de nuevo.",
+    apiErrorInvalidCredentials: "Credenciales inválidas.",
+    apiErrorEmailAlreadyTaken: "El correo electrónico ya está en uso.",
+    apiErrorInactiveAccount:
+      "Tu cuenta está inactiva. Contacta a un administrador.",
+    apiErrorEmailRequired: "El correo electrónico es obligatorio.",
+    apiErrorPasswordRequired: "La contraseña es obligatoria.",
+    apiErrorNameRequired: "El nombre es obligatorio.",
+    apiErrorPasswordMinLength:
+      "La contraseña debe tener al menos 8 caracteres.",
+    apiErrorPasswordConfirmationMismatch:
+      "La confirmación de contraseña no coincide.",
+    apiErrorPasswordConfirmationRequired:
+      "La confirmación de contraseña es obligatoria.",
+    show: "Mostrar",
+    hide: "Ocultar",
+    showPassword: "Mostrar contraseña",
+    hidePassword: "Ocultar contraseña",
     signIn: "Iniciar sesión",
     signingIn: "Iniciando sesión...",
     logout: "Cerrar sesión",

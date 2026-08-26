@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { FormEventHandler } from "react";
 
 import { StatusMessage } from "@/components/admin/StatusMessage";
@@ -37,6 +38,9 @@ export function CreateUserForm({
   onClearErrorMessages,
 }: CreateUserFormProps) {
   const { messages: t } = useI18n();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordConfirmationVisible, setIsPasswordConfirmationVisible] =
+    useState(false);
 
   return (
     <form
@@ -103,17 +107,30 @@ export function CreateUserForm({
           >
             {t.password}
           </label>
-          <input
-            id="create-user-password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={password}
-            onChange={(event) => onPasswordChange(event.target.value)}
-            disabled={isSubmitting}
-            className="app-input mt-2 block h-11 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
-          />
+          <div className="relative mt-2">
+            <input
+              id="create-user-password"
+              name="password"
+              type={isPasswordVisible ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(event) => onPasswordChange(event.target.value)}
+              disabled={isSubmitting}
+              className="app-input block h-11 w-full rounded-md border px-3 pr-20 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
+            />
+            <button
+              type="button"
+              aria-label={isPasswordVisible ? t.hidePassword : t.showPassword}
+              disabled={isSubmitting}
+              onClick={() =>
+                setIsPasswordVisible((currentValue) => !currentValue)
+              }
+              className="app-button-secondary absolute right-2 top-1/2 inline-flex h-7 -translate-y-1/2 items-center justify-center rounded-md border px-2.5 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] disabled:cursor-not-allowed"
+            >
+              {isPasswordVisible ? t.hide : t.show}
+            </button>
+          </div>
         </div>
 
         <div>
@@ -123,19 +140,36 @@ export function CreateUserForm({
           >
             {t.passwordConfirmation}
           </label>
-          <input
-            id="create-user-password-confirmation"
-            name="password_confirmation"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={passwordConfirmation}
-            onChange={(event) =>
-              onPasswordConfirmationChange(event.target.value)
-            }
-            disabled={isSubmitting}
-            className="app-input mt-2 block h-11 w-full rounded-md border px-3 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
-          />
+          <div className="relative mt-2">
+            <input
+              id="create-user-password-confirmation"
+              name="password_confirmation"
+              type={isPasswordConfirmationVisible ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              value={passwordConfirmation}
+              onChange={(event) =>
+                onPasswordConfirmationChange(event.target.value)
+              }
+              disabled={isSubmitting}
+              className="app-input block h-11 w-full rounded-md border px-3 pr-20 text-sm shadow-sm outline-none transition-colors disabled:cursor-not-allowed"
+            />
+            <button
+              type="button"
+              aria-label={
+                isPasswordConfirmationVisible ? t.hidePassword : t.showPassword
+              }
+              disabled={isSubmitting}
+              onClick={() =>
+                setIsPasswordConfirmationVisible(
+                  (currentValue) => !currentValue,
+                )
+              }
+              className="app-button-secondary absolute right-2 top-1/2 inline-flex h-7 -translate-y-1/2 items-center justify-center rounded-md border px-2.5 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] disabled:cursor-not-allowed"
+            >
+              {isPasswordConfirmationVisible ? t.hide : t.show}
+            </button>
+          </div>
         </div>
       </div>
 
