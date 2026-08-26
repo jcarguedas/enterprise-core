@@ -12,7 +12,7 @@ import { productDisplayName } from "@/lib/product-info";
 type NavigationItem = {
   labelKey: keyof Pick<
     SharedMessages,
-    "dashboard" | "roles" | "settings" | "users"
+    "dashboard" | "roles" | "settings" | "system" | "users"
   >;
   href: string;
   permission?: string;
@@ -32,6 +32,10 @@ const navigationItems: NavigationItem[] = [
     labelKey: "roles",
     href: "/roles",
     permission: MANAGE_USERS_PERMISSION,
+  },
+  {
+    labelKey: "system",
+    href: "/system",
   },
   {
     labelKey: "settings",
