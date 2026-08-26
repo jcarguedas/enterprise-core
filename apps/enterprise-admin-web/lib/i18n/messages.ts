@@ -59,6 +59,24 @@ export type SharedMessages = {
   dashboard: string;
   dashboardDescription: string;
   dashboardWelcome: string;
+  system: string;
+  systemDescription: string;
+  systemInformation: string;
+  systemInformationDescription: string;
+  productDisplayNameLabel: string;
+  productVersionLabel: string;
+  adminApp: string;
+  apiBaseUrl: string;
+  authenticationProvider: string;
+  enterpriseAuthService: string;
+  updateMode: string;
+  manualUpdatesFutureNetworkPlanned: string;
+  deploymentModel: string;
+  localFirstDirection: string;
+  releaseInformation: string;
+  releaseInformationDescription: string;
+  updateStrategyStatus: string;
+  updateStrategyDescription: string;
   administratorFallback: string;
   unavailable: string;
   accountSummary: string;
@@ -244,6 +262,29 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     dashboardDescription:
       "Protected admin workspace for Enterprise Core operations.",
     dashboardWelcome: "Welcome, {name}.",
+    system: "System",
+    systemDescription:
+      "Read-only product, deployment, and update strategy information for this Admin Web instance.",
+    systemInformation: "System Information",
+    systemInformationDescription:
+      "Current runtime details for the protected administration interface.",
+    productDisplayNameLabel: "Product display name",
+    productVersionLabel: "Product version",
+    adminApp: "Admin app",
+    apiBaseUrl: "API base URL",
+    authenticationProvider: "Authentication provider",
+    enterpriseAuthService: "Enterprise Auth Service",
+    updateMode: "Update mode",
+    manualUpdatesFutureNetworkPlanned:
+      "Manual updates / future update network planned",
+    deploymentModel: "Deployment model",
+    localFirstDirection: "Local-first direction",
+    releaseInformation: "Release Information",
+    releaseInformationDescription:
+      "The version label identifies this product build. Real update checking and distribution are not implemented yet.",
+    updateStrategyStatus: "Manual",
+    updateStrategyDescription:
+      "Future local-first deployments should be notified of available releases, then upgraded only after an administrator reviews notes, prepares backups, and approves the update.",
     administratorFallback: "administrator",
     unavailable: "Unavailable",
     accountSummary: "Account Summary",
@@ -519,6 +560,29 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     dashboardDescription:
       "Espacio administrativo protegido para operaciones de Enterprise Core.",
     dashboardWelcome: "Bienvenido, {name}.",
+    system: "Sistema",
+    systemDescription:
+      "Información de solo lectura sobre producto, despliegue y estrategia de actualizaciones para esta instancia de Admin Web.",
+    systemInformation: "Información del sistema",
+    systemInformationDescription:
+      "Detalles actuales de ejecución para la interfaz administrativa protegida.",
+    productDisplayNameLabel: "Nombre visible del producto",
+    productVersionLabel: "Versión del producto",
+    adminApp: "Aplicación admin",
+    apiBaseUrl: "URL base de API",
+    authenticationProvider: "Proveedor de autenticación",
+    enterpriseAuthService: "Enterprise Auth Service",
+    updateMode: "Modo de actualización",
+    manualUpdatesFutureNetworkPlanned:
+      "Actualizaciones manuales / red futura de actualizaciones planificada",
+    deploymentModel: "Modelo de despliegue",
+    localFirstDirection: "Dirección local-first",
+    releaseInformation: "Información de release",
+    releaseInformationDescription:
+      "La etiqueta de versión identifica este build del producto. La verificación y distribución real de actualizaciones aún no está implementada.",
+    updateStrategyStatus: "Manual",
+    updateStrategyDescription:
+      "Los futuros despliegues local-first deberían recibir avisos de releases disponibles y actualizarse solo después de que un administrador revise notas, prepare backups y apruebe la actualización.",
     administratorFallback: "administrador",
     unavailable: "No disponible",
     accountSummary: "Resumen de cuenta",
