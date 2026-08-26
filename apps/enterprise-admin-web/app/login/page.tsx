@@ -6,6 +6,7 @@ import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { ThemeSelector } from "@/components/admin/ThemeSelector";
+import { EyeIcon, EyeOffIcon } from "@/components/icons";
 import { apiConfig } from "@/lib/api-config";
 import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
@@ -206,7 +207,7 @@ function LoginContent() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     disabled={isSubmitting}
-                    className="app-input block h-12 w-full rounded-md border px-3 pr-20 text-sm shadow-sm outline-none transition-colors"
+                    className="app-input block h-12 w-full rounded-md border px-3 pr-12 text-sm shadow-sm outline-none transition-colors"
                     placeholder={t.passwordPlaceholder}
                   />
                   <button
@@ -218,9 +219,13 @@ function LoginContent() {
                     onClick={() =>
                       setIsPasswordVisible((currentValue) => !currentValue)
                     }
-                    className="app-button-secondary absolute right-2 top-1/2 inline-flex h-8 -translate-y-1/2 items-center justify-center rounded-md border px-3 text-xs font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] disabled:cursor-not-allowed"
+                    className="app-button-secondary absolute right-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md border shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] disabled:cursor-not-allowed"
                   >
-                    {isPasswordVisible ? t.hide : t.show}
+                    {isPasswordVisible ? (
+                      <EyeOffIcon className="size-4" />
+                    ) : (
+                      <EyeIcon className="size-4" />
+                    )}
                   </button>
                 </div>
               </div>

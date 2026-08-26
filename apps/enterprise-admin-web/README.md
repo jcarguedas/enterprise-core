@@ -20,6 +20,8 @@ The product brand is displayed with the current release label:
   permissions.
 - Runtime English/Spanish language switching stored in the browser.
 - Runtime light/dark theme switching stored in the browser.
+- Internal dependency-free SVG icons for sidebar navigation and password
+  visibility controls.
 - Floating toast notifications for non-critical successful operations.
 - Localized known backend/API error messages for login and user validation
   workflows.
