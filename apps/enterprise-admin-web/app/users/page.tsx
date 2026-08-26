@@ -65,6 +65,7 @@ function UsersContent() {
     useState(false);
   const createUserFormRef = useRef<HTMLDivElement>(null);
   const hasAppliedCreateUserIntentRef = useRef(false);
+  const hasAppliedEditUserIntentRef = useRef(false);
   const canManageUsers = hasPermission(trustedUser, MANAGE_USERS_PERMISSION);
   const isAccessDenied =
     (status === "ready" && !canManageUsers) ||
@@ -334,7 +335,7 @@ function UsersContent() {
     userStatusFlow,
   ]);
 
-  function handleEditUser(user: EnterpriseUser) {
+  const handleEditUser = useCallback((user: EnterpriseUser) => {
     if (
       createUserFlow.isSubmitting ||
       editUserFlow.isSubmitting ||
@@ -347,7 +348,13 @@ function UsersContent() {
     createUserFlow.cancelForm();
     userRolesFlow.closeRolesPanel();
     editUserFlow.startEditingUser(user);
-  }
+  }, [
+    createUserFlow,
+    editUserFlow,
+    isUserStatusUpdating,
+    userRolesFlow,
+    userStatusFlow,
+  ]);
 
   function handleViewRoles(user: EnterpriseUser) {
     if (
@@ -456,6 +463,39 @@ function UsersContent() {
     editUserFlow.isSubmitting,
     handleShowCreateUserForm,
     isUserStatusUpdating,
+    searchParams,
+    status,
+  ]);
+
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+    const search = searchParams.get("search");
+
+    if (intent !== "edit-user") {
+      hasAppliedEditUserIntentRef.current = false;
+      return;
+    }
+
+    const normalizedSearchParam = search?.trim().replace(/\s+/g, " ") ?? "";
+
+    if (
+      hasAppliedEditUserIntentRef.current ||
+      status !== "ready" ||
+      !canManageUsers ||
+      normalizedSearchParam.length < 2 ||
+      normalizedSearchQuery !== normalizedSearchParam ||
+      displayedUsers.length !== 1
+    ) {
+      return;
+    }
+
+    hasAppliedEditUserIntentRef.current = true;
+    handleEditUser(displayedUsers[0]);
+  }, [
+    canManageUsers,
+    displayedUsers,
+    handleEditUser,
+    normalizedSearchQuery,
     searchParams,
     status,
   ]);

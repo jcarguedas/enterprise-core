@@ -130,12 +130,19 @@ const userSearchPrefixes = [
   "usuario",
 ];
 
-function parseUserSearchTerm(value: string) {
+const editUserPrefixes = [
+  "edit user",
+  "update user",
+  "editar usuario",
+  "actualizar usuario",
+];
+
+function parsePrefixedTerm(value: string, prefixes: string[]) {
   const normalizedValue = normalizeSearchValue(value.trim()).replace(
     /\s+/g,
     " ",
   );
-  const matchedPrefix = userSearchPrefixes.find(
+  const matchedPrefix = prefixes.find(
     (prefix) =>
       normalizedValue === prefix || normalizedValue.startsWith(`${prefix} `),
   );
@@ -147,6 +154,14 @@ function parseUserSearchTerm(value: string) {
   const searchTerm = value.trim().slice(matchedPrefix.length).trim();
 
   return searchTerm.replace(/\s+/g, " ");
+}
+
+function parseUserSearchTerm(value: string) {
+  return parsePrefixedTerm(value, userSearchPrefixes);
+}
+
+function parseEditUserTerm(value: string) {
+  return parsePrefixedTerm(value, editUserPrefixes);
 }
 
 export function CommandPalette({ trustedUser }: CommandPaletteProps) {
@@ -176,7 +191,19 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
             ...command.aliases.es,
           ],
         }));
+      const editUserTerm = parseEditUserTerm(query);
       const userSearchTerm = parseUserSearchTerm(query);
+
+      if (canManageUsers && editUserTerm.length >= 2) {
+        staticCommands.unshift({
+          href: `/users?intent=edit-user&search=${encodeURIComponent(
+            editUserTerm,
+          )}`,
+          icon: UsersIcon,
+          label: t.editUserFor.replace("{query}", editUserTerm),
+          searchValues: [query, t.editUserCommand, t.editUserFor, editUserTerm],
+        });
+      }
 
       if (canManageUsers && userSearchTerm.length >= 2) {
         staticCommands.unshift({
