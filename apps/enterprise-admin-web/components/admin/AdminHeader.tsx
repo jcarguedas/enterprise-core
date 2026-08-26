@@ -1,17 +1,21 @@
 "use client";
 
+import { CommandPalette } from "@/components/admin/CommandPalette";
 import { LanguageSelector } from "@/components/admin/LanguageSelector";
 import { ThemeSelector } from "@/components/admin/ThemeSelector";
+import type { StoredUser } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
 
 type AdminHeaderProps = {
   userDisplayName: string;
+  trustedUser: StoredUser | null;
   isLoggingOut: boolean;
   onLogout: () => void;
 };
 
 export function AdminHeader({
   userDisplayName,
+  trustedUser,
   isLoggingOut,
   onLogout,
 }: AdminHeaderProps) {
@@ -29,6 +33,7 @@ export function AdminHeader({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
+        <CommandPalette trustedUser={trustedUser} />
         <LanguageSelector />
         <ThemeSelector />
 

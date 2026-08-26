@@ -26,6 +26,7 @@ export function AdminShell({
         <div className="flex min-w-0 flex-1 flex-col">
           <AdminHeader
             userDisplayName={userDisplayName}
+            trustedUser={trustedUser}
             isLoggingOut={isLoggingOut}
             onLogout={onLogout}
           />
