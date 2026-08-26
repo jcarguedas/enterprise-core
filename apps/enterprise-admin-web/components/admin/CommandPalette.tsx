@@ -17,42 +17,81 @@ import { useI18n } from "@/lib/i18n/use-i18n";
 import { hasPermission, MANAGE_USERS_PERMISSION } from "@/lib/permissions";
 
 type CommandItem = {
+  aliases: {
+    en: string[];
+    es: string[];
+  };
   href: string;
   icon: ComponentType<{ className?: string }>;
   labelKey: keyof Pick<
     SharedMessages,
-    "dashboard" | "roles" | "settings" | "system" | "users"
+    "createUser" | "dashboard" | "roles" | "settings" | "system" | "users"
   >;
   permission?: string;
 };
 
 const commandItems: CommandItem[] = [
   {
+    aliases: {
+      en: ["dashboard", "home", "open dashboard"],
+      es: ["inicio", "abrir dashboard"],
+    },
     href: "/dashboard",
     icon: DashboardIcon,
     labelKey: "dashboard",
   },
   {
+    aliases: {
+      en: ["users"],
+      es: [
+        "usuarios",
+        "abrir usuarios",
+        "gestionar usuarios",
+        "administrar usuarios",
+      ],
+    },
     href: "/users",
     icon: UsersIcon,
     labelKey: "users",
     permission: MANAGE_USERS_PERMISSION,
   },
   {
+    aliases: {
+      en: ["roles"],
+      es: ["permisos", "abrir roles", "ver roles"],
+    },
     href: "/roles",
     icon: RolesIcon,
     labelKey: "roles",
     permission: MANAGE_USERS_PERMISSION,
   },
   {
+    aliases: {
+      en: ["system"],
+      es: ["sistema", "abrir sistema", "informacion del sistema"],
+    },
     href: "/system",
     icon: SystemIcon,
     labelKey: "system",
   },
   {
+    aliases: {
+      en: ["settings"],
+      es: ["configuracion", "preferencias", "abrir configuracion"],
+    },
     href: "/settings",
     icon: SettingsIcon,
     labelKey: "settings",
+  },
+  {
+    aliases: {
+      en: ["create user", "new user", "add user"],
+      es: ["crear usuario", "nuevo usuario", "agregar usuario"],
+    },
+    href: "/users?intent=create-user",
+    icon: UsersIcon,
+    labelKey: "createUser",
+    permission: MANAGE_USERS_PERMISSION,
   },
 ];
 
@@ -66,6 +105,13 @@ function getShortcutHint() {
   }
 
   return navigator.platform.toLowerCase().includes("mac") ? "\u2318 K" : "Ctrl K";
+}
+
+function normalizeSearchValue(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
 }
 
 export function CommandPalette({ trustedUser }: CommandPaletteProps) {
@@ -84,15 +130,24 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
     [trustedUser],
   );
   const filteredCommands = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = normalizeSearchValue(query.trim());
 
     if (!normalizedQuery) {
       return visibleCommands;
     }
 
-    return visibleCommands.filter((command) =>
-      t[command.labelKey].toLowerCase().includes(normalizedQuery),
-    );
+    return visibleCommands.filter((command) => {
+      const searchableValues = [
+        t[command.labelKey],
+        command.href,
+        ...command.aliases.en,
+        ...command.aliases.es,
+      ];
+
+      return searchableValues.some((value) =>
+        normalizeSearchValue(value).includes(normalizedQuery),
+      );
+    });
   }, [query, t, visibleCommands]);
 
   useEffect(() => {
