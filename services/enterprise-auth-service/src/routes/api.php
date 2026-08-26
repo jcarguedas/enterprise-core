@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\SystemEventController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserRoleController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,8 @@ Route::middleware(['auth:sanctum', 'active-user'])->group(function () {
         ->middleware('permission:manage-users');
     Route::get('/roles', [RoleController::class, 'index'])
         ->middleware('permission:manage-users');
+    Route::get('/system-events', [SystemEventController::class, 'index'])
+        ->middleware('permission:view-system-events');
     Route::post('/users/{user}/roles', [UserRoleController::class, 'store'])
         ->middleware('permission:manage-users');
     Route::delete('/users/{user}/roles/{role}', [UserRoleController::class, 'destroy'])

@@ -41,7 +41,20 @@ Validates:
 
 - Initial roles are created.
 - Initial permissions are created.
+- The `view-system-events` permission is assigned to the Administrator role.
 - Seeders are idempotent and do not duplicate records when executed multiple times.
+
+### SystemEventsTest
+
+Validates:
+
+- A user with `view-system-events` can list system events.
+- A user without `view-system-events` cannot list system events.
+- Successful login creates a system event.
+- Failed login creates a system event without storing passwords.
+- Creating a user creates a system event.
+- Updating user active status creates activated and deactivated events.
+- Assigning and removing roles creates system events.
 
 ### RbacRelationshipsTest
 
@@ -64,3 +77,4 @@ The full suite should pass with `php artisan test`.
 - Authentication endpoints must include tests for successful and failed scenarios.
 - Protected endpoints must include tests for authenticated and unauthenticated access.
 - Seeders must be safe to run multiple times.
+- System event tests must verify that passwords, tokens, and raw credentials are not stored.

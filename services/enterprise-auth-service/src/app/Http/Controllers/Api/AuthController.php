@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SystemEventLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(private SystemEventLogger $systemEvents)
+    {
+    }
+
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
@@ -24,12 +29,31 @@ class AuthController extends Controller
             ! $user->is_active ||
             ! Hash::check($credentials['password'], $user->password)
         ) {
+            $this->systemEvents->log(
+                eventType: 'auth.login.failed',
+                severity: 'warning',
+                message: 'Failed login attempt.',
+                actorEmail: $credentials['email'],
+                metadata: [
+                    'attempted_email' => $credentials['email'],
+                ],
+                request: $request,
+            );
+
             return response()->json([
                 'message' => 'Invalid credentials.',
             ], 401);
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
+
+        $this->systemEvents->log(
+            eventType: 'auth.login.succeeded',
+            severity: 'info',
+            message: 'User logged in successfully.',
+            actor: $user,
+            request: $request,
+        );
 
         return response()->json([
             'token' => $token,
@@ -86,7 +110,17 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+
+        $this->systemEvents->log(
+            eventType: 'auth.logout',
+            severity: 'info',
+            message: 'User logged out successfully.',
+            actor: $user,
+            request: $request,
+        );
+
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Logged out successfully.',

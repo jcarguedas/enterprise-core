@@ -199,6 +199,7 @@ POST  /api/users
 GET   /api/users/{user}
 PATCH /api/users/{user}
 GET   /api/roles
+GET   /api/system-events
 GET   /api/users/{user}/roles
 POST  /api/users/{user}/roles
 DELETE /api/users/{user}/roles/{role}
@@ -223,6 +224,14 @@ Administrative user management endpoints are protected with:
 ```text
 auth:sanctum
 permission:manage-users
+```
+
+System event endpoints are protected with:
+
+```text
+auth:sanctum
+active-user
+permission:view-system-events
 ```
 
 ---
@@ -924,4 +933,114 @@ Requested user or role does not exist:
 
 ```http
 404 Not Found
+```
+
+---
+
+## System Events
+
+```http
+GET /api/system-events
+```
+
+Returns the latest system activity events first.
+
+System events provide a secure chronological foundation for future Admin Web activity log views. They are intended for operational visibility around authentication, user administration, and role assignment activity.
+
+### Authentication
+
+Requires a valid Bearer token for an active user.
+
+```http
+Authorization: Bearer {token}
+```
+
+### Required Permission
+
+```text
+view-system-events
+```
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|---|---:|---:|---|
+| `limit` | integer | no | Maximum number of events to return. Defaults to `50`; maximum is `100`. |
+
+### Successful Response
+
+Status code:
+
+```http
+200 OK
+```
+
+Example response:
+
+```json
+{
+  "events": [
+    {
+      "id": 1,
+      "event_type": "auth.login.succeeded",
+      "severity": "info",
+      "message": "User logged in successfully.",
+      "actor_user_id": 1,
+      "actor_email": "admin@example.com",
+      "target_type": null,
+      "target_id": null,
+      "ip_address": "127.0.0.1",
+      "user_agent": "Example Client",
+      "metadata": null,
+      "created_at": "2026-08-26T15:30:00.000000Z"
+    }
+  ],
+  "limit": 50
+}
+```
+
+### Current Event Types
+
+```text
+auth.login.succeeded
+auth.login.failed
+auth.logout
+users.created
+users.updated
+users.activated
+users.deactivated
+users.roles.assigned
+users.roles.removed
+```
+
+### Safety Boundary
+
+System events must not store passwords, Sanctum tokens, raw credentials, or full request bodies. Failed login events may store the attempted email address for security review, but never the attempted password.
+
+### Error Responses
+
+Guest request without token:
+
+```http
+401 Unauthorized
+```
+
+Inactive authenticated user:
+
+```http
+403 Forbidden
+```
+
+Authenticated user without `view-system-events` permission:
+
+```http
+403 Forbidden
+```
+
+Example response:
+
+```json
+{
+  "message": "This action is unauthorized."
+}
 ```

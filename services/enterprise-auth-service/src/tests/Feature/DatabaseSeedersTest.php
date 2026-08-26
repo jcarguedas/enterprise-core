@@ -70,7 +70,24 @@ class DatabaseSeedersTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->assertSame(4, Permission::count());
+        $this->assertDatabaseHas('permissions', [
+            'slug' => 'view-system-events',
+            'name' => 'View System Events',
+            'module' => 'system',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame(5, Permission::count());
+    }
+
+    public function test_permission_seeder_assigns_system_events_permission_to_administrator(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $this->seed(PermissionSeeder::class);
+
+        $administratorRole = Role::where('slug', 'administrator')->firstOrFail();
+
+        $this->assertTrue($administratorRole->hasPermission('view-system-events'));
     }
 
     public function test_database_seeders_are_idempotent(): void
@@ -82,6 +99,6 @@ class DatabaseSeedersTest extends TestCase
         $this->seed(PermissionSeeder::class);
 
         $this->assertSame(3, Role::count());
-        $this->assertSame(4, Permission::count());
+        $this->assertSame(5, Permission::count());
     }
 }

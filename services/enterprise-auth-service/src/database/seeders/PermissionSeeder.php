@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 
 class PermissionSeeder extends Seeder
@@ -41,6 +42,13 @@ class PermissionSeeder extends Seeder
                 'description' => 'Allows viewing the main dashboard.',
                 'is_active' => true,
             ],
+            [
+                'name' => 'View System Events',
+                'slug' => 'view-system-events',
+                'module' => 'system',
+                'description' => 'Allows viewing system activity events.',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($permissions as $permission) {
@@ -48,6 +56,13 @@ class PermissionSeeder extends Seeder
                 ['slug' => $permission['slug']],
                 $permission
             );
+        }
+
+        $administratorRole = Role::where('slug', 'administrator')->first();
+        $viewSystemEvents = Permission::where('slug', 'view-system-events')->first();
+
+        if ($administratorRole && $viewSystemEvents) {
+            $administratorRole->permissions()->syncWithoutDetaching([$viewSystemEvents->id]);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SystemEventLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,6 +12,10 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
+    public function __construct(private SystemEventLogger $systemEvents)
+    {
+    }
+
     public function index(): JsonResponse
     {
         $users = User::query()
@@ -33,6 +38,8 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): JsonResponse
     {
+        $wasActive = (bool) $user->is_active;
+
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'email' => [
@@ -57,6 +64,36 @@ class UserController extends Controller
         }
 
         $user->update($validated);
+        $user->refresh();
+
+        if (array_key_exists('is_active', $validated) && $wasActive !== (bool) $user->is_active) {
+            $this->systemEvents->log(
+                eventType: $user->is_active ? 'users.activated' : 'users.deactivated',
+                severity: 'info',
+                message: $user->is_active ? 'User activated.' : 'User deactivated.',
+                actor: $request->user(),
+                targetType: 'user',
+                targetId: $user->id,
+                metadata: [
+                    'target_email' => $user->email,
+                ],
+                request: $request,
+            );
+        } else {
+            $this->systemEvents->log(
+                eventType: 'users.updated',
+                severity: 'info',
+                message: 'User updated.',
+                actor: $request->user(),
+                targetType: 'user',
+                targetId: $user->id,
+                metadata: [
+                    'target_email' => $user->email,
+                    'updated_fields' => array_keys($validated),
+                ],
+                request: $request,
+            );
+        }
 
         return response()->json([
             'user' => $this->userPayload($user),
@@ -73,6 +110,19 @@ class UserController extends Controller
 
         $user = User::create($validated);
         $user->refresh();
+
+        $this->systemEvents->log(
+            eventType: 'users.created',
+            severity: 'info',
+            message: 'User created.',
+            actor: $request->user(),
+            targetType: 'user',
+            targetId: $user->id,
+            metadata: [
+                'target_email' => $user->email,
+            ],
+            request: $request,
+        );
 
         return response()->json([
             'user' => $this->userPayload($user),
