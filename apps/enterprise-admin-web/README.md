@@ -14,6 +14,8 @@ The product brand is displayed with the current release label:
 - Protected dashboard entry point for authenticated administrators.
 - Protected System Info page with read-only product version, API, auth provider,
   deployment direction, and update strategy status.
+- Protected Settings placeholder page for future workspace, localization,
+  appearance, and security preferences.
 - Permission-aware sidebar and dashboard actions based on `/api/me`
   permissions.
 - Runtime English/Spanish language switching stored in the browser.
@@ -94,8 +96,8 @@ The dashboard includes:
 The admin shell validates the current session through `GET /api/me` and uses the
 returned `user.permissions` array for navigation and dashboard UX decisions.
 
-The sidebar keeps Dashboard and System visible for authenticated users and shows
-Users only when the trusted current user has `manage-users`.
+The sidebar keeps Dashboard, System, and Settings visible for authenticated
+users and shows Users only when the trusted current user has `manage-users`.
 
 The `/users` page does not request `GET /api/users` when the trusted current
 user lacks `manage-users`; it shows an access-denied message inside the admin
@@ -107,6 +109,9 @@ read-only role catalog when the trusted current user has `manage-users`.
 
 The `/system` page is available to authenticated users without requiring
 `manage-users`. It is informational only and does not perform update checks.
+
+The `/settings` page is available to authenticated users without requiring
+`manage-users`. It is a placeholder only and does not persist settings yet.
 
 Access-denied states use a reusable admin component so future protected modules
 can present the same restricted-access pattern with a clear explanation and a
