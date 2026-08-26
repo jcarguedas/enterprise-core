@@ -30,6 +30,7 @@ Close it with:
 | Users | `/users` | Requires `manage-users` |
 | Roles | `/roles` | Requires `manage-users` |
 | System | `/system` | Visible to authenticated users |
+| System Events | `/system/events` | Requires `view-system-events` |
 | Settings | `/settings` | Visible to authenticated users |
 | Create User | `/users?intent=create-user` | Requires `manage-users` |
 | Search Users | `/users?search=<query>` | Requires `manage-users` |
@@ -46,6 +47,8 @@ Examples:
 - `home`
 - `usuarios`
 - `permisos`
+- `audit log`
+- `eventos del sistema`
 - `configuracion`
 - `crear usuario`
 - `nuevo usuario`
@@ -76,6 +79,8 @@ Commands that require `manage-users` are hidden when the trusted current user do
 - Create User.
 - Search Users.
 - Edit User.
+
+The System Events command requires `view-system-events` and is hidden when that permission is missing.
 
 Frontend visibility improves usability, but backend authorization remains the final enforcement layer for protected API behavior.
 

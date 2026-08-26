@@ -14,6 +14,8 @@ The product brand is displayed with the current release label:
 - Protected dashboard entry point for authenticated administrators.
 - Protected System Info page with read-only product version, API, auth provider,
   deployment direction, and update strategy status.
+- Protected System Events page with read-only chronological activity from the
+  Enterprise Auth Service.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -101,7 +103,9 @@ The admin shell validates the current session through `GET /api/me` and uses the
 returned `user.permissions` array for navigation and dashboard UX decisions.
 
 The sidebar keeps Dashboard, System, and Settings visible for authenticated
-users and shows Users only when the trusted current user has `manage-users`.
+users, shows Users and Roles only when the trusted current user has
+`manage-users`. System Events remains a System subpage and is not shown as a
+top-level sidebar item.
 
 The `/users` page does not request `GET /api/users` when the trusted current
 user lacks `manage-users`; it shows an access-denied message inside the admin
@@ -113,6 +117,12 @@ read-only role catalog when the trusted current user has `manage-users`.
 
 The `/system` page is available to authenticated users without requiring
 `manage-users`. It is informational only and does not perform update checks.
+
+The `/system/events` page lists the latest backend system events from
+`GET /api/system-events`. It requires `view-system-events`, is read-only, and
+does not expose raw event metadata, delete events, export events, or perform any
+mutation. It is accessible from the `/system` page when the trusted current user
+has `view-system-events`, and from the Command Palette with the same permission.
 
 The `/settings` page is available to authenticated users without requiring
 `manage-users`. It is a placeholder only and does not persist settings yet.
@@ -132,9 +142,9 @@ Command+K on macOS
 ```
 
 The current command palette is a safe navigation and typed intent foundation
-only. It includes known destinations for Dashboard, Users, Roles, System, and
-Settings, with localized aliases such as `home`, `usuarios`, `permisos`, and
-`configuracion`.
+only. It includes known destinations for Dashboard, Users, Roles, System,
+System Events, and Settings, with localized aliases such as `home`, `usuarios`,
+`permisos`, `activity log`, and `configuracion`.
 
 The palette also includes a future-safe Create User intent that navigates to
 `/users?intent=create-user`. The Users page responds by opening and preparing

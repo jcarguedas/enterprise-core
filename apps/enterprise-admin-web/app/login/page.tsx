@@ -12,7 +12,7 @@ import { getStoredToken, storeAuth } from "@/lib/auth-storage";
 import type { SharedMessages } from "@/lib/i18n/messages";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_REASON } from "@/lib/inactive-account";
-import { localizeApiErrorMessages } from "@/lib/localized-api-errors";
+import { getSafeLoginApiErrorMessage } from "@/lib/localized-api-errors";
 import { productDisplayName } from "@/lib/product-info";
 
 type LoginResponse = {
@@ -27,18 +27,30 @@ type LoginResponse = {
   errors?: Record<string, string[]>;
 };
 
-function getLoginErrorMessage(response: LoginResponse, messages: SharedMessages) {
+function getLoginErrorMessage(
+  response: LoginResponse,
+  messages: SharedMessages,
+  status: number,
+) {
   if (response.errors) {
     const errorMessages = Object.values(response.errors).flat();
 
     if (errorMessages.length > 0) {
-      return localizeApiErrorMessages(errorMessages, messages).join(" ");
+      return getSafeLoginApiErrorMessage({
+        messages,
+        rawMessages: errorMessages,
+        status,
+      });
     }
   }
 
   return response.message
-    ? localizeApiErrorMessages([response.message], messages).join(" ")
-    : messages.loginDefaultError;
+    ? getSafeLoginApiErrorMessage({
+        messages,
+        rawMessages: [response.message],
+        status,
+      })
+    : messages.loginGenericError;
 }
 
 function LoginContent() {
@@ -86,7 +98,7 @@ function LoginContent() {
       const data = (await response.json().catch(() => ({}))) as LoginResponse;
 
       if (!response.ok) {
-        setErrorMessage(getLoginErrorMessage(data, t));
+        setErrorMessage(getLoginErrorMessage(data, t, response.status));
         return;
       }
 
