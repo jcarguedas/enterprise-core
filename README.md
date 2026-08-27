@@ -1,34 +1,43 @@
 # Enterprise Core
 
-Enterprise Core is a portfolio-grade foundation for a modular business operations platform.
+Enterprise Core is a portfolio-grade foundation for a modular business operations platform in active development.
 
-The project is evolving from an admin web and authentication system into a broader enterprise platform architecture. The current implementation focuses on authentication, role-based access control, protected administration workflows, and a Next.js admin experience.
+The project is evolving from a secure authentication and administration system into a broader enterprise platform architecture. The current implementation focuses on API-first backend foundations, role-based access control, protected administration workflows, early business-domain modules, and a Next.js Admin Web experience.
 
-Enterprise Core is currently a platform foundation, not a complete ERP. Business modules such as customers, inventory, sales, reporting, invoicing, and AI-assisted operations are roadmap directions and should not be treated as implemented features.
+Enterprise Core is currently a platform foundation, not a complete ERP. Customers is the first business-domain module. Inventory, catalog, sales, reporting, Costa Rica electronic invoicing, and AI-assisted operations remain roadmap directions and should not be treated as implemented product areas.
 
 ## Current Status
 
-Enterprise Core currently provides a working authentication and administration foundation:
+Enterprise Core currently provides a working backend and frontend foundation for protected business administration:
 
-- Laravel Enterprise Auth Service.
-- PostgreSQL database.
+- Monorepo structure for backend services, frontend apps, and documentation.
+- Enterprise Auth Service backend.
+- Laravel and PostgreSQL backend foundation.
 - Laravel Sanctum authentication.
-- Active and inactive user support.
-- Roles and permissions.
-- Protected API endpoints.
+- Active user middleware and inactive account handling.
+- RBAC with roles and permissions.
+- User management backend.
+- Role listing and user role assignment backend.
+- System Events backend foundation.
+- Customers backend foundation.
 - Next.js Admin Web.
 - Public landing page.
 - Login page.
 - Protected dashboard.
-- Users module.
-- Read-only Roles page.
-- Permission-aware sidebar and dashboard actions.
+- Users management page.
+- Roles page.
+- System page.
+- System Events page.
+- Settings placeholder.
+- Customers page with create and edit flows.
 - Runtime English and Spanish language switching.
 - Runtime light and dark theme switching.
 - Toast notifications.
-- Reusable access-denied state.
+- Command Palette foundation with safe command intents.
+- Backend automated tests.
+- Frontend lint and build validation.
 
-The current focus is to keep the foundation clean, testable, and reviewable before expanding into business operations modules.
+The current focus is to keep the foundation clean, testable, and reviewable while expanding carefully into business operations modules.
 
 ## Repository Structure
 
@@ -46,8 +55,8 @@ docs/
 
 Key areas:
 
-- `services/enterprise-auth-service`: Laravel backend service for authentication, users, roles, permissions, and protected API behavior.
-- `apps/enterprise-admin-web`: Next.js admin frontend for login, dashboard, user management, roles visibility, theming, localization, and permission-aware navigation.
+- `services/enterprise-auth-service`: Laravel backend service for authentication, users, roles, permissions, system events, customers, and protected API behavior.
+- `apps/enterprise-admin-web`: Next.js admin frontend for login, dashboard, user management, roles visibility, system information, system events, customers, theming, localization, command palette workflows, and permission-aware navigation.
 - `docs/architecture`: Architecture documents for platform direction and future system design.
 
 ## Implemented Foundation
@@ -60,9 +69,14 @@ The backend foundation includes:
 - PostgreSQL persistence.
 - Sanctum token authentication.
 - Active and inactive user state.
+- Active user middleware.
 - User management endpoints.
 - Roles and permissions model.
+- Role listing endpoints.
+- User role assignment endpoints.
 - Permission middleware for administrative routes.
+- System Events foundation.
+- Customers module foundation.
 - Protected API endpoints.
 - Feature tests for core API behavior.
 
@@ -77,15 +91,27 @@ The frontend foundation includes:
 - Login flow.
 - Protected dashboard.
 - Users module.
-- Read-only Roles page.
+- Roles page.
+- System page.
+- System Events page.
+- Settings placeholder.
+- Customers page with create and edit flows.
 - Permission-aware sidebar navigation.
 - Permission-aware dashboard actions.
 - Runtime EN/ES language switching.
 - Runtime light/dark theme switching.
 - Toast notifications.
 - Reusable access-denied UI state.
+- Command Palette foundation.
+- Safe command intents for creating users, searching users, editing users, opening customers, searching customers, creating customers, editing customers, and opening system events.
 
-The frontend is intended to grow into an operational admin experience while keeping access control visible and consistent.
+The frontend is intended to grow into an operational admin experience while keeping access control, localization, and runtime preferences visible and consistent.
+
+### Business Modules
+
+Customers is the first business-domain module in Enterprise Core. The current foundation supports customer visibility and create/edit workflows in Admin Web backed by protected API behavior.
+
+Fiscal customer profile support and Costa Rica electronic invoicing are future work. They are not implemented yet and should be introduced incrementally with explicit data modeling, validation, authorization, tests, and documentation.
 
 ## Architecture Vision
 
@@ -119,23 +145,42 @@ npm run lint
 npm run build
 ```
 
-## Roadmap Direction
+## Roadmap
 
-Future roadmap areas may include:
+### Completed
 
-- Customer management.
-- Inventory management.
-- Sales and orders.
-- Reporting.
-- Audit logging.
-- Backup, export, and import workflows.
-- Local-first deployment tooling.
-- Licensing and update metadata services.
-- Command palette before AI-assisted commands.
-- Safe AI intent mapping through a command registry.
-- Costa Rica Electronic Invoicing as a future module.
+- Project structure for a monorepo with services, apps, and architecture documentation.
+- Authentication foundation with Laravel Sanctum.
+- RBAC foundation with roles, permissions, and protected administrative behavior.
+- User management backend and Admin Web workflows.
+- Roles foundation with role listing and user role assignment support.
+- Admin Web foundation with login, protected dashboard, users, roles, system, system events, settings, customers, localization, theming, and toast notifications.
+- Command Palette foundation with safe command intents for create user, search user, edit user, open customers, search customer, create customer, edit customer, and system events.
+- System Events backend and Admin Web page foundation.
+- Customers module foundation as the first business-domain module.
+- Backend automated tests.
+- Architecture documentation for local-first deployment, command-center design, command registry standards, and release/update strategy.
 
-These areas are intentionally described as future work. They should be implemented incrementally with tests, documentation, and explicit authorization rules.
+### Next
+
+- Improve the Customers module with richer profile fields, filtering, validation, and operational workflows.
+- Define business roles for customer and future module operations.
+- Add role-permission management workflows.
+- Prepare fiscal customer profiles for future Costa Rica electronic invoicing.
+- Plan product/catalog or inventory module boundaries.
+
+### Future
+
+- Inventory module.
+- Catalog module.
+- Sales and order workflows.
+- Reporting and operational analytics.
+- Costa Rica electronic invoicing.
+- Docker and deployment packaging.
+- Optional update and licensing network.
+- Voice or AI command input layer built on the command registry.
+
+Roadmap areas should be implemented incrementally with tests, documentation, and explicit authorization rules.
 
 ## Notes
 
