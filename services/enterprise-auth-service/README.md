@@ -195,7 +195,7 @@ The Customers foundation now includes optional fiscal profile fields:
 - `other_signs`
 - `fiscal_notes`
 
-These fields prepare customer records for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet. The service does not call Hacienda APIs, perform Hacienda lookups, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
+These fields prepare customer records for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet. Customer create and update routes do not call Hacienda APIs, perform Hacienda lookups, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
 
 `identification_type` remains optional and is validated as a Costa Rica fiscal identification code when provided:
 
@@ -210,6 +210,41 @@ Location catalogs and economic activity selection/catalogs are not implemented y
 Customer event metadata is limited to safe summaries such as `target_name` and `target_email`. It must not store full request bodies, credentials, tokens, customer notes, economic activity, fiscal email, full fiscal profiles, address/location fields, address details, or `fiscal_notes`.
 
 This is a foundation only. Customer deletion, advanced search, exports, and electronic invoicing are not implemented yet.
+
+---
+
+# Costa Rica Taxpayer Lookup
+
+Enterprise Auth Service includes a backend-mediated taxpayer lookup foundation for future customer fiscal data prefill.
+
+Current route:
+
+```text
+GET /api/taxpayer-lookup?identification_number=3101123456
+```
+
+This endpoint requires:
+
+```text
+auth:sanctum
+active-user
+permission:lookup-taxpayer
+```
+
+The `lookup-taxpayer` permission is seeded and assigned to the Administrator role by the permission seeder.
+
+The lookup validates `identification_number` as 9 to 12 numeric digits, checks the local `taxpayer_lookup_caches` table first, and only calls the Hacienda public taxpayer API when no non-expired cache entry exists.
+
+The response returns a normalized safe taxpayer DTO for Admin Web. It does not expose raw Hacienda payloads directly.
+
+Taxpayer lookup writes safe system events:
+
+- `taxpayer_lookup.succeeded`
+- `taxpayer_lookup.failed`
+
+Lookup event metadata is limited to source, HTTP status, and masked identification number. It must not store full Hacienda payloads or full taxpayer data.
+
+This is not electronic invoicing. It does not generate invoices, XML, signatures, invoice keys, consecutive numbers, taxes, CABYS data, branches, terminals, or document emission.
 
 ---
 
@@ -321,6 +356,7 @@ Current foundation:
 - Role listing and user role assignment backend.
 - System Events backend foundation.
 - Customers backend foundation with optional fiscal profile fields.
+- Backend-mediated Costa Rica taxpayer lookup foundation.
 - Backend automated tests.
 ---
 # Communication
@@ -347,6 +383,7 @@ Toda comunicación entre servicios deberá realizarse mediante contratos de API.
 - [x] Implement Customers foundation.
 - [x] Add optional customer fiscal profile fields for future Costa Rica electronic invoicing preparation.
 - [x] Add structured economic activity and location code/name fields for future catalog-backed fiscal workflows.
+- [x] Add backend-mediated Costa Rica taxpayer lookup foundation with cache-first behavior.
 - [x] Add backend automated tests for implemented behavior.
 
 ## Next

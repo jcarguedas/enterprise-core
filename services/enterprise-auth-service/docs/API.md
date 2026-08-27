@@ -200,6 +200,7 @@ GET   /api/users/{user}
 PATCH /api/users/{user}
 GET   /api/roles
 GET   /api/system-events
+GET   /api/taxpayer-lookup
 GET   /api/customers
 POST  /api/customers
 GET   /api/customers/{customer}
@@ -252,6 +253,14 @@ Customer create and update endpoints are protected with:
 auth:sanctum
 active-user
 permission:manage-customers
+```
+
+Taxpayer lookup endpoints are protected with:
+
+```text
+auth:sanctum
+active-user
+permission:lookup-taxpayer
 ```
 
 ---
@@ -1201,6 +1210,104 @@ Customer event metadata must not store full fiscal profiles, economic activity, 
 
 ---
 
+## Costa Rica Taxpayer Lookup
+
+The taxpayer lookup endpoint provides a backend-mediated foundation for future customer fiscal data prefill using the Hacienda public taxpayer API.
+
+This endpoint is data lookup only. It does not implement electronic invoicing, generate invoices, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
+
+```http
+GET /api/taxpayer-lookup?identification_number=3101123456
+```
+
+Requires `lookup-taxpayer`.
+
+The backend validates the identification number, checks the local cache first, calls Hacienda only when needed, normalizes the response, and returns a safe DTO. Raw Hacienda payloads are not returned directly to Admin Web.
+
+### Query Parameters
+
+| Parameter | Type | Required | Rules |
+|---|---|---:|---|
+| `identification_number` | string | yes | numeric, 9 to 12 digits |
+
+### Successful Response
+
+```json
+{
+  "taxpayer": {
+    "identification_number": "3101123456",
+    "name": "ACME SOCIEDAD ANONIMA",
+    "identification_type": "02",
+    "tax_regime": "Traditional",
+    "tax_status": "Active",
+    "economic_activities": [
+      {
+        "code": "6201.0",
+        "name": "Software development",
+        "status": "Active"
+      }
+    ]
+  },
+  "source": "live",
+  "fetched_at": "2026-08-27T15:30:00.000000Z"
+}
+```
+
+`source` is either `live` or `cache`.
+
+### Error Responses
+
+Missing or invalid identification number:
+
+```http
+422 Validation Error
+```
+
+Hacienda rejected the lookup request:
+
+```http
+422 Unprocessable Entity
+```
+
+No taxpayer record was found:
+
+```http
+404 Not Found
+```
+
+Hacienda rate limiting:
+
+```http
+429 Too Many Requests
+```
+
+Hacienda unavailable or connection timeout:
+
+```http
+503 Service Unavailable
+```
+
+Error responses use friendly messages and do not include raw Hacienda payloads.
+
+### Cache Behavior
+
+Successful live lookups are stored in `taxpayer_lookup_caches` with the raw payload, normalized payload, status, HTTP status, `fetched_at`, and `expires_at`.
+
+The endpoint checks non-expired cache entries before calling Hacienda. The default TTL is 24 hours and can be configured with `HACIENDA_TAXPAYER_LOOKUP_CACHE_TTL_HOURS`.
+
+### System Events
+
+Taxpayer lookup writes safe system events:
+
+```text
+taxpayer_lookup.succeeded
+taxpayer_lookup.failed
+```
+
+Metadata is limited to `source`, `http_status`, and a masked identification number such as `******3456`. Full Hacienda payloads and full taxpayer data must not be stored in system events.
+
+---
+
 ## System Events
 
 ```http
@@ -1279,6 +1386,8 @@ customers.created
 customers.updated
 customers.activated
 customers.deactivated
+taxpayer_lookup.succeeded
+taxpayer_lookup.failed
 ```
 
 ### Safety Boundary

@@ -323,6 +323,79 @@ Customer event metadata stores safe summaries only, currently `target_name` and 
 
 ---
 
+## Costa Rica Taxpayer Lookup
+
+Taxpayer lookup is protected by `auth:sanctum`, `active-user`, and the `lookup-taxpayer` permission.
+
+Use an Administrator account seeded with the current permissions, or assign `lookup-taxpayer` to the role used by the test account.
+
+This endpoint is a backend-mediated Hacienda lookup foundation for customer fiscal data prefill. It is not electronic invoicing and does not generate invoices, XML, signatures, invoice keys, consecutive numbers, branches, terminals, CABYS data, document emission, or taxes.
+
+### Request
+
+```powershell
+Invoke-RestMethod -Method Get `
+  -Uri "http://127.0.0.1:8000/api/taxpayer-lookup?identification_number=3101123456" `
+  -Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer $token"
+  }
+```
+
+### Expected Successful Response
+
+```json
+{
+  "taxpayer": {
+    "identification_number": "3101123456",
+    "name": "ACME SOCIEDAD ANONIMA",
+    "identification_type": "02",
+    "tax_regime": "Traditional",
+    "tax_status": "Active",
+    "economic_activities": [
+      {
+        "code": "6201.0",
+        "name": "Software development",
+        "status": "Active"
+      }
+    ]
+  },
+  "source": "live",
+  "fetched_at": "2026-08-27T15:30:00.000000Z"
+}
+```
+
+`source` can be `live` or `cache`. The backend checks `taxpayer_lookup_caches` before calling Hacienda. The default cache TTL is 24 hours.
+
+### Validation
+
+`identification_number` is required and must be numeric with 9 to 12 digits.
+
+Invalid requests return `422 Validation Error`.
+
+### Friendly Error Handling
+
+The endpoint maps Hacienda and connection failures to friendly responses:
+
+- `404 Not Found` when no taxpayer record is found.
+- `429 Too Many Requests` when Hacienda rate limits lookup.
+- `503 Service Unavailable` when Hacienda is unavailable or a connection timeout occurs.
+
+Raw Hacienda payloads are not returned in error responses.
+
+### System Events
+
+Taxpayer lookup writes:
+
+```text
+taxpayer_lookup.succeeded
+taxpayer_lookup.failed
+```
+
+Metadata stores only source, HTTP status, and a masked identification number such as `******3456`. It must not store full Hacienda payloads or full taxpayer data.
+
+---
+
 ## Unauthorized Request Example
 
 Calling a protected endpoint without a Bearer token should return `401 Unauthorized`.
