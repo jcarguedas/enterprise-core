@@ -1140,3 +1140,136 @@ Manual validation:
   - Inventory
   - Sales
   - Reports
+
+## 2026-08-27
+
+### Summary
+
+Advanced the customer fiscal workflow from architecture documentation into a working backend and Admin Web flow for Costa Rica taxpayer lookup, while preserving local-first safety, permission checks, user confirmation, and duplicate prevention.
+
+### Completed
+
+- Documented the future Costa Rica taxpayer lookup architecture.
+  - Added `docs/architecture/Costa Rica Taxpayer Lookup.md`.
+  - Documented backend-mediated Hacienda lookup.
+  - Documented local customer existence checks before lookup.
+  - Documented caching, rate limiting, resilience, privacy, audit, and Command Center safety.
+  - Clarified that this does not implement electronic invoicing, XML generation, XAdES signing, invoice keys, consecutive numbers, tax calculation, CABYS, or invoice issuing.
+
+- Added backend taxpayer lookup foundation in Enterprise Auth Service.
+  - Added `GET /api/taxpayer-lookup?identification_number=...`.
+  - Added `lookup-taxpayer` permission.
+  - Assigned `lookup-taxpayer` to Administrator through `PermissionSeeder`.
+  - Added `taxpayer_lookup_caches` migration.
+  - Added `TaxpayerLookupCache` model.
+  - Added `HaciendaTaxpayerLookupService`.
+  - Added `TaxpayerLookupController`.
+  - Added cache-first behavior before calling Hacienda.
+  - Added defensive Hacienda response normalization.
+  - Added friendly handling for 404, 429, 5xx, and connection errors.
+  - Added safe System Events:
+    - `taxpayer_lookup.succeeded`
+    - `taxpayer_lookup.failed`
+  - Avoided logging full Hacienda payloads or full taxpayer data.
+
+- Validated backend implementation.
+  - Applied local migration:
+    - `2026_08_27_020000_create_taxpayer_lookup_caches_table`
+  - Seeded permissions locally.
+  - Ran backend tests successfully:
+    - `106 passed (403 assertions)`
+
+- Added Admin Web taxpayer lookup button to Customer forms.
+  - Added `Consultar Hacienda` / `Consult Hacienda` button.
+  - Button only appears when the user has `lookup-taxpayer`.
+  - Added frontend API helper for `GET /api/taxpayer-lookup`.
+  - Added frontend validation before lookup:
+    - required identification number
+    - numeric only
+    - 9 to 12 digits
+  - Added lookup loading state.
+  - Added localized error handling for not found, rate limited, unavailable, validation, and generic failures.
+  - Added taxpayer data preview.
+  - Added source indicator:
+    - cache
+    - Hacienda/live
+  - Added manual `Aplicar datos del contribuyente` action.
+  - Ensured lookup does not create, update, or save customers automatically.
+
+- Added duplicate guard before Hacienda lookup from the create customer form.
+  - Checks currently loaded customers by exact `identification_number`.
+  - If one local customer exists:
+    - does not call taxpayer lookup
+    - shows local match message
+    - offers opening the existing customer in edit mode
+  - If multiple local customers exist:
+    - does not call taxpayer lookup
+    - asks the user to search/select manually
+  - If no local match exists:
+    - continues normal taxpayer lookup flow.
+  - Edit mode remains allowed to consult Hacienda manually.
+
+- Added safe Command Palette customer identification intent.
+  - Supports command text such as:
+    - `Crear cliente 3101123456`
+    - `Crear cliente cédula 3101123456`
+    - `Consultar Hacienda 3101123456`
+    - `Actualizar cliente 3101123456`
+  - Command Palette detects customer-related text and a 9 to 12 digit identification number.
+  - Navigates to:
+    - `/customers?intent=customer-identification&identification_number=...`
+  - Customers page consumes the intent safely.
+  - If one local customer exists:
+    - opens existing customer in edit mode when the user can manage customers.
+  - If no local customer exists:
+    - opens create customer form and pre-fills `identification_number` when the user can manage customers.
+  - If multiple local matches exist:
+    - routes user to manual search/selection.
+  - Command intent never consults Hacienda, creates, updates, or saves automatically.
+
+- Updated documentation.
+  - Updated root architecture references.
+  - Updated Enterprise Command Center architecture.
+  - Updated Enterprise Auth Service README, API, manual testing, testing docs, and changelog.
+  - Updated Admin Web README with taxpayer lookup, duplicate guard, and customer identification command behavior.
+
+### Published Commits
+
+- `e94e5bf` — merge: add Costa Rica taxpayer lookup design
+- `5f68a31` — merge: add taxpayer lookup foundation
+- `e9add59` — merge: add admin web taxpayer lookup button
+- `0cf34e7` — merge: guard taxpayer lookup against duplicate customers
+- `efa3efb` — merge: add customer identification command intent
+
+### Validation
+
+Backend:
+
+- `php artisan test`
+- Result: `106 passed (403 assertions)`
+
+Admin Web:
+
+- `npm run lint`
+- `npm run build`
+
+Result:
+
+- Lint passed.
+- Build passed.
+- Customers route builds successfully.
+
+### Notes
+
+This was a major customer fiscal workflow milestone. The product now has a safe, permission-aware, backend-mediated Hacienda taxpayer lookup path, with cache support, manual user review, duplicate prevention, and Command Center navigation intents.
+
+The implementation intentionally avoids automatic mutations. The user remains in control of all customer creation and update actions.
+
+### Next
+
+- Add focused frontend tests when a testing framework is introduced for Admin Web.
+- Consider showing a clearer customer-identification intent result message when a read-only user searches by identification.
+- Add official Costa Rica economic activity catalog support later.
+- Add official Costa Rica location catalog import later.
+- Continue evolving Command Center intents safely.
+- Defer automatic Hacienda refresh/update workflows until preview and confirmation UX is designed.
