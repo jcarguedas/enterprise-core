@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n/use-i18n";
 import type { TaxpayerLookupSuccessResult } from "@/lib/taxpayer-lookup-api";
 
 type CustomerFormMode = "create" | "edit";
+type TaxpayerLookupLocalCustomerMatchStatus = "single" | "multiple" | null;
 
 type CustomerFormProps = {
   mode: CustomerFormMode;
@@ -50,6 +51,7 @@ type CustomerFormProps = {
   isLookingUpTaxpayer: boolean;
   taxpayerLookupResult: TaxpayerLookupSuccessResult | null;
   taxpayerLookupErrorMessage: string;
+  taxpayerLookupLocalCustomerMatch: TaxpayerLookupLocalCustomerMatchStatus;
   selectedTaxpayerEconomicActivityCode: string;
   onNameChange: (value: string) => void;
   onLegalNameChange: (value: string) => void;
@@ -83,6 +85,7 @@ type CustomerFormProps = {
   onClearErrorMessages: () => void;
   onLookupTaxpayer: () => void;
   onApplyTaxpayerData: () => void;
+  onOpenExistingCustomer?: () => void;
   onSelectedTaxpayerEconomicActivityCodeChange: (value: string) => void;
 };
 
@@ -428,6 +431,7 @@ export function CustomerForm({
   isLookingUpTaxpayer,
   taxpayerLookupResult,
   taxpayerLookupErrorMessage,
+  taxpayerLookupLocalCustomerMatch,
   selectedTaxpayerEconomicActivityCode,
   onNameChange,
   onLegalNameChange,
@@ -461,6 +465,7 @@ export function CustomerForm({
   onClearErrorMessages,
   onLookupTaxpayer,
   onApplyTaxpayerData,
+  onOpenExistingCustomer,
   onSelectedTaxpayerEconomicActivityCodeChange,
 }: CustomerFormProps) {
   const { messages: t } = useI18n();
@@ -715,6 +720,37 @@ export function CustomerForm({
           {taxpayerLookupErrorMessage ? (
             <StatusMessage variant="error" className="md:col-span-2">
               {taxpayerLookupErrorMessage}
+            </StatusMessage>
+          ) : null}
+          {taxpayerLookupLocalCustomerMatch ? (
+            <StatusMessage
+              variant="info"
+              className="rounded-md border border-[var(--app-border)] px-4 py-3 leading-6 md:col-span-2"
+            >
+              <div className="space-y-3">
+                <div>
+                  <p className="app-text font-semibold">
+                    {taxpayerLookupLocalCustomerMatch === "single"
+                      ? t.taxpayerLookupLocalCustomerExistsTitle
+                      : t.taxpayerLookupMultipleLocalCustomersTitle}
+                  </p>
+                  <p className="mt-1">
+                    {taxpayerLookupLocalCustomerMatch === "single"
+                      ? t.taxpayerLookupLocalCustomerExistsDescription
+                      : t.taxpayerLookupMultipleLocalCustomersDescription}
+                  </p>
+                </div>
+                {taxpayerLookupLocalCustomerMatch === "single" ? (
+                  <button
+                    type="button"
+                    onClick={onOpenExistingCustomer}
+                    disabled={isSubmitting || !onOpenExistingCustomer}
+                    className="app-button-secondary inline-flex h-9 items-center justify-center rounded-md border px-3 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
+                  >
+                    {t.openExistingCustomer}
+                  </button>
+                ) : null}
+              </div>
             </StatusMessage>
           ) : null}
           {taxpayerLookupResult ? (
