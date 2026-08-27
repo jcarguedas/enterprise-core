@@ -162,6 +162,43 @@ Example command metadata:
 
 These examples are illustrative and are not implemented yet.
 
+## Future Safe Command Candidate: Customer Taxpayer Lookup
+
+A future safe command candidate is:
+
+```text
+Consultar Hacienda para cliente
+```
+
+Related natural-language examples may include:
+
+```text
+Crear cliente 3101123456
+Crear cliente cedula 3101123456
+Consultar Hacienda 3101123456
+Actualizar cliente 3101123456
+```
+
+This command must be designed as a guided workflow, not as automatic mutation.
+It should:
+
+- Parse and validate a possible 9 to 12 digit identification number.
+- Check whether a local customer already exists before consulting Hacienda.
+- Open the existing customer in edit mode or offer a refresh workflow when one
+  local match exists.
+- Show a selection state when multiple local customers match.
+- Prefill a create form only when no local customer exists and backend-mediated
+  taxpayer lookup succeeds.
+- Require explicit user confirmation before saving any customer changes.
+- Preview any future "update from Hacienda" result before applying data.
+- Avoid logging full taxpayer lookup payloads in command or system events.
+
+The command palette must never run this lookup or mutate customer records
+automatically without user action.
+
+See [Costa Rica Taxpayer Lookup](Costa%20Rica%20Taxpayer%20Lookup.md) for the
+future backend-mediated lookup architecture.
+
 ## Incremental Roadmap
 
 A safe implementation path may be:
