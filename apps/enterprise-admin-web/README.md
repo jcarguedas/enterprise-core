@@ -155,6 +155,13 @@ and lets the user apply selected data to the form. Lookup never creates or
 updates customers automatically; the user must still review the form and press
 Save Customer or Update Customer.
 
+In the create customer form, taxpayer lookup first checks the currently loaded
+customer list for an exact `identification_number` match. A single local match
+opens the existing customer in the edit workflow instead of consulting Hacienda
+immediately, while multiple local matches ask the user to search and select the
+customer manually. This helps avoid accidental duplicates and still requires
+explicit user review and save actions.
+
 These fields only prepare customer records for future Costa Rica fiscal
 workflows. Admin Web does not implement electronic invoicing, call Hacienda
 directly, provide economic activity catalogs, import official location

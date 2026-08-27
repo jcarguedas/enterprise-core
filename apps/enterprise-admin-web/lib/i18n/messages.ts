@@ -253,6 +253,11 @@ export type SharedMessages = {
   taxpayerLookupIdentificationRequired: string;
   taxpayerLookupIdentificationNumeric: string;
   taxpayerLookupIdentificationLength: string;
+  taxpayerLookupLocalCustomerExistsTitle: string;
+  taxpayerLookupLocalCustomerExistsDescription: string;
+  openExistingCustomer: string;
+  taxpayerLookupMultipleLocalCustomersTitle: string;
+  taxpayerLookupMultipleLocalCustomersDescription: string;
   taxRegime: string;
   taxStatus: string;
   fetchedAt: string;
@@ -645,6 +650,15 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Identification number must contain only numbers.",
     taxpayerLookupIdentificationLength:
       "Identification number must be between 9 and 12 digits before consulting Hacienda.",
+    taxpayerLookupLocalCustomerExistsTitle:
+      "A customer with this identification already exists.",
+    taxpayerLookupLocalCustomerExistsDescription:
+      "Open the existing customer in edit mode before consulting Hacienda or creating a new one.",
+    openExistingCustomer: "Open existing customer",
+    taxpayerLookupMultipleLocalCustomersTitle:
+      "Multiple customers match this identification.",
+    taxpayerLookupMultipleLocalCustomersDescription:
+      "Search for the customer manually before continuing.",
     taxRegime: "Tax regime",
     taxStatus: "Tax status",
     fetchedAt: "Fetched at",
@@ -878,6 +892,15 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "El número de identificación solo debe contener números.",
     taxpayerLookupIdentificationLength:
       "El número de identificación debe tener entre 9 y 12 dígitos antes de consultar Hacienda.",
+    taxpayerLookupLocalCustomerExistsTitle:
+      "Ya existe un cliente con esta identificación.",
+    taxpayerLookupLocalCustomerExistsDescription:
+      "Abre el cliente existente en modo edición antes de consultar Hacienda o crear uno nuevo.",
+    openExistingCustomer: "Abrir cliente existente",
+    taxpayerLookupMultipleLocalCustomersTitle:
+      "Hay varios clientes con esta identificación.",
+    taxpayerLookupMultipleLocalCustomersDescription:
+      "Busca el cliente manualmente antes de continuar.",
     taxRegime: "Régimen tributario",
     taxStatus: "Estado tributario",
     fetchedAt: "Consultado el",

@@ -29,7 +29,20 @@ type UseCreateCustomerOptions = {
   onCustomerCreated: (createdCustomer: Customer) => void;
   onInactiveAccount: () => void;
   onUnauthorized: () => void;
+  findCustomersByIdentificationNumber?: (
+    identificationNumber: string,
+  ) => Customer[];
 };
+
+type TaxpayerLookupLocalCustomerMatch =
+  | {
+      status: "single";
+      customer: Customer;
+    }
+  | {
+      status: "multiple";
+    }
+  | null;
 
 function normalizeOptionalValue(value: string) {
   const trimmedValue = value.trim();
@@ -38,6 +51,7 @@ function normalizeOptionalValue(value: string) {
 }
 
 export function useCreateCustomer({
+  findCustomersByIdentificationNumber,
   onCustomerCreated,
   onInactiveAccount,
   onUnauthorized,
@@ -80,6 +94,10 @@ export function useCreateCustomer({
     useState<TaxpayerLookupSuccessResult | null>(null);
   const [taxpayerLookupErrorMessage, setTaxpayerLookupErrorMessage] =
     useState("");
+  const [
+    taxpayerLookupLocalCustomerMatch,
+    setTaxpayerLookupLocalCustomerMatch,
+  ] = useState<TaxpayerLookupLocalCustomerMatch>(null);
   const [
     selectedTaxpayerEconomicActivityCode,
     setSelectedTaxpayerEconomicActivityCode,
@@ -200,6 +218,7 @@ export function useCreateCustomer({
   function clearTaxpayerLookupResult() {
     setTaxpayerLookupResult(null);
     setTaxpayerLookupErrorMessage("");
+    setTaxpayerLookupLocalCustomerMatch(null);
     setSelectedTaxpayerEconomicActivityCode("");
   }
 
@@ -238,6 +257,25 @@ export function useCreateCustomer({
       return;
     }
 
+    const normalizedIdentificationNumber = identificationNumber.trim();
+    const localMatches =
+      findCustomersByIdentificationNumber?.(normalizedIdentificationNumber) ??
+      [];
+    const [localCustomerMatch] = localMatches;
+
+    if (localMatches.length === 1 && localCustomerMatch) {
+      setTaxpayerLookupLocalCustomerMatch({
+        status: "single",
+        customer: localCustomerMatch,
+      });
+      return;
+    }
+
+    if (localMatches.length > 1) {
+      setTaxpayerLookupLocalCustomerMatch({ status: "multiple" });
+      return;
+    }
+
     const token = getStoredToken();
 
     if (!token) {
@@ -249,7 +287,7 @@ export function useCreateCustomer({
 
     const result = await lookupTaxpayerFromApi(
       token,
-      identificationNumber.trim(),
+      normalizedIdentificationNumber,
     );
 
     setIsLookingUpTaxpayer(false);
@@ -565,6 +603,7 @@ export function useCreateCustomer({
     setSelectedTaxpayerEconomicActivityCode,
     submit,
     taxpayerLookupErrorMessage,
+    taxpayerLookupLocalCustomerMatch,
     taxpayerLookupResult,
   };
 }

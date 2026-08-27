@@ -96,7 +96,24 @@ function CustomersContent() {
   const refreshCustomerList = useCallback(() => {
     loadCustomers();
   }, [loadCustomers]);
+  const findCustomersByIdentificationNumber = useCallback(
+    (identificationNumber: string) => {
+      const normalizedIdentificationNumber = identificationNumber.trim();
+
+      if (!normalizedIdentificationNumber) {
+        return [];
+      }
+
+      return customers.filter(
+        (customer) =>
+          (customer.identification_number ?? "").trim() ===
+          normalizedIdentificationNumber,
+      );
+    },
+    [customers],
+  );
   const createCustomerFlow = useCreateCustomer({
+    findCustomersByIdentificationNumber,
     onCustomerCreated: refreshCustomerList,
     onInactiveAccount: handleInactiveAccount,
     onUnauthorized: handleUnauthorized,
@@ -182,6 +199,16 @@ function CustomersContent() {
     },
     [cancelCreateCustomerForm, startEditingCustomerForm],
   );
+  const openLocalTaxpayerLookupCustomer = useCallback(() => {
+    const localCustomerMatch =
+      createCustomerFlow.taxpayerLookupLocalCustomerMatch;
+
+    if (localCustomerMatch?.status !== "single") {
+      return;
+    }
+
+    startEditingCustomer(localCustomerMatch.customer);
+  }, [createCustomerFlow.taxpayerLookupLocalCustomerMatch, startEditingCustomer]);
 
   useEffect(() => {
     if (status !== "ready" || !canViewCustomers) {
@@ -448,6 +475,10 @@ function CustomersContent() {
                         taxpayerLookupErrorMessage={
                           createCustomerFlow.taxpayerLookupErrorMessage
                         }
+                        taxpayerLookupLocalCustomerMatch={
+                          createCustomerFlow.taxpayerLookupLocalCustomerMatch
+                            ?.status ?? null
+                        }
                         selectedTaxpayerEconomicActivityCode={
                           createCustomerFlow.selectedTaxpayerEconomicActivityCode
                         }
@@ -511,6 +542,9 @@ function CustomersContent() {
                         onApplyTaxpayerData={
                           createCustomerFlow.applyTaxpayerData
                         }
+                        onOpenExistingCustomer={
+                          openLocalTaxpayerLookupCustomer
+                        }
                         onSelectedTaxpayerEconomicActivityCodeChange={
                           createCustomerFlow.setSelectedTaxpayerEconomicActivityCode
                         }
@@ -563,6 +597,7 @@ function CustomersContent() {
                       taxpayerLookupErrorMessage={
                         editCustomerFlow.taxpayerLookupErrorMessage
                       }
+                      taxpayerLookupLocalCustomerMatch={null}
                       selectedTaxpayerEconomicActivityCode={
                         editCustomerFlow.selectedTaxpayerEconomicActivityCode
                       }
