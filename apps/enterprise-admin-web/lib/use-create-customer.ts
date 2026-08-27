@@ -9,6 +9,12 @@ import {
   type CustomerPayload,
   type Customer,
 } from "@/lib/customers-api";
+import {
+  economicActivityCodePattern,
+  getCustomerFieldErrorsFromApiErrors,
+  sanitizeEconomicActivityCodeInput,
+  type CustomerFormFieldErrors,
+} from "@/lib/customer-form-field-errors";
 import { useI18n } from "@/lib/i18n/use-i18n";
 import {
   localizeApiErrorMessage,
@@ -36,35 +42,89 @@ export function useCreateCustomer({
   const { messages: t } = useI18n();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [name, setName] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [commercialName, setCommercialName] = useState("");
   const [email, setEmail] = useState("");
+  const [fiscalEmail, setFiscalEmail] = useState("");
+  const [economicActivityCode, setEconomicActivityCode] = useState("");
+  const [economicActivityName, setEconomicActivityName] = useState("");
   const [phone, setPhone] = useState("");
   const [identificationType, setIdentificationType] = useState("");
   const [identificationNumber, setIdentificationNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [province, setProvince] = useState("");
+  const [provinceCode, setProvinceCode] = useState("");
+  const [provinceName, setProvinceName] = useState("");
+  const [canton, setCanton] = useState("");
+  const [cantonCode, setCantonCode] = useState("");
+  const [cantonName, setCantonName] = useState("");
+  const [district, setDistrict] = useState("");
+  const [districtCode, setDistrictCode] = useState("");
+  const [districtName, setDistrictName] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [neighborhoodCode, setNeighborhoodCode] = useState("");
+  const [neighborhoodName, setNeighborhoodName] = useState("");
+  const [otherSigns, setOtherSigns] = useState("");
   const [notes, setNotes] = useState("");
+  const [fiscalNotes, setFiscalNotes] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<CustomerFormFieldErrors>({});
+
+  function clearFieldError(field: keyof CustomerFormFieldErrors) {
+    setFieldErrors((currentFieldErrors) => {
+      if (!currentFieldErrors[field]) {
+        return currentFieldErrors;
+      }
+
+      const nextFieldErrors = { ...currentFieldErrors };
+      delete nextFieldErrors[field];
+
+      return nextFieldErrors;
+    });
+  }
 
   function resetForm() {
     setName("");
+    setLegalName("");
+    setCommercialName("");
     setEmail("");
+    setFiscalEmail("");
+    setEconomicActivityCode("");
+    setEconomicActivityName("");
     setPhone("");
     setIdentificationType("");
     setIdentificationNumber("");
     setAddress("");
+    setProvince("");
+    setProvinceCode("");
+    setProvinceName("");
+    setCanton("");
+    setCantonCode("");
+    setCantonName("");
+    setDistrict("");
+    setDistrictCode("");
+    setDistrictName("");
+    setNeighborhood("");
+    setNeighborhoodCode("");
+    setNeighborhoodName("");
+    setOtherSigns("");
     setNotes("");
+    setFiscalNotes("");
     setIsActive(true);
   }
 
   function showForm() {
     setErrorMessages([]);
+    setFieldErrors({});
     setIsFormVisible(true);
   }
 
   function cancelForm() {
     resetForm();
     setErrorMessages([]);
+    setFieldErrors({});
     setIsFormVisible(false);
   }
 
@@ -72,22 +132,154 @@ export function useCreateCustomer({
     setErrorMessages([]);
   }
 
+  function handleNameChange(value: string) {
+    clearFieldError("name");
+    setName(value);
+  }
+
+  function handleEmailChange(value: string) {
+    clearFieldError("email");
+    setEmail(value);
+  }
+
+  function handleFiscalEmailChange(value: string) {
+    clearFieldError("fiscalEmail");
+    setFiscalEmail(value);
+  }
+
+  function handleIdentificationTypeChange(value: string) {
+    clearFieldError("identificationType");
+    setIdentificationType(value);
+  }
+
+  function handleEconomicActivityCodeChange(value: string) {
+    clearFieldError("economicActivityCode");
+    setEconomicActivityCode(sanitizeEconomicActivityCodeInput(value));
+  }
+
+  function handleProvinceCodeChange(value: string) {
+    clearFieldError("provinceCode");
+    setProvinceCode(value);
+  }
+
+  function handleCantonCodeChange(value: string) {
+    clearFieldError("cantonCode");
+    setCantonCode(value);
+  }
+
+  function handleDistrictCodeChange(value: string) {
+    clearFieldError("districtCode");
+    setDistrictCode(value);
+  }
+
+  function handleNeighborhoodCodeChange(value: string) {
+    clearFieldError("neighborhoodCode");
+    setNeighborhoodCode(value);
+  }
+
   function getPayload(): CustomerPayload {
     return {
       name: name.trim(),
+      legal_name: normalizeOptionalValue(legalName),
+      commercial_name: normalizeOptionalValue(commercialName),
       email: normalizeOptionalValue(email),
+      fiscal_email: normalizeOptionalValue(fiscalEmail),
+      economic_activity_code: normalizeOptionalValue(economicActivityCode),
+      economic_activity_name: normalizeOptionalValue(economicActivityName),
       phone: normalizeOptionalValue(phone),
       identification_type: normalizeOptionalValue(identificationType),
       identification_number: normalizeOptionalValue(identificationNumber),
       address: normalizeOptionalValue(address),
+      province: normalizeOptionalValue(province),
+      province_code: normalizeOptionalValue(provinceCode),
+      province_name: normalizeOptionalValue(provinceName),
+      canton: normalizeOptionalValue(canton),
+      canton_code: normalizeOptionalValue(cantonCode),
+      canton_name: normalizeOptionalValue(cantonName),
+      district: normalizeOptionalValue(district),
+      district_code: normalizeOptionalValue(districtCode),
+      district_name: normalizeOptionalValue(districtName),
+      neighborhood: normalizeOptionalValue(neighborhood),
+      neighborhood_code: normalizeOptionalValue(neighborhoodCode),
+      neighborhood_name: normalizeOptionalValue(neighborhoodName),
+      other_signs: normalizeOptionalValue(otherSigns),
       notes: normalizeOptionalValue(notes),
+      fiscal_notes: normalizeOptionalValue(fiscalNotes),
       is_active: isActive,
     };
+  }
+
+  function validateForm() {
+    const messages: string[] = [];
+
+    if (!provinceCode.trim()) {
+      messages.push(t.customerProvinceRequired);
+    }
+
+    if (!cantonCode.trim()) {
+      messages.push(t.customerCantonRequired);
+    }
+
+    if (!districtCode.trim()) {
+      messages.push(t.customerDistrictRequired);
+    }
+
+    if (!neighborhoodCode.trim()) {
+      messages.push(t.customerNeighborhoodRequired);
+    }
+
+    if (
+      economicActivityCode.trim() &&
+      !economicActivityCodePattern.test(economicActivityCode.trim())
+    ) {
+      messages.push(t.customerEconomicActivityCodeFormat);
+    }
+
+    return messages;
+  }
+
+  function getFrontendFieldErrors() {
+    const nextFieldErrors: CustomerFormFieldErrors = {};
+
+    if (!provinceCode.trim()) {
+      nextFieldErrors.provinceCode = t.customerProvinceRequired;
+    }
+
+    if (!cantonCode.trim()) {
+      nextFieldErrors.cantonCode = t.customerCantonRequired;
+    }
+
+    if (!districtCode.trim()) {
+      nextFieldErrors.districtCode = t.customerDistrictRequired;
+    }
+
+    if (!neighborhoodCode.trim()) {
+      nextFieldErrors.neighborhoodCode = t.customerNeighborhoodRequired;
+    }
+
+    if (
+      economicActivityCode.trim() &&
+      !economicActivityCodePattern.test(economicActivityCode.trim())
+    ) {
+      nextFieldErrors.economicActivityCode =
+        t.customerEconomicActivityCodeFormat;
+    }
+
+    return nextFieldErrors;
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessages([]);
+
+    const validationMessages = validateForm();
+
+    if (validationMessages.length > 0) {
+      setFieldErrors(getFrontendFieldErrors());
+      setErrorMessages(validationMessages);
+      return;
+    }
+
     setIsSubmitting(true);
 
     const token = getStoredToken();
@@ -129,6 +321,7 @@ export function useCreateCustomer({
     }
 
     if (result.status === "validation_error") {
+      setFieldErrors(getCustomerFieldErrorsFromApiErrors(result.errors, t));
       setErrorMessages(localizeApiErrorMessages(result.messages, t));
       return;
     }
@@ -138,26 +331,65 @@ export function useCreateCustomer({
 
   return {
     address,
+    canton,
+    cantonCode,
+    cantonName,
+    commercialName,
+    district,
+    districtCode,
+    districtName,
     email,
+    economicActivityCode,
+    economicActivityName,
     errorMessages,
+    fieldErrors,
+    fiscalEmail,
+    fiscalNotes,
     identificationNumber,
     identificationType,
     isActive,
     isFormVisible,
     isSubmitting,
+    legalName,
     name,
+    neighborhood,
+    neighborhoodCode,
+    neighborhoodName,
     notes,
+    otherSigns,
     phone,
+    province,
+    provinceCode,
+    provinceName,
     cancelForm,
     clearErrorMessages,
     setAddress,
-    setEmail,
+    setCanton,
+    setCantonCode: handleCantonCodeChange,
+    setCantonName,
+    setCommercialName,
+    setDistrict,
+    setDistrictCode: handleDistrictCodeChange,
+    setDistrictName,
+    setEmail: handleEmailChange,
+    setEconomicActivityCode: handleEconomicActivityCodeChange,
+    setEconomicActivityName,
+    setFiscalEmail: handleFiscalEmailChange,
+    setFiscalNotes,
     setIdentificationNumber,
-    setIdentificationType,
+    setIdentificationType: handleIdentificationTypeChange,
     setIsActive,
-    setName,
+    setLegalName,
+    setName: handleNameChange,
+    setNeighborhood,
+    setNeighborhoodCode: handleNeighborhoodCodeChange,
+    setNeighborhoodName,
     setNotes,
+    setOtherSigns,
     setPhone,
+    setProvince,
+    setProvinceCode: handleProvinceCodeChange,
+    setProvinceName,
     showForm,
     submit,
   };

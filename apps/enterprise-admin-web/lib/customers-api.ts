@@ -4,12 +4,31 @@ import { isInactiveAccountApiResponse } from "@/lib/inactive-account";
 export type Customer = {
   id: number;
   name: string;
+  legal_name: string | null;
+  commercial_name: string | null;
   email: string | null;
+  fiscal_email: string | null;
+  economic_activity_code: string | null;
+  economic_activity_name: string | null;
   phone: string | null;
   identification_type: string | null;
   identification_number: string | null;
   address: string | null;
+  province: string | null;
+  province_code: string | null;
+  province_name: string | null;
+  canton: string | null;
+  canton_code: string | null;
+  canton_name: string | null;
+  district: string | null;
+  district_code: string | null;
+  district_name: string | null;
+  neighborhood: string | null;
+  neighborhood_code: string | null;
+  neighborhood_name: string | null;
+  other_signs: string | null;
   notes: string | null;
+  fiscal_notes: string | null;
   is_active: boolean;
   created_by_user_id: number | null;
   updated_by_user_id: number | null;
@@ -37,12 +56,31 @@ type InactiveAccountResult = {
 
 export type CustomerPayload = {
   name: string;
+  legal_name?: string | null;
+  commercial_name?: string | null;
   email?: string | null;
+  fiscal_email?: string | null;
+  economic_activity_code?: string | null;
+  economic_activity_name?: string | null;
   phone?: string | null;
   identification_type?: string | null;
   identification_number?: string | null;
   address?: string | null;
+  province?: string | null;
+  province_code?: string | null;
+  province_name?: string | null;
+  canton?: string | null;
+  canton_code?: string | null;
+  canton_name?: string | null;
+  district?: string | null;
+  district_code?: string | null;
+  district_name?: string | null;
+  neighborhood?: string | null;
+  neighborhood_code?: string | null;
+  neighborhood_name?: string | null;
+  other_signs?: string | null;
   notes?: string | null;
+  fiscal_notes?: string | null;
   is_active?: boolean;
 };
 
@@ -78,6 +116,7 @@ export type SaveCustomerResult =
   | {
       status: "validation_error";
       messages: string[];
+      errors: Record<string, string[]>;
     }
   | {
       status: "error";
@@ -91,6 +130,19 @@ function getValidationMessages(response: ValidationResponse) {
 
   return Object.values(response.errors).flatMap((value) =>
     Array.isArray(value) ? value : [value],
+  );
+}
+
+function getValidationErrors(response: ValidationResponse) {
+  if (!response.errors) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(response.errors).map(([field, value]) => [
+      field,
+      Array.isArray(value) ? value : [value],
+    ]),
   );
 }
 
@@ -190,6 +242,7 @@ export async function createCustomer(
 
     if (response.status === 422) {
       const messages = getValidationMessages(data);
+      const errors = getValidationErrors(data);
 
       return {
         status: "validation_error",
@@ -197,6 +250,7 @@ export async function createCustomer(
           messages.length > 0
             ? messages
             : ["Please correct the highlighted fields and try again."],
+        errors,
       };
     }
 
@@ -271,6 +325,7 @@ export async function updateCustomer(
 
     if (response.status === 422) {
       const messages = getValidationMessages(data);
+      const errors = getValidationErrors(data);
 
       return {
         status: "validation_error",
@@ -278,6 +333,7 @@ export async function updateCustomer(
           messages.length > 0
             ? messages
             : ["Please correct the highlighted fields and try again."],
+        errors,
       };
     }
 

@@ -18,6 +18,12 @@ The product brand is displayed with the current release label:
   Enterprise Auth Service.
 - Protected Customers page backed by `GET /api/customers`, with create/edit
   workflows available to users with `manage-customers`.
+- Customer create/edit forms support optional fiscal profile fields and
+  structured location preparation for future Costa Rica fiscal data needs.
+- Customer location fields use cascading selects backed by a temporary local
+  demo catalog for UX validation.
+- Customer economic activity code input is constrained in the UI to the
+  `XXXX.X` format as preparation for future Costa Rica fiscal workflows.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -123,6 +129,27 @@ fields. Users with `manage-customers` can create customers through
 Users with `view-customers` but without `manage-customers` can only view and
 search. Customer delete, export, bulk actions, and quick status toggles are not
 implemented.
+
+Customer create/edit forms include optional fiscal profile fields such as legal
+name, commercial name, fiscal email, economic activity code/name, structured
+province/canton/district/neighborhood code and name values, other signs, and
+fiscal notes. The visible location workflow uses cascading selects for
+province, canton, district, and neighborhood, backed by a temporary local demo
+catalog. Existing province, canton, district, and neighborhood text payload
+fields remain supported for backward compatibility.
+
+`identification_type` is optional and uses Costa Rica fiscal identification code
+options: `01`, `02`, `03`, `04`, and `05`.
+
+The economic activity code field accepts digits and a single dot, and is
+currently constrained in the UI to the `XXXX.X` format when provided, as
+preparation for future Costa Rica electronic invoicing data requirements.
+
+These fields only prepare customer records for future Costa Rica fiscal
+workflows. Admin Web does not implement electronic invoicing, call Hacienda
+APIs, perform Hacienda lookup, provide economic activity catalogs, import
+official location catalogs, generate XML, sign documents, manage consecutive
+numbers, or calculate taxes.
 
 The `/roles` page follows the same pattern for `GET /api/roles` and shows a
 read-only role catalog when the trusted current user has `manage-users`.
