@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import type { CurrentUserErrorReason } from "@/lib/auth-api";
 import { getCurrentUser, logoutCurrentUser } from "@/lib/auth-api";
 import {
   clearStoredAuth,
@@ -11,9 +12,24 @@ import {
   storeUser,
 } from "@/lib/auth-storage";
 import { useI18n } from "@/lib/i18n/use-i18n";
+import type { SharedMessages } from "@/lib/i18n/messages";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
+import { localizeApiErrorMessage } from "@/lib/localized-api-errors";
 
 export type SessionStatus = "checking" | "ready" | "error";
+
+function getSessionErrorMessage(
+  reason: CurrentUserErrorReason,
+  messages: SharedMessages,
+) {
+  const sessionErrorMessages: Record<CurrentUserErrorReason, string> = {
+    auth_service_unavailable: messages.authServiceUnavailable,
+    incomplete_user_profile: messages.sessionIncompleteUserProfile,
+    session_validation_failed: messages.sessionValidationFailed,
+  };
+
+  return sessionErrorMessages[reason];
+}
 
 export function useProtectedAdminSession() {
   const router = useRouter();
@@ -61,7 +77,11 @@ export function useProtectedAdminSession() {
       }
 
       setTrustedUser(null);
-      setErrorMessage(result.message);
+      setErrorMessage(
+        result.message
+          ? localizeApiErrorMessage(result.message, t)
+          : getSessionErrorMessage(result.reason, t),
+      );
       setStatus("error");
     }
 
@@ -70,7 +90,7 @@ export function useProtectedAdminSession() {
     return () => {
       isCurrent = false;
     };
-  }, [router]);
+  }, [router, t]);
 
   async function logout() {
     const token = getStoredToken();

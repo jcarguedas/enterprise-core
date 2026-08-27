@@ -26,8 +26,14 @@ export type CurrentUserResult =
     }
   | {
       status: "error";
-      message: string;
+      message?: string;
+      reason: CurrentUserErrorReason;
     };
+
+export type CurrentUserErrorReason =
+  | "auth_service_unavailable"
+  | "incomplete_user_profile"
+  | "session_validation_failed";
 
 export type LogoutResult =
   | {
@@ -90,9 +96,8 @@ export async function getCurrentUser(token: string): Promise<CurrentUserResult> 
     if (!response.ok) {
       return {
         status: "error",
-        message:
-          data.message ??
-          "Unable to validate the current session. Please try again.",
+        message: data.message,
+        reason: "session_validation_failed",
       };
     }
 
@@ -101,7 +106,7 @@ export async function getCurrentUser(token: string): Promise<CurrentUserResult> 
     if (!user) {
       return {
         status: "error",
-        message: "The auth service returned an incomplete user profile.",
+        reason: "incomplete_user_profile",
       };
     }
 
@@ -112,8 +117,7 @@ export async function getCurrentUser(token: string): Promise<CurrentUserResult> 
   } catch {
     return {
       status: "error",
-      message:
-        "Unable to reach the auth service. Please confirm it is running and try again.",
+      reason: "auth_service_unavailable",
     };
   }
 }
