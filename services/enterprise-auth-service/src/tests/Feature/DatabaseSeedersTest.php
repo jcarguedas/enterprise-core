@@ -91,7 +91,14 @@ class DatabaseSeedersTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->assertSame(7, Permission::count());
+        $this->assertDatabaseHas('permissions', [
+            'slug' => 'lookup-taxpayer',
+            'name' => 'Lookup Taxpayer',
+            'module' => 'customers',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame(8, Permission::count());
     }
 
     public function test_permission_seeder_assigns_administrator_permissions(): void
@@ -104,6 +111,7 @@ class DatabaseSeedersTest extends TestCase
         $this->assertTrue($administratorRole->hasPermission('view-system-events'));
         $this->assertTrue($administratorRole->hasPermission('view-customers'));
         $this->assertTrue($administratorRole->hasPermission('manage-customers'));
+        $this->assertTrue($administratorRole->hasPermission('lookup-taxpayer'));
     }
 
     public function test_database_seeders_are_idempotent(): void
@@ -115,6 +123,6 @@ class DatabaseSeedersTest extends TestCase
         $this->seed(PermissionSeeder::class);
 
         $this->assertSame(3, Role::count());
-        $this->assertSame(7, Permission::count());
+        $this->assertSame(8, Permission::count());
     }
 }

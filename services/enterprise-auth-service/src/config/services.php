@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'hacienda_taxpayer_lookup' => [
+        'url' => env('HACIENDA_TAXPAYER_LOOKUP_URL', 'https://api.hacienda.go.cr/fe/ae'),
+        'timeout' => (int) env('HACIENDA_TAXPAYER_LOOKUP_TIMEOUT', 10),
+        'cache_ttl_hours' => (int) env('HACIENDA_TAXPAYER_LOOKUP_CACHE_TTL_HOURS', 24),
+    ],
+
 ];
