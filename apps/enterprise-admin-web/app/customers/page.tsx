@@ -59,8 +59,16 @@ function CustomersContent() {
   const createCustomerFormRef = useRef<HTMLDivElement>(null);
   const hasAppliedCreateCustomerIntentRef = useRef(false);
   const appliedEditCustomerIntentKeyRef = useRef("");
+  const appliedCustomerIdentificationIntentKeyRef = useRef("");
   const [shouldAutoFocusCreateCustomerForm, setShouldAutoFocusCreateCustomerForm] =
     useState(false);
+  const [
+    customerIdentificationIntentMessage,
+    setCustomerIdentificationIntentMessage,
+  ] = useState<{
+    text: string;
+    variant: "info" | "error";
+  } | null>(null);
   const canViewCustomers = hasPermission(
     trustedUser,
     VIEW_CUSTOMERS_PERMISSION,
@@ -184,6 +192,7 @@ function CustomersContent() {
 
   const showCreateCustomerForm = useCallback(
     ({ shouldFocus = false }: { shouldFocus?: boolean } = {}) => {
+      setCustomerIdentificationIntentMessage(null);
       cancelEditCustomerForm();
       showCreateCustomerFormPanel();
       setShouldAutoFocusCreateCustomerForm(shouldFocus);
@@ -193,6 +202,7 @@ function CustomersContent() {
 
   const startEditingCustomer = useCallback(
     (customer: Customer) => {
+      setCustomerIdentificationIntentMessage(null);
       cancelCreateCustomerForm();
       setShouldAutoFocusCreateCustomerForm(false);
       startEditingCustomerForm(customer);
@@ -313,6 +323,96 @@ function CustomersContent() {
     status,
   ]);
 
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+    const identificationNumber =
+      searchParams.get("identification_number")?.trim() ?? "";
+    const intentKey = `${intent}:${identificationNumber}`;
+
+    if (
+      status !== "ready" ||
+      customersStatus !== "ready" ||
+      !canViewCustomers ||
+      intent !== "customer-identification" ||
+      appliedCustomerIdentificationIntentKeyRef.current === intentKey
+    ) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      appliedCustomerIdentificationIntentKeyRef.current = intentKey;
+      hasAppliedCreateCustomerIntentRef.current = false;
+      appliedEditCustomerIntentKeyRef.current = "";
+
+      if (!/^\d{9,12}$/.test(identificationNumber)) {
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentInvalid,
+          variant: "error",
+        });
+        return;
+      }
+
+      const localMatches =
+        findCustomersByIdentificationNumber(identificationNumber);
+      const [localCustomerMatch] = localMatches;
+
+      if (localMatches.length === 1 && localCustomerMatch) {
+        if (canManageCustomers) {
+          startEditingCustomer(localCustomerMatch);
+          return;
+        }
+
+        setSearchQuery(identificationNumber);
+        return;
+      }
+
+      if (localMatches.length > 1) {
+        setSearchQuery(identificationNumber);
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentMultipleMatches,
+          variant: "info",
+        });
+        return;
+      }
+
+      if (!canManageCustomers) {
+        setSearchQuery(identificationNumber);
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentNoCreatePermission,
+          variant: "info",
+        });
+        return;
+      }
+
+      showCreateCustomerForm({ shouldFocus: true });
+      createCustomerFlow.setIdentificationNumber(identificationNumber);
+
+      window.setTimeout(() => {
+        createCustomerFormRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 0);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    canManageCustomers,
+    canViewCustomers,
+    createCustomerFlow,
+    customersStatus,
+    findCustomersByIdentificationNumber,
+    searchParams,
+    showCreateCustomerForm,
+    startEditingCustomer,
+    status,
+    t.customerIdentificationIntentInvalid,
+    t.customerIdentificationIntentMultipleMatches,
+    t.customerIdentificationIntentNoCreatePermission,
+  ]);
+
   return (
     <AdminShell
       userDisplayName={userDisplayName}
@@ -417,6 +517,15 @@ function CustomersContent() {
               {customersStatus === "error" ? (
                 <StatusMessage variant="error" className="m-5">
                   {customersErrorMessage}
+                </StatusMessage>
+              ) : null}
+
+              {customerIdentificationIntentMessage ? (
+                <StatusMessage
+                  variant={customerIdentificationIntentMessage.variant}
+                  className="m-5"
+                >
+                  {customerIdentificationIntentMessage.text}
                 </StatusMessage>
               ) : null}
 

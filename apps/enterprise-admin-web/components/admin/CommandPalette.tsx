@@ -203,6 +203,25 @@ const editCustomerPrefixes = [
   "actualizar cliente",
 ];
 
+const customerIdentificationKeywords = [
+  "customer",
+  "customers",
+  "identification",
+  "taxpayer",
+  "hacienda",
+  "create",
+  "update",
+  "cliente",
+  "clientes",
+  "cedula",
+  "cédula",
+  "identificacion",
+  "identificación",
+  "contribuyente",
+  "crear",
+  "actualizar",
+];
+
 function parsePrefixedTerm(value: string, prefixes: string[]) {
   const normalizedValue = normalizeSearchValue(value.trim()).replace(
     /\s+/g,
@@ -236,6 +255,25 @@ function parseEditUserTerm(value: string) {
 
 function parseEditCustomerTerm(value: string) {
   return parsePrefixedTerm(value, editCustomerPrefixes);
+}
+
+function parseCustomerIdentificationNumber(value: string) {
+  const trimmedValue = value.trim();
+  const normalizedValue = normalizeSearchValue(trimmedValue);
+  const isCustomerRelated = customerIdentificationKeywords.some((keyword) =>
+    normalizedValue.includes(normalizeSearchValue(keyword)),
+  );
+
+  if (!isCustomerRelated) {
+    return "";
+  }
+
+  const digitMatches = trimmedValue.match(/\d+/g) ?? [];
+  const identificationNumber = digitMatches.find(
+    (match) => match.length >= 9 && match.length <= 12,
+  );
+
+  return identificationNumber ?? "";
 }
 
 export function CommandPalette({ trustedUser }: CommandPaletteProps) {
@@ -276,7 +314,32 @@ export function CommandPalette({ trustedUser }: CommandPaletteProps) {
       const customerSearchTerm = parseCustomerSearchTerm(query);
       const editCustomerTerm = parseEditCustomerTerm(query);
       const editUserTerm = parseEditUserTerm(query);
+      const customerIdentificationNumber =
+        parseCustomerIdentificationNumber(query);
       const userSearchTerm = parseUserSearchTerm(query);
+
+      if (canViewCustomers && customerIdentificationNumber) {
+        const label = canManageCustomers
+          ? t.commandFindOrCreateCustomerByIdentification
+          : t.commandOpenCustomerByIdentification;
+
+        staticCommands.unshift({
+          href: `/customers?intent=customer-identification&identification_number=${encodeURIComponent(
+            customerIdentificationNumber,
+          )}`,
+          icon: UsersIcon,
+          label: label.replace(
+            "{identificationNumber}",
+            customerIdentificationNumber,
+          ),
+          searchValues: [
+            query,
+            label,
+            t.customers,
+            customerIdentificationNumber,
+          ],
+        });
+      }
 
       if (canManageCustomers && editCustomerTerm.length >= 2) {
         staticCommands.unshift({
