@@ -251,6 +251,8 @@ export type SharedMessages = {
   inactiveAccountLoginMessage: string;
   validationError: string;
   validatingSession: string;
+  sessionValidationFailed: string;
+  sessionIncompleteUserProfile: string;
   protectedWorkspacePlaceholder: string;
   userManagementUnavailable: string;
   userManagementUnavailableDescription: string;
@@ -564,6 +566,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Your account is inactive. Contact an administrator.",
     validationError: "Validation error",
     validatingSession: "Validating session...",
+    sessionValidationFailed:
+      "Unable to validate the current session. Please try again.",
+    sessionIncompleteUserProfile:
+      "The auth service returned an incomplete user profile.",
     protectedWorkspacePlaceholder: "Protected admin workspace placeholder.",
     userManagementUnavailable: "User Management Unavailable",
     userManagementUnavailableDescription:
@@ -718,6 +724,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     inactiveAccountLoginMessage:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     validationError: "Error de validación",
+    sessionValidationFailed:
+      "No se pudo validar la sesión actual. Inténtalo de nuevo.",
+    sessionIncompleteUserProfile:
+      "El servicio de autenticación devolvió un perfil de usuario incompleto.",
     goToLogin: "Ir al inicio de sesión",
     backToOverview: "Volver al resumen",
     loginEyebrow: "Consola segura de operaciones",
