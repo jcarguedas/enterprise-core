@@ -91,10 +91,7 @@ class CustomerController extends Controller
                 actor: $request->user(),
                 targetType: 'customer',
                 targetId: $customer->id,
-                metadata: [
-                    ...$this->customerEventMetadata($customer),
-                    'updated_fields' => array_keys($validated),
-                ],
+                metadata: $this->customerEventMetadata($customer),
                 request: $request,
             );
         }
@@ -113,12 +110,21 @@ class CustomerController extends Controller
 
         $validated = $request->validate([
             'name' => [$presenceRule, 'string', 'max:255'],
+            'legal_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'commercial_name' => ['sometimes', 'nullable', 'string', 'max:255'],
             'email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'fiscal_email' => ['sometimes', 'nullable', 'email', 'max:255'],
             'phone' => ['sometimes', 'nullable', 'string', 'max:50'],
             'identification_type' => ['sometimes', 'nullable', 'string', 'max:50'],
             'identification_number' => ['sometimes', 'nullable', 'string', 'max:100'],
             'address' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'province' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'canton' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'district' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'neighborhood' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'other_signs' => ['sometimes', 'nullable', 'string', 'max:500'],
             'notes' => ['sometimes', 'nullable', 'string', 'max:2000'],
+            'fiscal_notes' => ['sometimes', 'nullable', 'string', 'max:2000'],
             'is_active' => ['sometimes', 'nullable', 'boolean'],
         ]);
 
@@ -130,19 +136,28 @@ class CustomerController extends Controller
     }
 
     /**
-     * @return array{id: int, name: string, email: string|null, phone: string|null, identification_type: string|null, identification_number: string|null, address: string|null, notes: string|null, is_active: bool, created_by_user_id: int|null, updated_by_user_id: int|null, created_at: string|null, updated_at: string|null}
+     * @return array{id: int, name: string, legal_name: string|null, commercial_name: string|null, email: string|null, fiscal_email: string|null, phone: string|null, identification_type: string|null, identification_number: string|null, address: string|null, province: string|null, canton: string|null, district: string|null, neighborhood: string|null, other_signs: string|null, notes: string|null, fiscal_notes: string|null, is_active: bool, created_by_user_id: int|null, updated_by_user_id: int|null, created_at: string|null, updated_at: string|null}
      */
     private function customerPayload(Customer $customer): array
     {
         return [
             'id' => $customer->id,
             'name' => $customer->name,
+            'legal_name' => $customer->legal_name,
+            'commercial_name' => $customer->commercial_name,
             'email' => $customer->email,
+            'fiscal_email' => $customer->fiscal_email,
             'phone' => $customer->phone,
             'identification_type' => $customer->identification_type,
             'identification_number' => $customer->identification_number,
             'address' => $customer->address,
+            'province' => $customer->province,
+            'canton' => $customer->canton,
+            'district' => $customer->district,
+            'neighborhood' => $customer->neighborhood,
+            'other_signs' => $customer->other_signs,
             'notes' => $customer->notes,
+            'fiscal_notes' => $customer->fiscal_notes,
             'is_active' => (bool) $customer->is_active,
             'created_by_user_id' => $customer->created_by_user_id,
             'updated_by_user_id' => $customer->updated_by_user_id,

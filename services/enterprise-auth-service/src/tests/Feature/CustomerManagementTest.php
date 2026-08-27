@@ -38,12 +38,21 @@ class CustomerManagementTest extends TestCase
                 [
                     'id',
                     'name',
+                    'legal_name',
+                    'commercial_name',
                     'email',
+                    'fiscal_email',
                     'phone',
                     'identification_type',
                     'identification_number',
                     'address',
+                    'province',
+                    'canton',
+                    'district',
+                    'neighborhood',
+                    'other_signs',
                     'notes',
+                    'fiscal_notes',
                     'is_active',
                     'created_by_user_id',
                     'updated_by_user_id',
@@ -100,24 +109,51 @@ class CustomerManagementTest extends TestCase
         $response = $this->withToken($token)
             ->postJson('/api/customers', [
                 'name' => 'New Customer',
+                'legal_name' => 'New Customer Sociedad Anonima',
+                'commercial_name' => 'New Customer Store',
                 'email' => 'customer@example.test',
+                'fiscal_email' => 'invoices@example.test',
                 'phone' => '+506 2222 3333',
                 'identification_type' => 'tax_id',
                 'identification_number' => '123456789',
                 'address' => 'San Jose',
+                'province' => 'San Jose',
+                'canton' => 'Central',
+                'district' => 'Carmen',
+                'neighborhood' => 'Amon',
+                'other_signs' => 'North side of the central park.',
                 'notes' => 'Preferred billing contact.',
+                'fiscal_notes' => 'Use fiscal profile once invoicing is implemented.',
             ]);
 
         $response->assertCreated();
 
         $response->assertJsonPath('customer.name', 'New Customer');
+        $response->assertJsonPath('customer.legal_name', 'New Customer Sociedad Anonima');
+        $response->assertJsonPath('customer.commercial_name', 'New Customer Store');
+        $response->assertJsonPath('customer.fiscal_email', 'invoices@example.test');
+        $response->assertJsonPath('customer.province', 'San Jose');
+        $response->assertJsonPath('customer.canton', 'Central');
+        $response->assertJsonPath('customer.district', 'Carmen');
+        $response->assertJsonPath('customer.neighborhood', 'Amon');
+        $response->assertJsonPath('customer.other_signs', 'North side of the central park.');
+        $response->assertJsonPath('customer.fiscal_notes', 'Use fiscal profile once invoicing is implemented.');
         $response->assertJsonPath('customer.is_active', true);
         $response->assertJsonPath('customer.created_by_user_id', $user->id);
         $response->assertJsonPath('customer.updated_by_user_id', $user->id);
 
         $this->assertDatabaseHas('customers', [
             'name' => 'New Customer',
+            'legal_name' => 'New Customer Sociedad Anonima',
+            'commercial_name' => 'New Customer Store',
             'email' => 'customer@example.test',
+            'fiscal_email' => 'invoices@example.test',
+            'province' => 'San Jose',
+            'canton' => 'Central',
+            'district' => 'Carmen',
+            'neighborhood' => 'Amon',
+            'other_signs' => 'North side of the central park.',
+            'fiscal_notes' => 'Use fiscal profile once invoicing is implemented.',
             'is_active' => true,
             'created_by_user_id' => $user->id,
             'updated_by_user_id' => $user->id,
@@ -162,6 +198,26 @@ class CustomerManagementTest extends TestCase
         ]);
     }
 
+    public function test_create_customer_rejects_invalid_fiscal_email(): void
+    {
+        $user = User::factory()->create();
+        $this->givePermissions($user, ['manage-customers']);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson('/api/customers', [
+                'name' => 'Invalid Fiscal Email',
+                'fiscal_email' => 'not-an-email',
+            ]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJsonValidationErrors([
+            'fiscal_email',
+        ]);
+    }
+
     public function test_created_customer_defaults_to_active(): void
     {
         $user = User::factory()->create();
@@ -194,14 +250,32 @@ class CustomerManagementTest extends TestCase
         $response = $this->withToken($token)
             ->patchJson("/api/customers/{$customer->id}", [
                 'name' => 'Updated Customer',
+                'legal_name' => 'Updated Customer Limitada',
+                'commercial_name' => 'Updated Customer Store',
                 'email' => 'updated@example.test',
+                'fiscal_email' => 'updated-invoices@example.test',
+                'province' => 'Alajuela',
+                'canton' => 'San Carlos',
+                'district' => 'Quesada',
+                'neighborhood' => 'Cedral',
+                'other_signs' => 'Blue gate near the main road.',
                 'notes' => 'Internal notes should not appear in event metadata.',
+                'fiscal_notes' => 'Fiscal note for future invoicing only.',
             ]);
 
         $response->assertOk();
 
         $response->assertJsonPath('customer.name', 'Updated Customer');
+        $response->assertJsonPath('customer.legal_name', 'Updated Customer Limitada');
+        $response->assertJsonPath('customer.commercial_name', 'Updated Customer Store');
         $response->assertJsonPath('customer.email', 'updated@example.test');
+        $response->assertJsonPath('customer.fiscal_email', 'updated-invoices@example.test');
+        $response->assertJsonPath('customer.province', 'Alajuela');
+        $response->assertJsonPath('customer.canton', 'San Carlos');
+        $response->assertJsonPath('customer.district', 'Quesada');
+        $response->assertJsonPath('customer.neighborhood', 'Cedral');
+        $response->assertJsonPath('customer.other_signs', 'Blue gate near the main road.');
+        $response->assertJsonPath('customer.fiscal_notes', 'Fiscal note for future invoicing only.');
         $response->assertJsonPath('customer.updated_by_user_id', $user->id);
     }
 
@@ -279,7 +353,15 @@ class CustomerManagementTest extends TestCase
             ->postJson('/api/customers', [
                 'name' => 'Event Customer',
                 'email' => 'event@example.test',
+                'fiscal_email' => 'fiscal-event@example.test',
+                'address' => 'Sensitive exact address.',
+                'province' => 'San Jose',
+                'canton' => 'Central',
+                'district' => 'Carmen',
+                'neighborhood' => 'Amon',
+                'other_signs' => 'Sensitive location details.',
                 'notes' => 'Do not log this note.',
+                'fiscal_notes' => 'Do not log this fiscal note.',
             ]);
 
         $response->assertCreated();
@@ -295,6 +377,10 @@ class CustomerManagementTest extends TestCase
             'target_email' => 'event@example.test',
         ], $event->metadata);
         $this->assertStringNotContainsString('Do not log this note.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Do not log this fiscal note.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Sensitive exact address.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Sensitive location details.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('fiscal-event@example.test', json_encode($event->toArray()));
     }
 
     public function test_updating_customer_creates_system_event(): void
@@ -313,7 +399,15 @@ class CustomerManagementTest extends TestCase
             ->patchJson("/api/customers/{$customer->id}", [
                 'name' => 'Updated Event Customer',
                 'email' => 'updated-event@example.test',
+                'fiscal_email' => 'updated-fiscal-event@example.test',
+                'address' => 'Updated sensitive exact address.',
+                'province' => 'Cartago',
+                'canton' => 'Central',
+                'district' => 'Oriental',
+                'neighborhood' => 'Los Angeles',
+                'other_signs' => 'Updated sensitive location details.',
                 'notes' => 'Do not log updated notes.',
+                'fiscal_notes' => 'Do not log updated fiscal notes.',
             ]);
 
         $response->assertOk();
@@ -323,9 +417,16 @@ class CustomerManagementTest extends TestCase
         $this->assertSame($user->id, $event->actor_user_id);
         $this->assertSame('customer', $event->target_type);
         $this->assertSame((string) $customer->id, $event->target_id);
-        $this->assertSame('Updated Event Customer', $event->metadata['target_name']);
-        $this->assertSame('updated-event@example.test', $event->metadata['target_email']);
+        $this->assertSame([
+            'target_name' => 'Updated Event Customer',
+            'target_email' => 'updated-event@example.test',
+        ], $event->metadata);
         $this->assertStringNotContainsString('Do not log updated notes.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Do not log updated fiscal notes.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Updated sensitive exact address.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Updated sensitive location details.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('fiscal_email', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('updated-fiscal-event@example.test', json_encode($event->toArray()));
     }
 
     public function test_guest_cannot_access_customer_routes(): void

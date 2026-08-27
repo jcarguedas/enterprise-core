@@ -961,7 +961,9 @@ Requested user or role does not exist:
 
 Customers are the first business-domain module foundation in Enterprise Auth Service.
 
-The module is intentionally small and API-first. It supports listing, detail, creation, and partial updates for customer records. It does not yet implement customer deletion, advanced search, exports, invoicing, or Admin Web screens.
+The module is intentionally small and API-first. It supports listing, detail, creation, partial updates, and optional fiscal profile data for customer records.
+
+The fiscal profile fields prepare customer data for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet: the service does not call Hacienda APIs, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, or calculate taxes.
 
 ### List Customers
 
@@ -979,12 +981,21 @@ Example response:
     {
       "id": 1,
       "name": "Acme Corporation",
+      "legal_name": "Acme Corporation Sociedad Anonima",
+      "commercial_name": "Acme",
       "email": "billing@acme.test",
+      "fiscal_email": "invoices@acme.test",
       "phone": "+506 2222 3333",
       "identification_type": "tax_id",
       "identification_number": "123456789",
       "address": "San Jose",
+      "province": "San Jose",
+      "canton": "Central",
+      "district": "Carmen",
+      "neighborhood": "Amon",
+      "other_signs": "North side of the central park.",
       "notes": "Preferred billing contact.",
+      "fiscal_notes": "Optional fiscal profile notes.",
       "is_active": true,
       "created_by_user_id": 1,
       "updated_by_user_id": 1,
@@ -1010,12 +1021,21 @@ Example response:
   "customer": {
     "id": 1,
     "name": "Acme Corporation",
+    "legal_name": "Acme Corporation Sociedad Anonima",
+    "commercial_name": "Acme",
     "email": "billing@acme.test",
+    "fiscal_email": "invoices@acme.test",
     "phone": "+506 2222 3333",
     "identification_type": "tax_id",
     "identification_number": "123456789",
     "address": "San Jose",
+    "province": "San Jose",
+    "canton": "Central",
+    "district": "Carmen",
+    "neighborhood": "Amon",
+    "other_signs": "North side of the central park.",
     "notes": "Preferred billing contact.",
+    "fiscal_notes": "Optional fiscal profile notes.",
     "is_active": true,
     "created_by_user_id": 1,
     "updated_by_user_id": 1,
@@ -1038,12 +1058,21 @@ Example request:
 ```json
 {
   "name": "Acme Corporation",
+  "legal_name": "Acme Corporation Sociedad Anonima",
+  "commercial_name": "Acme",
   "email": "billing@acme.test",
+  "fiscal_email": "invoices@acme.test",
   "phone": "+506 2222 3333",
   "identification_type": "tax_id",
   "identification_number": "123456789",
   "address": "San Jose",
+  "province": "San Jose",
+  "canton": "Central",
+  "district": "Carmen",
+  "neighborhood": "Amon",
+  "other_signs": "North side of the central park.",
   "notes": "Preferred billing contact.",
+  "fiscal_notes": "Optional fiscal profile notes.",
   "is_active": true
 }
 ```
@@ -1053,15 +1082,26 @@ Validation rules:
 | Field | Rules |
 |---|---|
 | `name` | required, string, max 255 |
+| `legal_name` | nullable, string, max 255 |
+| `commercial_name` | nullable, string, max 255 |
 | `email` | nullable, email, max 255 |
+| `fiscal_email` | nullable, email, max 255 |
 | `phone` | nullable, string, max 50 |
 | `identification_type` | nullable, string, max 50 |
 | `identification_number` | nullable, string, max 100 |
 | `address` | nullable, string, max 500 |
+| `province` | nullable, string, max 100 |
+| `canton` | nullable, string, max 100 |
+| `district` | nullable, string, max 100 |
+| `neighborhood` | nullable, string, max 100 |
+| `other_signs` | nullable, string, max 500 |
 | `notes` | nullable, string, max 2000 |
+| `fiscal_notes` | nullable, string, max 2000 |
 | `is_active` | nullable, boolean |
 
 New customers default to active when `is_active` is omitted.
+
+Fiscal fields are optional and nullable. They are data preparation only and do not trigger electronic invoicing behavior.
 
 Successful response:
 
@@ -1104,6 +1144,8 @@ customers.deactivated
 ```
 
 Customer event metadata stores safe summaries such as `target_name` and `target_email`. It does not store full request bodies or customer notes.
+
+Customer event metadata must not store full fiscal profiles, address details, or `fiscal_notes`.
 
 ---
 

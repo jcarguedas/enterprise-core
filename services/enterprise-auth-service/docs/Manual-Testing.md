@@ -216,6 +216,8 @@ Read routes require `view-customers`. Create and update routes require `manage-c
 
 Use an Administrator account seeded with the current permissions, or assign the required customer permissions to the role used by the test account.
 
+Customer fiscal profile fields are optional and nullable. They prepare customer records for a future Costa Rica electronic invoicing module only. Electronic invoicing is not implemented yet: no Hacienda API calls, XML generation, signing, invoice keys, consecutive numbers, branches, terminals, or tax calculation are performed.
+
 ### Create Customer
 
 ```powershell
@@ -226,7 +228,7 @@ $customerResponse = Invoke-RestMethod -Method Post `
     "Accept" = "application/json"
     "Authorization" = "Bearer $token"
   } `
-  -Body '{"name":"Acme Corporation","email":"billing@acme.test","phone":"+506 2222 3333"}'
+  -Body '{"name":"Acme Corporation","legal_name":"Acme Corporation Sociedad Anonima","commercial_name":"Acme","email":"billing@acme.test","fiscal_email":"invoices@acme.test","phone":"+506 2222 3333","identification_type":"tax_id","identification_number":"123456789","address":"San Jose","province":"San Jose","canton":"Central","district":"Carmen","neighborhood":"Amon","other_signs":"North side of the central park.","fiscal_notes":"Optional fiscal profile notes."}'
 
 $customerResponse
 ```
@@ -238,12 +240,21 @@ Expected result:
   "customer": {
     "id": 1,
     "name": "Acme Corporation",
+    "legal_name": "Acme Corporation Sociedad Anonima",
+    "commercial_name": "Acme",
     "email": "billing@acme.test",
+    "fiscal_email": "invoices@acme.test",
     "phone": "+506 2222 3333",
-    "identification_type": null,
-    "identification_number": null,
-    "address": null,
+    "identification_type": "tax_id",
+    "identification_number": "123456789",
+    "address": "San Jose",
+    "province": "San Jose",
+    "canton": "Central",
+    "district": "Carmen",
+    "neighborhood": "Amon",
+    "other_signs": "North side of the central park.",
     "notes": null,
+    "fiscal_notes": "Optional fiscal profile notes.",
     "is_active": true,
     "created_by_user_id": 1,
     "updated_by_user_id": 1,
@@ -274,7 +285,7 @@ Invoke-RestMethod -Method Patch `
     "Accept" = "application/json"
     "Authorization" = "Bearer $token"
   } `
-  -Body '{"name":"Acme Corporation Updated","is_active":false}'
+  -Body '{"name":"Acme Corporation Updated","fiscal_email":"updated-invoices@acme.test","province":"Alajuela","canton":"San Carlos","district":"Quesada","is_active":false}'
 ```
 
 Customer create and update actions write system events:
@@ -286,7 +297,7 @@ customers.activated
 customers.deactivated
 ```
 
-Customer event metadata stores safe summaries only. It does not store full request bodies or customer notes.
+Customer event metadata stores safe summaries only, currently `target_name` and `target_email`. It does not store full request bodies, customer notes, full fiscal profiles, address details, or `fiscal_notes`.
 
 ---
 
