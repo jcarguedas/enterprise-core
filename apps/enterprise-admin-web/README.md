@@ -240,6 +240,13 @@ See [Command Palette](docs/Command-Palette.md) for the Admin Web command
 palette manual and [Command Center Roadmap](docs/Command-Center-Roadmap.md)
 for the phased product direction.
 
+Customer identification commands can route safely to the Customers page with an
+intent such as `/customers?intent=customer-identification&identification_number=...`.
+The Customers page checks local records first, opens an existing customer when a
+single exact match exists, or pre-fills the create form when no local match exists
+and the user has `manage-customers`. These commands never consult Hacienda, create,
+update, or save customer records automatically.
+
 ## Roles
 
 The read-only Roles page is available at `/roles`. It validates the current

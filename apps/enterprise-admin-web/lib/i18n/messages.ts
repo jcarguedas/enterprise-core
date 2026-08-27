@@ -67,6 +67,8 @@ export type SharedMessages = {
   editUserFor: string;
   editCustomerCommand: string;
   editCustomerFor: string;
+  commandOpenCustomerByIdentification: string;
+  commandFindOrCreateCustomerByIdentification: string;
   customerSearchFor: string;
   searchUser: string;
   searchUsersFor: string;
@@ -81,6 +83,9 @@ export type SharedMessages = {
   customersLoadError: string;
   customersManageDescription: string;
   customersManageAccessDeniedDescription: string;
+  customerIdentificationIntentMultipleMatches: string;
+  customerIdentificationIntentNoCreatePermission: string;
+  customerIdentificationIntentInvalid: string;
   closeCommandPalette: string;
   dashboard: string;
   dashboardDescription: string;
@@ -422,6 +427,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUserFor: 'Edit user "{query}"',
     editCustomerCommand: "Edit customer",
     editCustomerFor: 'Edit customer "{query}"',
+    commandOpenCustomerByIdentification:
+      "Open customer by identification {identificationNumber}",
+    commandFindOrCreateCustomerByIdentification:
+      "Find or create customer with identification {identificationNumber}",
     customerSearchFor: 'Search customers for "{query}"',
     searchUser: "Search user",
     searchUsersFor: 'Search users for "{query}"',
@@ -442,6 +451,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Create and edit customer records when the manage-customers permission is available. Delete, export, and bulk actions are not implemented.",
     customersManageAccessDeniedDescription:
       "You do not have permission to manage customers.",
+    customerIdentificationIntentMultipleMatches:
+      "Multiple customers match this identification. Search and select the customer manually before continuing.",
+    customerIdentificationIntentNoCreatePermission:
+      "No customer matches this identification. Creating customers requires manage-customers.",
+    customerIdentificationIntentInvalid:
+      "Enter a numeric identification number with 9 to 12 digits.",
     closeCommandPalette: "Close command palette",
     dashboard: "Dashboard",
     dashboardDescription:
@@ -1020,6 +1035,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUserFor: 'Editar usuario "{query}"',
     editCustomerCommand: "Editar cliente",
     editCustomerFor: 'Editar cliente "{query}"',
+    commandOpenCustomerByIdentification:
+      "Abrir cliente por identificación {identificationNumber}",
+    commandFindOrCreateCustomerByIdentification:
+      "Buscar o crear cliente con identificación {identificationNumber}",
     customerSearchFor: 'Buscar clientes por "{query}"',
     searchUser: "Buscar usuario",
     searchUsersFor: 'Buscar usuarios por "{query}"',
@@ -1040,6 +1059,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Crea y edita registros de clientes cuando el permiso manage-customers está disponible. Eliminar, exportar y acciones masivas no están implementadas.",
     customersManageAccessDeniedDescription:
       "No tienes permiso para administrar clientes.",
+    customerIdentificationIntentMultipleMatches:
+      "Hay varios clientes con esta identificación. Busca y selecciona el cliente manualmente antes de continuar.",
+    customerIdentificationIntentNoCreatePermission:
+      "No hay clientes con esta identificación. Crear clientes requiere manage-customers.",
+    customerIdentificationIntentInvalid:
+      "Ingresa un número de identificación numérico de 9 a 12 dígitos.",
     closeCommandPalette: "Cerrar paleta de comandos",
     dashboard: "Dashboard",
     dashboardDescription:
