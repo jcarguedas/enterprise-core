@@ -173,7 +173,23 @@ Customer actions write safe system events:
 
 Customer event metadata is limited to safe summaries such as customer name and email. It must not store full request bodies, credentials, tokens, or customer notes.
 
-This is a foundation only. Customer deletion, advanced search, exports, invoicing, and Admin Web customer screens are not implemented yet.
+The Customers foundation now includes optional fiscal profile fields:
+
+- `legal_name`
+- `commercial_name`
+- `fiscal_email`
+- `province`
+- `canton`
+- `district`
+- `neighborhood`
+- `other_signs`
+- `fiscal_notes`
+
+These fields prepare customer records for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet. The service does not call Hacienda APIs, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, or calculate taxes.
+
+Customer event metadata is limited to safe summaries such as `target_name` and `target_email`. It must not store full request bodies, credentials, tokens, customer notes, full fiscal profiles, address details, or `fiscal_notes`.
+
+This is a foundation only. Customer deletion, advanced search, exports, and electronic invoicing are not implemented yet.
 
 ---
 
@@ -229,13 +245,13 @@ The current automated testing documentation is available at:
 
 El servicio implementará:
 
-- JWT Authentication
+- Laravel Sanctum Authentication
 - Password Hashing
 - Token Revocation
-- Refresh Tokens
+- Active User Middleware
 - Rate Limiting
-- Email Verification
-- Password Reset
+- Permission-protected administrative routes
+- Safe system event metadata
 - Role Based Access Control (RBAC)
 
 ---
@@ -246,7 +262,7 @@ Tecnologías previstas:
 
 - Laravel
 - PostgreSQL
-- JWT
+- Laravel Sanctum
 - OpenAPI
 - PHPUnit
 
@@ -273,10 +289,19 @@ Este servicio sigue los principios establecidos en Enterprise Core Blueprint y e
 
 # Current Status
 
-🚧 Under Development
+Under active development.
 
-Sprint 1
+Current foundation:
 
+- Laravel and PostgreSQL backend.
+- Sanctum authentication.
+- Active user middleware.
+- RBAC with users, roles, and permissions.
+- User management backend.
+- Role listing and user role assignment backend.
+- System Events backend foundation.
+- Customers backend foundation with optional fiscal profile fields.
+- Backend automated tests.
 ---
 # Communication
 
@@ -289,13 +314,39 @@ Toda comunicación entre servicios deberá realizarse mediante contratos de API.
 ---
 # Roadmap
 
-- [x] Initialize Laravel Project
-- [x] Configure PostgreSQL Connection
-- [ ] Configure JWT Authentication
-- [ ] Create Initial Domain Models
-- [ ] Create OpenAPI Specification
-- [ ] Implement Authentication Flow
-- [ ] Implement Authorization Layer
-- [ ] Implement Audit Logging
+## Completed
+
+- [x] Initialize Laravel project.
+- [x] Configure PostgreSQL connection.
+- [x] Implement Sanctum authentication.
+- [x] Create initial User, Role, Permission, System Event, and Customer models.
+- [x] Implement RBAC authorization layer.
+- [x] Implement user management endpoints.
+- [x] Implement role listing and user role assignment endpoints.
+- [x] Implement System Events foundation.
+- [x] Implement Customers foundation.
+- [x] Add optional customer fiscal profile fields for future Costa Rica electronic invoicing preparation.
+- [x] Add backend automated tests for implemented behavior.
+
+## Next
+
+- Improve the Customers module.
+- Define business roles.
+- Add role-permission management.
+- Prepare fiscal customer profile workflows for future Costa Rica electronic invoicing.
+- Plan product/catalog or inventory module boundaries.
+
+## Future
+
+- Inventory.
+- Catalog.
+- Sales.
+- Reporting.
+- Costa Rica electronic invoicing.
+- Docker and deployment packaging.
+- Optional update and licensing network.
+- Voice or AI command input layer.
+
+Electronic invoicing remains future work and must be introduced separately with explicit data modeling, authorization, tests, and documentation.
 
 
