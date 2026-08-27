@@ -5,6 +5,7 @@ export type CustomerFormFieldErrors = {
   email?: string;
   fiscalEmail?: string;
   identificationType?: string;
+  identificationNumber?: string;
   economicActivityCode?: string;
   provinceCode?: string;
   cantonCode?: string;
@@ -17,6 +18,7 @@ const customerFieldByBackendKey: Record<string, keyof CustomerFormFieldErrors> =
   email: "email",
   fiscal_email: "fiscalEmail",
   identification_type: "identificationType",
+  identification_number: "identificationNumber",
   economic_activity_code: "economicActivityCode",
   province_code: "provinceCode",
   canton_code: "cantonCode",
@@ -73,6 +75,22 @@ function localizeCustomerApiFieldMessage(
 
   if (message === "The selected identification type is invalid.") {
     return messages.apiErrorIdentificationTypeInvalid;
+  }
+
+  if (message === "The identification number field is required.") {
+    return messages.taxpayerLookupIdentificationRequired;
+  }
+
+  if (message === "The identification number field format is invalid.") {
+    return messages.taxpayerLookupIdentificationNumeric;
+  }
+
+  if (
+    message === "The identification number field must be at least 9 characters." ||
+    message ===
+      "The identification number field must not be greater than 12 characters."
+  ) {
+    return messages.taxpayerLookupIdentificationLength;
   }
 
   if (message === "The selected province code is invalid.") {

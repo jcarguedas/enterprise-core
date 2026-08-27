@@ -9,6 +9,7 @@ import {
 } from "@/lib/customer-form-field-errors";
 import { customerLocationCatalog } from "@/lib/customer-location-catalog";
 import { useI18n } from "@/lib/i18n/use-i18n";
+import type { TaxpayerLookupSuccessResult } from "@/lib/taxpayer-lookup-api";
 
 type CustomerFormMode = "create" | "edit";
 
@@ -45,6 +46,11 @@ type CustomerFormProps = {
   isSubmitting: boolean;
   errorMessages: string[];
   fieldErrors: CustomerFormFieldErrors;
+  canLookupTaxpayer: boolean;
+  isLookingUpTaxpayer: boolean;
+  taxpayerLookupResult: TaxpayerLookupSuccessResult | null;
+  taxpayerLookupErrorMessage: string;
+  selectedTaxpayerEconomicActivityCode: string;
   onNameChange: (value: string) => void;
   onLegalNameChange: (value: string) => void;
   onCommercialNameChange: (value: string) => void;
@@ -75,6 +81,9 @@ type CustomerFormProps = {
   onSubmit: FormEventHandler<HTMLFormElement>;
   onCancel: () => void;
   onClearErrorMessages: () => void;
+  onLookupTaxpayer: () => void;
+  onApplyTaxpayerData: () => void;
+  onSelectedTaxpayerEconomicActivityCodeChange: (value: string) => void;
 };
 
 type FormSectionProps = {
@@ -270,6 +279,126 @@ function SelectField({
   );
 }
 
+function TaxpayerLookupPreview({
+  result,
+  selectedEconomicActivityCode,
+  onSelectedEconomicActivityCodeChange,
+  onApplyTaxpayerData,
+}: {
+  result: TaxpayerLookupSuccessResult;
+  selectedEconomicActivityCode: string;
+  onSelectedEconomicActivityCodeChange: (value: string) => void;
+  onApplyTaxpayerData: () => void;
+}) {
+  const { messages: t } = useI18n();
+  const { taxpayer } = result;
+  const sourceLabel =
+    result.source === "cache" ? t.taxpayerDataFromCache : t.taxpayerDataFromHacienda;
+  const economicActivityOptions = [
+    {
+      label: t.selectEconomicActivity,
+      value: "",
+    },
+    ...taxpayer.economic_activities.map((activity) => ({
+      label: [activity.code, activity.name].filter(Boolean).join(" - "),
+      value: activity.code ?? "",
+    })),
+  ];
+
+  return (
+    <div className="app-surface-muted md:col-span-2 rounded-md border border-[var(--app-border)] p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="app-text text-sm font-semibold">
+            {t.taxpayerDataFound}
+          </p>
+          <p className="app-subtle mt-1 text-sm">
+            {t.reviewAndApplyTaxpayerData}
+          </p>
+        </div>
+        <span className="app-badge-success inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold">
+          {sourceLabel}
+        </span>
+      </div>
+
+      <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.name}
+          </dt>
+          <dd className="app-text mt-1">{taxpayer.name ?? t.unavailable}</dd>
+        </div>
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.identificationType}
+          </dt>
+          <dd className="app-text mt-1">
+            {taxpayer.identification_type ?? t.unavailable}
+          </dd>
+        </div>
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.identificationNumber}
+          </dt>
+          <dd className="app-text mt-1">{taxpayer.identification_number}</dd>
+        </div>
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.taxStatus}
+          </dt>
+          <dd className="app-text mt-1">
+            {taxpayer.tax_status ?? t.unavailable}
+          </dd>
+        </div>
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.taxRegime}
+          </dt>
+          <dd className="app-text mt-1">
+            {taxpayer.tax_regime ?? t.unavailable}
+          </dd>
+        </div>
+        <div>
+          <dt className="app-subtle text-xs font-semibold uppercase">
+            {t.fetchedAt}
+          </dt>
+          <dd className="app-text mt-1">{result.fetched_at ?? t.unavailable}</dd>
+        </div>
+      </dl>
+
+      {taxpayer.economic_activities.length > 1 ? (
+        <div className="mt-4">
+          <SelectField
+            id="customer-taxpayer-economic-activity"
+            name="taxpayer_economic_activity"
+            label={t.economicActivityName}
+            value={selectedEconomicActivityCode}
+            onChange={onSelectedEconomicActivityCodeChange}
+            disabled={false}
+            options={economicActivityOptions}
+          />
+        </div>
+      ) : null}
+
+      {taxpayer.economic_activities.length === 1 ? (
+        <p className="app-muted mt-4 text-sm">
+          {[taxpayer.economic_activities[0]?.code, taxpayer.economic_activities[0]?.name]
+            .filter(Boolean)
+            .join(" - ")}
+        </p>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={onApplyTaxpayerData}
+        className="app-button-primary mt-4 inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2"
+      >
+        {t.applyTaxpayerData}
+      </button>
+    </div>
+  );
+}
+
 export function CustomerForm({
   mode,
   name,
@@ -295,6 +424,11 @@ export function CustomerForm({
   isSubmitting,
   errorMessages,
   fieldErrors,
+  canLookupTaxpayer,
+  isLookingUpTaxpayer,
+  taxpayerLookupResult,
+  taxpayerLookupErrorMessage,
+  selectedTaxpayerEconomicActivityCode,
   onNameChange,
   onLegalNameChange,
   onCommercialNameChange,
@@ -325,6 +459,9 @@ export function CustomerForm({
   onSubmit,
   onCancel,
   onClearErrorMessages,
+  onLookupTaxpayer,
+  onApplyTaxpayerData,
+  onSelectedTaxpayerEconomicActivityCodeChange,
 }: CustomerFormProps) {
   const { messages: t } = useI18n();
   const title = mode === "create" ? t.createCustomer : t.editCustomer;
@@ -561,7 +698,37 @@ export function CustomerForm({
             value={identificationNumber}
             onChange={onIdentificationNumberChange}
             disabled={isSubmitting}
+            errorMessage={fieldErrors.identificationNumber}
           />
+          {canLookupTaxpayer ? (
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={onLookupTaxpayer}
+                disabled={isSubmitting || isLookingUpTaxpayer}
+                className="app-button-secondary inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 disabled:cursor-not-allowed"
+              >
+                {isLookingUpTaxpayer ? t.consultingHacienda : t.consultHacienda}
+              </button>
+            </div>
+          ) : null}
+          {taxpayerLookupErrorMessage ? (
+            <StatusMessage variant="error" className="md:col-span-2">
+              {taxpayerLookupErrorMessage}
+            </StatusMessage>
+          ) : null}
+          {taxpayerLookupResult ? (
+            <TaxpayerLookupPreview
+              result={taxpayerLookupResult}
+              selectedEconomicActivityCode={
+                selectedTaxpayerEconomicActivityCode
+              }
+              onSelectedEconomicActivityCodeChange={
+                onSelectedTaxpayerEconomicActivityCodeChange
+              }
+              onApplyTaxpayerData={onApplyTaxpayerData}
+            />
+          ) : null}
           <div className="flex items-end">
             <label className="app-muted inline-flex items-center gap-3 text-sm font-medium">
               <input

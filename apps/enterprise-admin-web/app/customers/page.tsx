@@ -22,6 +22,7 @@ import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 import {
   hasPermission,
+  LOOKUP_TAXPAYER_PERMISSION,
   MANAGE_CUSTOMERS_PERMISSION,
   VIEW_CUSTOMERS_PERMISSION,
 } from "@/lib/permissions";
@@ -67,6 +68,10 @@ function CustomersContent() {
   const canManageCustomers = hasPermission(
     trustedUser,
     MANAGE_CUSTOMERS_PERMISSION,
+  );
+  const canLookupTaxpayer = hasPermission(
+    trustedUser,
+    LOOKUP_TAXPAYER_PERMISSION,
   );
   const handleUnauthorized = useCallback(() => {
     clearStoredAuth();
@@ -433,6 +438,19 @@ function CustomersContent() {
                         isSubmitting={createCustomerFlow.isSubmitting}
                         errorMessages={createCustomerFlow.errorMessages}
                         fieldErrors={createCustomerFlow.fieldErrors}
+                        canLookupTaxpayer={canLookupTaxpayer}
+                        isLookingUpTaxpayer={
+                          createCustomerFlow.isLookingUpTaxpayer
+                        }
+                        taxpayerLookupResult={
+                          createCustomerFlow.taxpayerLookupResult
+                        }
+                        taxpayerLookupErrorMessage={
+                          createCustomerFlow.taxpayerLookupErrorMessage
+                        }
+                        selectedTaxpayerEconomicActivityCode={
+                          createCustomerFlow.selectedTaxpayerEconomicActivityCode
+                        }
                         onNameChange={createCustomerFlow.setName}
                         onLegalNameChange={createCustomerFlow.setLegalName}
                         onCommercialNameChange={
@@ -489,6 +507,13 @@ function CustomersContent() {
                         onClearErrorMessages={
                           createCustomerFlow.clearErrorMessages
                         }
+                        onLookupTaxpayer={createCustomerFlow.lookupTaxpayer}
+                        onApplyTaxpayerData={
+                          createCustomerFlow.applyTaxpayerData
+                        }
+                        onSelectedTaxpayerEconomicActivityCodeChange={
+                          createCustomerFlow.setSelectedTaxpayerEconomicActivityCode
+                        }
                       />
                     </div>
                   ) : null}
@@ -532,6 +557,15 @@ function CustomersContent() {
                       isSubmitting={editCustomerFlow.isSubmitting}
                       errorMessages={editCustomerFlow.errorMessages}
                       fieldErrors={editCustomerFlow.fieldErrors}
+                      canLookupTaxpayer={canLookupTaxpayer}
+                      isLookingUpTaxpayer={editCustomerFlow.isLookingUpTaxpayer}
+                      taxpayerLookupResult={editCustomerFlow.taxpayerLookupResult}
+                      taxpayerLookupErrorMessage={
+                        editCustomerFlow.taxpayerLookupErrorMessage
+                      }
+                      selectedTaxpayerEconomicActivityCode={
+                        editCustomerFlow.selectedTaxpayerEconomicActivityCode
+                      }
                       onNameChange={editCustomerFlow.setName}
                       onLegalNameChange={editCustomerFlow.setLegalName}
                       onCommercialNameChange={editCustomerFlow.setCommercialName}
@@ -574,6 +608,11 @@ function CustomersContent() {
                       onSubmit={editCustomerFlow.submit}
                       onCancel={editCustomerFlow.cancelEditing}
                       onClearErrorMessages={editCustomerFlow.clearErrorMessages}
+                      onLookupTaxpayer={editCustomerFlow.lookupTaxpayer}
+                      onApplyTaxpayerData={editCustomerFlow.applyTaxpayerData}
+                      onSelectedTaxpayerEconomicActivityCodeChange={
+                        editCustomerFlow.setSelectedTaxpayerEconomicActivityCode
+                      }
                     />
                   ) : null}
 

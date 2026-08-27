@@ -20,6 +20,10 @@ import {
   localizeApiErrorMessage,
   localizeApiErrorMessages,
 } from "@/lib/localized-api-errors";
+import {
+  lookupTaxpayer as lookupTaxpayerFromApi,
+  type TaxpayerLookupSuccessResult,
+} from "@/lib/taxpayer-lookup-api";
 
 type UseCreateCustomerOptions = {
   onCustomerCreated: (createdCustomer: Customer) => void;
@@ -71,6 +75,15 @@ export function useCreateCustomer({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<CustomerFormFieldErrors>({});
+  const [isLookingUpTaxpayer, setIsLookingUpTaxpayer] = useState(false);
+  const [taxpayerLookupResult, setTaxpayerLookupResult] =
+    useState<TaxpayerLookupSuccessResult | null>(null);
+  const [taxpayerLookupErrorMessage, setTaxpayerLookupErrorMessage] =
+    useState("");
+  const [
+    selectedTaxpayerEconomicActivityCode,
+    setSelectedTaxpayerEconomicActivityCode,
+  ] = useState("");
 
   function clearFieldError(field: keyof CustomerFormFieldErrors) {
     setFieldErrors((currentFieldErrors) => {
@@ -113,6 +126,7 @@ export function useCreateCustomer({
     setNotes("");
     setFiscalNotes("");
     setIsActive(true);
+    clearTaxpayerLookupResult();
   }
 
   function showForm() {
@@ -152,6 +166,12 @@ export function useCreateCustomer({
     setIdentificationType(value);
   }
 
+  function handleIdentificationNumberChange(value: string) {
+    clearFieldError("identificationNumber");
+    setIdentificationNumber(value);
+    clearTaxpayerLookupResult();
+  }
+
   function handleEconomicActivityCodeChange(value: string) {
     clearFieldError("economicActivityCode");
     setEconomicActivityCode(sanitizeEconomicActivityCodeInput(value));
@@ -175,6 +195,152 @@ export function useCreateCustomer({
   function handleNeighborhoodCodeChange(value: string) {
     clearFieldError("neighborhoodCode");
     setNeighborhoodCode(value);
+  }
+
+  function clearTaxpayerLookupResult() {
+    setTaxpayerLookupResult(null);
+    setTaxpayerLookupErrorMessage("");
+    setSelectedTaxpayerEconomicActivityCode("");
+  }
+
+  function getTaxpayerLookupIdentificationError() {
+    const normalizedIdentificationNumber = identificationNumber.trim();
+
+    if (!normalizedIdentificationNumber) {
+      return t.taxpayerLookupIdentificationRequired;
+    }
+
+    if (!/^\d+$/.test(normalizedIdentificationNumber)) {
+      return t.taxpayerLookupIdentificationNumeric;
+    }
+
+    if (
+      normalizedIdentificationNumber.length < 9 ||
+      normalizedIdentificationNumber.length > 12
+    ) {
+      return t.taxpayerLookupIdentificationLength;
+    }
+
+    return "";
+  }
+
+  async function lookupTaxpayer() {
+    const identificationError = getTaxpayerLookupIdentificationError();
+
+    clearTaxpayerLookupResult();
+
+    if (identificationError) {
+      setFieldErrors((currentFieldErrors) => ({
+        ...currentFieldErrors,
+        identificationNumber: identificationError,
+      }));
+      setTaxpayerLookupErrorMessage(identificationError);
+      return;
+    }
+
+    const token = getStoredToken();
+
+    if (!token) {
+      onUnauthorized();
+      return;
+    }
+
+    setIsLookingUpTaxpayer(true);
+
+    const result = await lookupTaxpayerFromApi(
+      token,
+      identificationNumber.trim(),
+    );
+
+    setIsLookingUpTaxpayer(false);
+
+    if (result.status === "success") {
+      setTaxpayerLookupResult(result);
+      setSelectedTaxpayerEconomicActivityCode(
+        result.taxpayer.economic_activities[0]?.code ?? "",
+      );
+      return;
+    }
+
+    if (result.status === "unauthorized") {
+      onUnauthorized();
+      return;
+    }
+
+    if (result.status === "inactive_account") {
+      onInactiveAccount();
+      return;
+    }
+
+    if (result.status === "forbidden") {
+      setTaxpayerLookupErrorMessage(t.customersManageAccessDeniedDescription);
+      return;
+    }
+
+    if (result.status === "validation_error") {
+      setFieldErrors(getCustomerFieldErrorsFromApiErrors(result.errors, t));
+      setTaxpayerLookupErrorMessage(
+        localizeApiErrorMessages(result.messages, t).join(" "),
+      );
+      return;
+    }
+
+    if (result.status === "not_found") {
+      setTaxpayerLookupErrorMessage(t.taxpayerDataNotFound);
+      return;
+    }
+
+    if (result.status === "rate_limited") {
+      setTaxpayerLookupErrorMessage(t.taxpayerLookupRateLimited);
+      return;
+    }
+
+    if (result.status === "unavailable") {
+      setTaxpayerLookupErrorMessage(t.taxpayerLookupUnavailable);
+      return;
+    }
+
+    setTaxpayerLookupErrorMessage(t.taxpayerLookupFailed);
+  }
+
+  function applyTaxpayerData() {
+    if (!taxpayerLookupResult) {
+      return;
+    }
+
+    const { taxpayer } = taxpayerLookupResult;
+
+    if (taxpayer.name) {
+      handleNameChange(taxpayer.name);
+      setLegalName(taxpayer.name);
+    }
+
+    if (["01", "02", "03", "04", "05"].includes(taxpayer.identification_type ?? "")) {
+      handleIdentificationTypeChange(taxpayer.identification_type ?? "");
+    }
+
+    handleIdentificationNumberChange(taxpayer.identification_number);
+
+    const selectedEconomicActivity =
+      taxpayer.economic_activities.length === 1
+        ? taxpayer.economic_activities[0]
+        : taxpayer.economic_activities.find(
+            (activity) =>
+              activity.code === selectedTaxpayerEconomicActivityCode,
+          );
+
+    if (selectedEconomicActivity?.code) {
+      handleEconomicActivityCodeChange(selectedEconomicActivity.code);
+    }
+
+    if (selectedEconomicActivity?.name) {
+      setEconomicActivityName(selectedEconomicActivity.name);
+    }
+
+    addToast({
+      message: t.taxpayerDataApplied,
+      variant: "success",
+    });
   }
 
   function getPayload(): CustomerPayload {
@@ -376,7 +542,7 @@ export function useCreateCustomer({
     setEconomicActivityName,
     setFiscalEmail: handleFiscalEmailChange,
     setFiscalNotes,
-    setIdentificationNumber,
+    setIdentificationNumber: handleIdentificationNumberChange,
     setIdentificationType: handleIdentificationTypeChange,
     setIsActive,
     setLegalName,
@@ -391,6 +557,14 @@ export function useCreateCustomer({
     setProvinceCode: handleProvinceCodeChange,
     setProvinceName,
     showForm,
+    applyTaxpayerData,
+    clearTaxpayerLookupResult,
+    isLookingUpTaxpayer,
+    lookupTaxpayer,
+    selectedTaxpayerEconomicActivityCode,
+    setSelectedTaxpayerEconomicActivityCode,
     submit,
+    taxpayerLookupErrorMessage,
+    taxpayerLookupResult,
   };
 }

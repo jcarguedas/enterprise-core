@@ -238,6 +238,25 @@ export type SharedMessages = {
   customerDistrictRequired: string;
   customerNeighborhoodRequired: string;
   customerEconomicActivityCodeFormat: string;
+  consultHacienda: string;
+  consultingHacienda: string;
+  applyTaxpayerData: string;
+  taxpayerDataFound: string;
+  taxpayerDataNotFound: string;
+  taxpayerDataFromCache: string;
+  taxpayerDataFromHacienda: string;
+  reviewAndApplyTaxpayerData: string;
+  taxpayerDataApplied: string;
+  taxpayerLookupFailed: string;
+  taxpayerLookupUnavailable: string;
+  taxpayerLookupRateLimited: string;
+  taxpayerLookupIdentificationRequired: string;
+  taxpayerLookupIdentificationNumeric: string;
+  taxpayerLookupIdentificationLength: string;
+  taxRegime: string;
+  taxStatus: string;
+  fetchedAt: string;
+  selectEconomicActivity: string;
   identificationType: string;
   identificationNumber: string;
   crudComingNext: string;
@@ -605,6 +624,31 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     customerNeighborhoodRequired: "Neighborhood is required.",
     customerEconomicActivityCodeFormat:
       "Economic activity code must use the format XXXX.X.",
+    consultHacienda: "Consult Hacienda",
+    consultingHacienda: "Consulting Hacienda...",
+    applyTaxpayerData: "Apply taxpayer data",
+    taxpayerDataFound: "Taxpayer data found",
+    taxpayerDataNotFound:
+      "No Hacienda taxpayer data was found for this identification.",
+    taxpayerDataFromCache: "Data came from cache",
+    taxpayerDataFromHacienda: "Data came from Hacienda",
+    reviewAndApplyTaxpayerData: "Review and apply the data before saving.",
+    taxpayerDataApplied: "Taxpayer data applied.",
+    taxpayerLookupFailed: "Taxpayer lookup failed.",
+    taxpayerLookupUnavailable:
+      "Hacienda lookup is unavailable right now. You can continue entering the data manually.",
+    taxpayerLookupRateLimited:
+      "Hacienda temporarily rate limited the lookup. Try again later.",
+    taxpayerLookupIdentificationRequired:
+      "Identification number is required before consulting Hacienda.",
+    taxpayerLookupIdentificationNumeric:
+      "Identification number must contain only numbers.",
+    taxpayerLookupIdentificationLength:
+      "Identification number must be between 9 and 12 digits before consulting Hacienda.",
+    taxRegime: "Tax regime",
+    taxStatus: "Tax status",
+    fetchedAt: "Fetched at",
+    selectEconomicActivity: "Select economic activity",
     identificationType: "Identification type",
     identificationNumber: "Identification number",
     crudComingNext: "CRUD coming next",
@@ -813,6 +857,31 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     customerNeighborhoodRequired: "El barrio es obligatorio.",
     customerEconomicActivityCodeFormat:
       "El código de actividad económica debe usar el formato XXXX.X.",
+    consultHacienda: "Consultar Hacienda",
+    consultingHacienda: "Consultando Hacienda...",
+    applyTaxpayerData: "Aplicar datos del contribuyente",
+    taxpayerDataFound: "Datos del contribuyente encontrados",
+    taxpayerDataNotFound:
+      "No se encontraron datos en Hacienda para esta identificación.",
+    taxpayerDataFromCache: "Datos obtenidos desde caché",
+    taxpayerDataFromHacienda: "Datos obtenidos desde Hacienda",
+    reviewAndApplyTaxpayerData: "Revisa y aplica los datos antes de guardar.",
+    taxpayerDataApplied: "Datos del contribuyente aplicados.",
+    taxpayerLookupFailed: "No se pudo consultar el contribuyente.",
+    taxpayerLookupUnavailable:
+      "No se pudo consultar Hacienda en este momento. Puedes continuar ingresando los datos manualmente.",
+    taxpayerLookupRateLimited:
+      "Hacienda limitó temporalmente la consulta. Intenta de nuevo más tarde.",
+    taxpayerLookupIdentificationRequired:
+      "El número de identificación es obligatorio antes de consultar Hacienda.",
+    taxpayerLookupIdentificationNumeric:
+      "El número de identificación solo debe contener números.",
+    taxpayerLookupIdentificationLength:
+      "El número de identificación debe tener entre 9 y 12 dígitos antes de consultar Hacienda.",
+    taxRegime: "Régimen tributario",
+    taxStatus: "Estado tributario",
+    fetchedAt: "Consultado el",
+    selectEconomicActivity: "Selecciona actividad económica",
     identificationType: "Tipo de identificación",
     identificationNumber: "Número de identificación",
     crudComingNext: "CRUD próximamente",
