@@ -120,6 +120,7 @@ Enterprise Core is being documented as a modular platform with two important arc
 - [Local-First Enterprise Core](docs/architecture/Local-First%20Enterprise%20Core.md): describes a future local-first deployment model where each customer can run its own local instance and database, with cloud services limited to licensing, subscription status, update metadata, and product distribution.
 - [Enterprise Command Center](docs/architecture/Enterprise%20Command%20Center.md): describes a future command-ready and AI-ready operational dashboard architecture built around safe known commands, permissions, confirmation flows, application services, and audit logs.
 - [Command Registry Standard](docs/architecture/Command%20Registry%20Standard.md): defines command types, permission expectations, confirmation rules, audit expectations, and module design guidance for future command-aware modules.
+- [Costa Rica Taxpayer Lookup](docs/architecture/Costa%20Rica%20Taxpayer%20Lookup.md): describes a future backend-mediated Hacienda taxpayer lookup flow for customer fiscal data prefill, local customer existence checks, caching, and safe Command Center behavior.
 - [Release and Update Strategy](docs/architecture/Release%20and%20Update%20Strategy.md): describes future versioning, release metadata, customer-controlled local updates, migration safety, and the relationship between updates and licensing.
 
 These documents describe direction, not completed implementation.
@@ -176,6 +177,7 @@ npm run build
 - Sales and order workflows.
 - Reporting and operational analytics.
 - Costa Rica electronic invoicing.
+- Backend-mediated Costa Rica taxpayer lookup for customer fiscal data prefill.
 - Docker and deployment packaging.
 - Optional update and licensing network.
 - Voice or AI command input layer built on the command registry.
