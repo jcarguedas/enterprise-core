@@ -963,7 +963,19 @@ Customers are the first business-domain module foundation in Enterprise Auth Ser
 
 The module is intentionally small and API-first. It supports listing, detail, creation, partial updates, and optional fiscal profile data for customer records.
 
-The fiscal profile fields prepare customer data for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet: the service does not call Hacienda APIs, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, or calculate taxes.
+The fiscal profile fields prepare customer data for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet: the service does not call Hacienda APIs, perform Hacienda lookups, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
+
+Location catalogs and economic activity selection/catalogs are not implemented yet. Existing `province`, `canton`, `district`, and `neighborhood` text fields remain for backward compatibility. The newer code/name fields are intended for a future catalog-backed UI.
+
+`identification_type` is optional. When provided, it must use one of the Costa Rica fiscal identification codes:
+
+| Code | Meaning |
+|---|---|
+| `01` | Cedula fisica |
+| `02` | Cedula juridica |
+| `03` | DIMEX |
+| `04` | NITE |
+| `05` | Extranjero No Domiciliado |
 
 ### List Customers
 
@@ -985,14 +997,24 @@ Example response:
       "commercial_name": "Acme",
       "email": "billing@acme.test",
       "fiscal_email": "invoices@acme.test",
+      "economic_activity_code": "620100",
+      "economic_activity_name": "Software development services",
       "phone": "+506 2222 3333",
-      "identification_type": "tax_id",
+      "identification_type": "02",
       "identification_number": "123456789",
       "address": "San Jose",
       "province": "San Jose",
+      "province_code": "1",
+      "province_name": "San Jose",
       "canton": "Central",
+      "canton_code": "01",
+      "canton_name": "Central",
       "district": "Carmen",
+      "district_code": "01",
+      "district_name": "Carmen",
       "neighborhood": "Amon",
+      "neighborhood_code": "01",
+      "neighborhood_name": "Amon",
       "other_signs": "North side of the central park.",
       "notes": "Preferred billing contact.",
       "fiscal_notes": "Optional fiscal profile notes.",
@@ -1025,14 +1047,24 @@ Example response:
     "commercial_name": "Acme",
     "email": "billing@acme.test",
     "fiscal_email": "invoices@acme.test",
+    "economic_activity_code": "620100",
+    "economic_activity_name": "Software development services",
     "phone": "+506 2222 3333",
-    "identification_type": "tax_id",
+    "identification_type": "02",
     "identification_number": "123456789",
     "address": "San Jose",
     "province": "San Jose",
+    "province_code": "1",
+    "province_name": "San Jose",
     "canton": "Central",
+    "canton_code": "01",
+    "canton_name": "Central",
     "district": "Carmen",
+    "district_code": "01",
+    "district_name": "Carmen",
     "neighborhood": "Amon",
+    "neighborhood_code": "01",
+    "neighborhood_name": "Amon",
     "other_signs": "North side of the central park.",
     "notes": "Preferred billing contact.",
     "fiscal_notes": "Optional fiscal profile notes.",
@@ -1062,14 +1094,24 @@ Example request:
   "commercial_name": "Acme",
   "email": "billing@acme.test",
   "fiscal_email": "invoices@acme.test",
+  "economic_activity_code": "620100",
+  "economic_activity_name": "Software development services",
   "phone": "+506 2222 3333",
-  "identification_type": "tax_id",
+  "identification_type": "02",
   "identification_number": "123456789",
   "address": "San Jose",
   "province": "San Jose",
+  "province_code": "1",
+  "province_name": "San Jose",
   "canton": "Central",
+  "canton_code": "01",
+  "canton_name": "Central",
   "district": "Carmen",
+  "district_code": "01",
+  "district_name": "Carmen",
   "neighborhood": "Amon",
+  "neighborhood_code": "01",
+  "neighborhood_name": "Amon",
   "other_signs": "North side of the central park.",
   "notes": "Preferred billing contact.",
   "fiscal_notes": "Optional fiscal profile notes.",
@@ -1086,14 +1128,24 @@ Validation rules:
 | `commercial_name` | nullable, string, max 255 |
 | `email` | nullable, email, max 255 |
 | `fiscal_email` | nullable, email, max 255 |
+| `economic_activity_code` | nullable, string, max 20 |
+| `economic_activity_name` | nullable, string, max 255 |
 | `phone` | nullable, string, max 50 |
-| `identification_type` | nullable, string, max 50 |
+| `identification_type` | nullable, string, one of `01`, `02`, `03`, `04`, `05` |
 | `identification_number` | nullable, string, max 100 |
 | `address` | nullable, string, max 500 |
 | `province` | nullable, string, max 100 |
+| `province_code` | nullable, string, max 2 |
+| `province_name` | nullable, string, max 100 |
 | `canton` | nullable, string, max 100 |
+| `canton_code` | nullable, string, max 2 |
+| `canton_name` | nullable, string, max 100 |
 | `district` | nullable, string, max 100 |
+| `district_code` | nullable, string, max 2 |
+| `district_name` | nullable, string, max 100 |
 | `neighborhood` | nullable, string, max 100 |
+| `neighborhood_code` | nullable, string, max 2 |
+| `neighborhood_name` | nullable, string, max 100 |
 | `other_signs` | nullable, string, max 500 |
 | `notes` | nullable, string, max 2000 |
 | `fiscal_notes` | nullable, string, max 2000 |
@@ -1145,7 +1197,7 @@ customers.deactivated
 
 Customer event metadata stores safe summaries such as `target_name` and `target_email`. It does not store full request bodies or customer notes.
 
-Customer event metadata must not store full fiscal profiles, address details, or `fiscal_notes`.
+Customer event metadata must not store full fiscal profiles, economic activity, fiscal email, address/location code or name details, address details, or `fiscal_notes`.
 
 ---
 

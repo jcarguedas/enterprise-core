@@ -42,14 +42,24 @@ class CustomerManagementTest extends TestCase
                     'commercial_name',
                     'email',
                     'fiscal_email',
+                    'economic_activity_code',
+                    'economic_activity_name',
                     'phone',
                     'identification_type',
                     'identification_number',
                     'address',
                     'province',
+                    'province_code',
+                    'province_name',
                     'canton',
+                    'canton_code',
+                    'canton_name',
                     'district',
+                    'district_code',
+                    'district_name',
                     'neighborhood',
+                    'neighborhood_code',
+                    'neighborhood_name',
                     'other_signs',
                     'notes',
                     'fiscal_notes',
@@ -113,14 +123,24 @@ class CustomerManagementTest extends TestCase
                 'commercial_name' => 'New Customer Store',
                 'email' => 'customer@example.test',
                 'fiscal_email' => 'invoices@example.test',
+                'economic_activity_code' => '620100',
+                'economic_activity_name' => 'Software development services',
                 'phone' => '+506 2222 3333',
-                'identification_type' => 'tax_id',
+                'identification_type' => '02',
                 'identification_number' => '123456789',
                 'address' => 'San Jose',
                 'province' => 'San Jose',
+                'province_code' => '1',
+                'province_name' => 'San Jose',
                 'canton' => 'Central',
+                'canton_code' => '01',
+                'canton_name' => 'Central',
                 'district' => 'Carmen',
+                'district_code' => '01',
+                'district_name' => 'Carmen',
                 'neighborhood' => 'Amon',
+                'neighborhood_code' => '01',
+                'neighborhood_name' => 'Amon',
                 'other_signs' => 'North side of the central park.',
                 'notes' => 'Preferred billing contact.',
                 'fiscal_notes' => 'Use fiscal profile once invoicing is implemented.',
@@ -132,10 +152,21 @@ class CustomerManagementTest extends TestCase
         $response->assertJsonPath('customer.legal_name', 'New Customer Sociedad Anonima');
         $response->assertJsonPath('customer.commercial_name', 'New Customer Store');
         $response->assertJsonPath('customer.fiscal_email', 'invoices@example.test');
+        $response->assertJsonPath('customer.economic_activity_code', '620100');
+        $response->assertJsonPath('customer.economic_activity_name', 'Software development services');
+        $response->assertJsonPath('customer.identification_type', '02');
         $response->assertJsonPath('customer.province', 'San Jose');
+        $response->assertJsonPath('customer.province_code', '1');
+        $response->assertJsonPath('customer.province_name', 'San Jose');
         $response->assertJsonPath('customer.canton', 'Central');
+        $response->assertJsonPath('customer.canton_code', '01');
+        $response->assertJsonPath('customer.canton_name', 'Central');
         $response->assertJsonPath('customer.district', 'Carmen');
+        $response->assertJsonPath('customer.district_code', '01');
+        $response->assertJsonPath('customer.district_name', 'Carmen');
         $response->assertJsonPath('customer.neighborhood', 'Amon');
+        $response->assertJsonPath('customer.neighborhood_code', '01');
+        $response->assertJsonPath('customer.neighborhood_name', 'Amon');
         $response->assertJsonPath('customer.other_signs', 'North side of the central park.');
         $response->assertJsonPath('customer.fiscal_notes', 'Use fiscal profile once invoicing is implemented.');
         $response->assertJsonPath('customer.is_active', true);
@@ -148,10 +179,21 @@ class CustomerManagementTest extends TestCase
             'commercial_name' => 'New Customer Store',
             'email' => 'customer@example.test',
             'fiscal_email' => 'invoices@example.test',
+            'economic_activity_code' => '620100',
+            'economic_activity_name' => 'Software development services',
+            'identification_type' => '02',
             'province' => 'San Jose',
+            'province_code' => '1',
+            'province_name' => 'San Jose',
             'canton' => 'Central',
+            'canton_code' => '01',
+            'canton_name' => 'Central',
             'district' => 'Carmen',
+            'district_code' => '01',
+            'district_name' => 'Carmen',
             'neighborhood' => 'Amon',
+            'neighborhood_code' => '01',
+            'neighborhood_name' => 'Amon',
             'other_signs' => 'North side of the central park.',
             'fiscal_notes' => 'Use fiscal profile once invoicing is implemented.',
             'is_active' => true,
@@ -218,6 +260,26 @@ class CustomerManagementTest extends TestCase
         ]);
     }
 
+    public function test_create_customer_rejects_invalid_identification_type(): void
+    {
+        $user = User::factory()->create();
+        $this->givePermissions($user, ['manage-customers']);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        $response = $this->withToken($token)
+            ->postJson('/api/customers', [
+                'name' => 'Invalid Identification Type',
+                'identification_type' => 'tax_id',
+            ]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJsonValidationErrors([
+            'identification_type',
+        ]);
+    }
+
     public function test_created_customer_defaults_to_active(): void
     {
         $user = User::factory()->create();
@@ -254,10 +316,20 @@ class CustomerManagementTest extends TestCase
                 'commercial_name' => 'Updated Customer Store',
                 'email' => 'updated@example.test',
                 'fiscal_email' => 'updated-invoices@example.test',
+                'economic_activity_code' => '471100',
+                'economic_activity_name' => 'Retail sale in non-specialized stores',
                 'province' => 'Alajuela',
+                'province_code' => '2',
+                'province_name' => 'Alajuela',
                 'canton' => 'San Carlos',
+                'canton_code' => '10',
+                'canton_name' => 'San Carlos',
                 'district' => 'Quesada',
+                'district_code' => '01',
+                'district_name' => 'Quesada',
                 'neighborhood' => 'Cedral',
+                'neighborhood_code' => '02',
+                'neighborhood_name' => 'Cedral',
                 'other_signs' => 'Blue gate near the main road.',
                 'notes' => 'Internal notes should not appear in event metadata.',
                 'fiscal_notes' => 'Fiscal note for future invoicing only.',
@@ -270,10 +342,20 @@ class CustomerManagementTest extends TestCase
         $response->assertJsonPath('customer.commercial_name', 'Updated Customer Store');
         $response->assertJsonPath('customer.email', 'updated@example.test');
         $response->assertJsonPath('customer.fiscal_email', 'updated-invoices@example.test');
+        $response->assertJsonPath('customer.economic_activity_code', '471100');
+        $response->assertJsonPath('customer.economic_activity_name', 'Retail sale in non-specialized stores');
         $response->assertJsonPath('customer.province', 'Alajuela');
+        $response->assertJsonPath('customer.province_code', '2');
+        $response->assertJsonPath('customer.province_name', 'Alajuela');
         $response->assertJsonPath('customer.canton', 'San Carlos');
+        $response->assertJsonPath('customer.canton_code', '10');
+        $response->assertJsonPath('customer.canton_name', 'San Carlos');
         $response->assertJsonPath('customer.district', 'Quesada');
+        $response->assertJsonPath('customer.district_code', '01');
+        $response->assertJsonPath('customer.district_name', 'Quesada');
         $response->assertJsonPath('customer.neighborhood', 'Cedral');
+        $response->assertJsonPath('customer.neighborhood_code', '02');
+        $response->assertJsonPath('customer.neighborhood_name', 'Cedral');
         $response->assertJsonPath('customer.other_signs', 'Blue gate near the main road.');
         $response->assertJsonPath('customer.fiscal_notes', 'Fiscal note for future invoicing only.');
         $response->assertJsonPath('customer.updated_by_user_id', $user->id);
@@ -354,11 +436,21 @@ class CustomerManagementTest extends TestCase
                 'name' => 'Event Customer',
                 'email' => 'event@example.test',
                 'fiscal_email' => 'fiscal-event@example.test',
+                'economic_activity_code' => '620100',
+                'economic_activity_name' => 'Sensitive economic activity',
                 'address' => 'Sensitive exact address.',
                 'province' => 'San Jose',
+                'province_code' => '1',
+                'province_name' => 'San Jose',
                 'canton' => 'Central',
+                'canton_code' => '01',
+                'canton_name' => 'Central',
                 'district' => 'Carmen',
+                'district_code' => '01',
+                'district_name' => 'Carmen',
                 'neighborhood' => 'Amon',
+                'neighborhood_code' => '01',
+                'neighborhood_name' => 'Amon',
                 'other_signs' => 'Sensitive location details.',
                 'notes' => 'Do not log this note.',
                 'fiscal_notes' => 'Do not log this fiscal note.',
@@ -380,6 +472,13 @@ class CustomerManagementTest extends TestCase
         $this->assertStringNotContainsString('Do not log this fiscal note.', json_encode($event->toArray()));
         $this->assertStringNotContainsString('Sensitive exact address.', json_encode($event->toArray()));
         $this->assertStringNotContainsString('Sensitive location details.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Sensitive economic activity', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('economic_activity_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('province_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('province_name', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('canton_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('district_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('neighborhood_code', json_encode($event->toArray()));
         $this->assertStringNotContainsString('fiscal-event@example.test', json_encode($event->toArray()));
     }
 
@@ -400,11 +499,21 @@ class CustomerManagementTest extends TestCase
                 'name' => 'Updated Event Customer',
                 'email' => 'updated-event@example.test',
                 'fiscal_email' => 'updated-fiscal-event@example.test',
+                'economic_activity_code' => '471100',
+                'economic_activity_name' => 'Updated sensitive economic activity',
                 'address' => 'Updated sensitive exact address.',
                 'province' => 'Cartago',
+                'province_code' => '3',
+                'province_name' => 'Cartago',
                 'canton' => 'Central',
+                'canton_code' => '01',
+                'canton_name' => 'Central',
                 'district' => 'Oriental',
+                'district_code' => '01',
+                'district_name' => 'Oriental',
                 'neighborhood' => 'Los Angeles',
+                'neighborhood_code' => '03',
+                'neighborhood_name' => 'Los Angeles',
                 'other_signs' => 'Updated sensitive location details.',
                 'notes' => 'Do not log updated notes.',
                 'fiscal_notes' => 'Do not log updated fiscal notes.',
@@ -425,6 +534,13 @@ class CustomerManagementTest extends TestCase
         $this->assertStringNotContainsString('Do not log updated fiscal notes.', json_encode($event->toArray()));
         $this->assertStringNotContainsString('Updated sensitive exact address.', json_encode($event->toArray()));
         $this->assertStringNotContainsString('Updated sensitive location details.', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('Updated sensitive economic activity', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('economic_activity_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('province_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('province_name', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('canton_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('district_code', json_encode($event->toArray()));
+        $this->assertStringNotContainsString('neighborhood_code', json_encode($event->toArray()));
         $this->assertStringNotContainsString('fiscal_email', json_encode($event->toArray()));
         $this->assertStringNotContainsString('updated-fiscal-event@example.test', json_encode($event->toArray()));
     }

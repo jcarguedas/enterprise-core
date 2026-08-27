@@ -178,16 +178,36 @@ The Customers foundation now includes optional fiscal profile fields:
 - `legal_name`
 - `commercial_name`
 - `fiscal_email`
+- `economic_activity_code`
+- `economic_activity_name`
 - `province`
+- `province_code`
+- `province_name`
 - `canton`
+- `canton_code`
+- `canton_name`
 - `district`
+- `district_code`
+- `district_name`
 - `neighborhood`
+- `neighborhood_code`
+- `neighborhood_name`
 - `other_signs`
 - `fiscal_notes`
 
-These fields prepare customer records for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet. The service does not call Hacienda APIs, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, or calculate taxes.
+These fields prepare customer records for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet. The service does not call Hacienda APIs, perform Hacienda lookups, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
 
-Customer event metadata is limited to safe summaries such as `target_name` and `target_email`. It must not store full request bodies, credentials, tokens, customer notes, full fiscal profiles, address details, or `fiscal_notes`.
+`identification_type` remains optional and is validated as a Costa Rica fiscal identification code when provided:
+
+- `01` Cedula fisica
+- `02` Cedula juridica
+- `03` DIMEX
+- `04` NITE
+- `05` Extranjero No Domiciliado
+
+Location catalogs and economic activity selection/catalogs are not implemented yet. Existing `province`, `canton`, `district`, and `neighborhood` text fields remain for backward compatibility. New code/name fields are intended for a future catalog-backed UI.
+
+Customer event metadata is limited to safe summaries such as `target_name` and `target_email`. It must not store full request bodies, credentials, tokens, customer notes, economic activity, fiscal email, full fiscal profiles, address/location fields, address details, or `fiscal_notes`.
 
 This is a foundation only. Customer deletion, advanced search, exports, and electronic invoicing are not implemented yet.
 
@@ -326,6 +346,7 @@ Toda comunicación entre servicios deberá realizarse mediante contratos de API.
 - [x] Implement System Events foundation.
 - [x] Implement Customers foundation.
 - [x] Add optional customer fiscal profile fields for future Costa Rica electronic invoicing preparation.
+- [x] Add structured economic activity and location code/name fields for future catalog-backed fiscal workflows.
 - [x] Add backend automated tests for implemented behavior.
 
 ## Next

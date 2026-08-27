@@ -55,12 +55,13 @@ Validates:
 - A user without `manage-customers` cannot create or update customers.
 - Customer creation validates required `name`.
 - Customer creation validates `fiscal_email`.
+- Customer creation validates Costa Rica fiscal `identification_type` codes.
 - Customer create and update responses include optional fiscal profile fields.
-- Fiscal profile fields can be created and updated without triggering invoicing behavior.
+- Structured fiscal profile fields can be created and updated without triggering invoicing behavior.
 - New customers default to active.
 - Customer activation and deactivation create system events.
 - Customer creation and update create system events.
-- Customer system event metadata excludes full fiscal profiles, address details, and `fiscal_notes`.
+- Customer system event metadata excludes economic activity, fiscal email, full fiscal profiles, address/location fields, address details, and `fiscal_notes`.
 - Guest and inactive authenticated users cannot access customer routes.
 
 ### SystemEventsTest
@@ -96,4 +97,4 @@ The full suite should pass with `php artisan test`.
 - Authentication endpoints must include tests for successful and failed scenarios.
 - Protected endpoints must include tests for authenticated and unauthenticated access.
 - Seeders must be safe to run multiple times.
-- System event tests must verify that passwords, tokens, raw credentials, full request bodies, customer address details, and fiscal notes are not stored.
+- System event tests must verify that passwords, tokens, raw credentials, full request bodies, customer economic activity, fiscal email, address/location details, and fiscal notes are not stored.
