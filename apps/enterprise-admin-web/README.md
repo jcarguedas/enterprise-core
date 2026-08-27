@@ -24,6 +24,9 @@ The product brand is displayed with the current release label:
   demo catalog for UX validation.
 - Customer economic activity code input is constrained in the UI to the
   `XXXX.X` format as preparation for future Costa Rica fiscal workflows.
+- Customer forms can consult Costa Rica Hacienda taxpayer data through the
+  backend-mediated taxpayer lookup endpoint when the user has
+  `lookup-taxpayer`.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -145,11 +148,18 @@ The economic activity code field accepts digits and a single dot, and is
 currently constrained in the UI to the `XXXX.X` format when provided, as
 preparation for future Costa Rica electronic invoicing data requirements.
 
+When the authenticated user has `lookup-taxpayer`, customer forms show a
+`Consult Hacienda` button next to the identification fields. The button calls
+the backend `GET /api/taxpayer-lookup` endpoint, shows a taxpayer data preview,
+and lets the user apply selected data to the form. Lookup never creates or
+updates customers automatically; the user must still review the form and press
+Save Customer or Update Customer.
+
 These fields only prepare customer records for future Costa Rica fiscal
 workflows. Admin Web does not implement electronic invoicing, call Hacienda
-APIs, perform Hacienda lookup, provide economic activity catalogs, import
-official location catalogs, generate XML, sign documents, manage consecutive
-numbers, or calculate taxes.
+directly, provide economic activity catalogs, import official location
+catalogs, generate XML, sign documents, manage consecutive numbers, manage
+CABYS, or calculate taxes.
 
 The `/roles` page follows the same pattern for `GET /api/roles` and shows a
 read-only role catalog when the trusted current user has `manage-users`.
