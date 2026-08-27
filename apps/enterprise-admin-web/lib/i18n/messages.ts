@@ -43,6 +43,8 @@ export type SharedMessages = {
   apiErrorInvalidCredentials: string;
   apiErrorEmailAlreadyTaken: string;
   apiErrorEmailInvalid: string;
+  apiErrorFiscalEmailInvalid: string;
+  apiErrorIdentificationTypeInvalid: string;
   apiErrorInactiveAccount: string;
   apiErrorEmailRequired: string;
   apiErrorPasswordRequired: string;
@@ -190,8 +192,52 @@ export type SharedMessages = {
   saveCustomer: string;
   updateCustomer: string;
   customerDetails: string;
+  basicCustomerDetails: string;
+  fiscalProfile: string;
+  fiscalProfileHelperText: string;
+  locationCatalogHelperText: string;
+  locationCatalogTemporaryHelperText: string;
+  legalName: string;
+  commercialName: string;
+  fiscalEmail: string;
+  economicActivityCode: string;
+  economicActivityName: string;
+  selectIdentificationType: string;
+  identificationTypePhysicalId: string;
+  identificationTypeLegalEntityId: string;
+  identificationTypeDimex: string;
+  identificationTypeNite: string;
+  identificationTypeNonDomiciledForeigner: string;
+  selectProvince: string;
+  selectCanton: string;
+  selectDistrict: string;
+  selectNeighborhood: string;
+  noCantonsAvailable: string;
+  noDistrictsAvailable: string;
+  noNeighborhoodsAvailable: string;
+  addressLocation: string;
   address: string;
+  province: string;
+  provinceCode: string;
+  provinceName: string;
+  canton: string;
+  cantonCode: string;
+  cantonName: string;
+  district: string;
+  districtCode: string;
+  districtName: string;
+  neighborhood: string;
+  neighborhoodCode: string;
+  neighborhoodName: string;
+  otherSigns: string;
   notes: string;
+  internalNotes: string;
+  fiscalNotes: string;
+  customerProvinceRequired: string;
+  customerCantonRequired: string;
+  customerDistrictRequired: string;
+  customerNeighborhoodRequired: string;
+  customerEconomicActivityCodeFormat: string;
   identificationType: string;
   identificationNumber: string;
   crudComingNext: string;
@@ -321,6 +367,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     apiErrorInvalidCredentials: "Invalid credentials.",
     apiErrorEmailAlreadyTaken: "The email has already been taken.",
     apiErrorEmailInvalid: "The email field must be a valid email address.",
+    apiErrorFiscalEmailInvalid:
+      "The fiscal email field must be a valid email address.",
+    apiErrorIdentificationTypeInvalid:
+      "The selected identification type is invalid.",
     apiErrorInactiveAccount:
       "Your account is inactive. Contact an administrator.",
     apiErrorEmailRequired: "The email field is required.",
@@ -504,8 +554,57 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     saveCustomer: "Save customer",
     updateCustomer: "Update customer",
     customerDetails: "Customer details",
+    basicCustomerDetails: "Basic customer details",
+    fiscalProfile: "Fiscal profile",
+    fiscalProfileHelperText:
+      "Fiscal profile fields prepare customer data for future Costa Rica electronic invoicing. Electronic invoicing is not implemented yet.",
+    locationCatalogHelperText:
+      "Location catalogs and Hacienda lookup are not implemented yet. Code and name fields prepare future catalog-backed selection.",
+    locationCatalogTemporaryHelperText:
+      "Location selection uses a temporary local catalog. Official Costa Rica location catalogs will be imported in a future feature.",
+    legalName: "Legal name",
+    commercialName: "Commercial name",
+    fiscalEmail: "Fiscal email",
+    economicActivityCode: "Economic activity code",
+    economicActivityName: "Economic activity name",
+    selectIdentificationType: "Select identification type",
+    identificationTypePhysicalId: "01 - Physical ID",
+    identificationTypeLegalEntityId: "02 - Legal entity ID",
+    identificationTypeDimex: "03 - DIMEX",
+    identificationTypeNite: "04 - NITE",
+    identificationTypeNonDomiciledForeigner:
+      "05 - Non-domiciled foreigner",
+    selectProvince: "Select province",
+    selectCanton: "Select canton",
+    selectDistrict: "Select district",
+    selectNeighborhood: "Select neighborhood",
+    noCantonsAvailable: "No cantons available",
+    noDistrictsAvailable: "No districts available",
+    noNeighborhoodsAvailable: "No neighborhoods available",
+    addressLocation: "Address / location",
     address: "Address",
+    province: "Province",
+    provinceCode: "Province code",
+    provinceName: "Province name",
+    canton: "Canton",
+    cantonCode: "Canton code",
+    cantonName: "Canton name",
+    district: "District",
+    districtCode: "District code",
+    districtName: "District name",
+    neighborhood: "Neighborhood",
+    neighborhoodCode: "Neighborhood code",
+    neighborhoodName: "Neighborhood name",
+    otherSigns: "Other signs",
     notes: "Notes",
+    internalNotes: "Internal notes",
+    fiscalNotes: "Fiscal notes",
+    customerProvinceRequired: "Province is required.",
+    customerCantonRequired: "Canton is required.",
+    customerDistrictRequired: "District is required.",
+    customerNeighborhoodRequired: "Neighborhood is required.",
+    customerEconomicActivityCodeFormat:
+      "Economic activity code must use the format XXXX.X.",
     identificationType: "Identification type",
     identificationNumber: "Identification number",
     crudComingNext: "CRUD coming next",
@@ -663,8 +762,57 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     saveCustomer: "Guardar cliente",
     updateCustomer: "Actualizar cliente",
     customerDetails: "Detalles del cliente",
+    basicCustomerDetails: "Detalles básicos del cliente",
+    fiscalProfile: "Perfil fiscal",
+    fiscalProfileHelperText:
+      "Los campos de perfil fiscal preparan los datos del cliente para una futura factura electrónica en Costa Rica. La factura electrónica todavía no está implementada.",
+    locationCatalogHelperText:
+      "Los catálogos de ubicación y la consulta a Hacienda todavía no están implementados. Los campos de código y nombre preparan una selección futura basada en catálogos.",
+    locationCatalogTemporaryHelperText:
+      "La selección de ubicación usa un catálogo local temporal. Los catálogos oficiales de ubicación de Costa Rica se importarán en una funcionalidad futura.",
+    legalName: "Razón social",
+    commercialName: "Nombre comercial",
+    fiscalEmail: "Correo fiscal",
+    economicActivityCode: "Código de actividad económica",
+    economicActivityName: "Nombre de actividad económica",
+    selectIdentificationType: "Selecciona el tipo de identificación",
+    identificationTypePhysicalId: "01 - Cédula física",
+    identificationTypeLegalEntityId: "02 - Cédula jurídica",
+    identificationTypeDimex: "03 - DIMEX",
+    identificationTypeNite: "04 - NITE",
+    identificationTypeNonDomiciledForeigner:
+      "05 - Extranjero No Domiciliado",
+    selectProvince: "Selecciona la provincia",
+    selectCanton: "Selecciona el cantón",
+    selectDistrict: "Selecciona el distrito",
+    selectNeighborhood: "Selecciona el barrio",
+    noCantonsAvailable: "No hay cantones disponibles",
+    noDistrictsAvailable: "No hay distritos disponibles",
+    noNeighborhoodsAvailable: "No hay barrios disponibles",
+    addressLocation: "Dirección / ubicación",
     address: "Dirección",
+    province: "Provincia",
+    provinceCode: "Código de provincia",
+    provinceName: "Nombre de provincia",
+    canton: "Cantón",
+    cantonCode: "Código de cantón",
+    cantonName: "Nombre de cantón",
+    district: "Distrito",
+    districtCode: "Código de distrito",
+    districtName: "Nombre de distrito",
+    neighborhood: "Barrio",
+    neighborhoodCode: "Código de barrio",
+    neighborhoodName: "Nombre de barrio",
+    otherSigns: "Otras señas",
     notes: "Notas",
+    internalNotes: "Notas internas",
+    fiscalNotes: "Notas fiscales",
+    customerProvinceRequired: "La provincia es obligatoria.",
+    customerCantonRequired: "El cantón es obligatorio.",
+    customerDistrictRequired: "El distrito es obligatorio.",
+    customerNeighborhoodRequired: "El barrio es obligatorio.",
+    customerEconomicActivityCodeFormat:
+      "El código de actividad económica debe usar el formato XXXX.X.",
     identificationType: "Tipo de identificación",
     identificationNumber: "Número de identificación",
     crudComingNext: "CRUD próximamente",
@@ -749,6 +897,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     apiErrorEmailAlreadyTaken: "El correo electrónico ya está en uso.",
     apiErrorEmailInvalid:
       "El correo electrónico debe ser una dirección válida.",
+    apiErrorFiscalEmailInvalid:
+      "El correo fiscal debe ser una dirección válida.",
+    apiErrorIdentificationTypeInvalid:
+      "El tipo de identificación seleccionado no es válido.",
     apiErrorInactiveAccount:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     apiErrorEmailRequired: "El correo electrónico es obligatorio.",

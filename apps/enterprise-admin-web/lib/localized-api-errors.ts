@@ -4,6 +4,10 @@ const knownApiErrorKeys = {
   "Invalid credentials.": "apiErrorInvalidCredentials",
   "The email has already been taken.": "apiErrorEmailAlreadyTaken",
   "The email field must be a valid email address.": "apiErrorEmailInvalid",
+  "The fiscal email field must be a valid email address.":
+    "apiErrorFiscalEmailInvalid",
+  "The selected identification type is invalid.":
+    "apiErrorIdentificationTypeInvalid",
   "Your account is inactive.": "apiErrorInactiveAccount",
   "The email field is required.": "apiErrorEmailRequired",
   "The password field is required.": "apiErrorPasswordRequired",
