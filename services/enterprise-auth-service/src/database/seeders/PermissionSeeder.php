@@ -81,6 +81,7 @@ class PermissionSeeder extends Seeder
 
         $administratorRole = Role::where('slug', 'administrator')->first();
         $administratorPermissions = Permission::whereIn('slug', [
+            'manage-users',
             'view-system-events',
             'view-customers',
             'manage-customers',

@@ -133,6 +133,29 @@ The current REST API documentation is available at:
 
 ---
 
+# Local Demo Admin
+
+Running the default database seeders creates an active demo administrator account:
+
+```text
+Email: admin@example.com
+Password: password123
+```
+
+These are demo credentials for local development and technical demos only. Change them for any non-demo environment.
+
+The demo admin values can be configured before seeding with:
+
+```text
+ADMIN_USER_NAME
+ADMIN_USER_EMAIL
+ADMIN_USER_PASSWORD
+```
+
+The seeded user is assigned to the `Administrator` role.
+
+---
+
 # Customers
 
 Enterprise Auth Service now includes the first business-domain module foundation: Customers.

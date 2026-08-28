@@ -8,6 +8,7 @@ This document explains how to manually test the Enterprise Auth Service API duri
 - Enterprise Auth Service configured with a valid `.env`.
 - Database migrations executed.
 - Laravel development server running.
+- Database seeders executed with `php artisan migrate --seed`.
 
 ## Start the local server
 
@@ -26,29 +27,18 @@ http://127.0.0.1:8000
 
 ---
 
-## Create a test user
+## Demo admin user
 
-Run Tinker:
+After running migrations and seeders, a local demo administrator account is available:
 
-```powershell
-php artisan tinker
+```text
+Email: admin@example.com
+Password: password123
 ```
 
-Create a local test user:
+These are demo credentials for local development and technical demos only. Change them for any non-demo environment.
 
-```php
-\App\Models\User::create([
-    'name' => 'Admin User',
-    'email' => 'admin@example.com',
-    'password' => bcrypt('password123'),
-]);
-```
-
-Exit Tinker:
-
-```php
-exit
-```
+The demo admin is active and assigned to the `Administrator` role.
 
 ---
 
@@ -94,11 +84,19 @@ $response
   "token": "plain-text-token",
   "token_type": "Bearer",
   "user": {
-    "id": 1,
-    "name": "Admin User",
+      "id": 1,
+    "name": "Admin",
     "email": "admin@example.com",
-    "roles": [],
-    "permissions": []
+    "roles": [
+      "administrator"
+    ],
+    "permissions": [
+      "lookup-taxpayer",
+      "manage-customers",
+      "manage-users",
+      "view-customers",
+      "view-system-events"
+    ]
   }
 }
 ```
@@ -130,7 +128,7 @@ Invoke-RestMethod -Method Get `
 {
   "user": {
     "id": 1,
-    "name": "Admin User",
+    "name": "Admin",
     "email": "admin@example.com"
   }
 }
