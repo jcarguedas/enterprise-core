@@ -70,3 +70,5 @@ Write-Info "Opening Admin Web: $AdminUrl"
 Start-Process $AdminUrl
 
 Write-Info "Startup commands launched. Keep the backend and frontend PowerShell windows open while demoing Enterprise Core."
+
+Write-Info "Keep both PowerShell windows open. Closing them stops the local demo runtime."
