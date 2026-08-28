@@ -138,6 +138,7 @@ The current Windows demo setup is technical and manual. No production Windows in
 
 ## Release Notes
 
+- [Enterprise Core v1.0.2](docs/releases/v1.0.2.md)
 - [Enterprise Core v1.0.1](docs/releases/v1.0.1.md)
 
 ## Validation
