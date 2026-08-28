@@ -8,6 +8,8 @@ This document describes a future local-first architecture direction. It is not a
 
 The target model is to let each customer or company run its own Enterprise Core instance and database while keeping operational data local by default.
 
+For the Windows packaging direction that supports this model, see [Windows Local Installer Strategy](Windows%20Local%20Installer%20Strategy.md).
+
 ## Current Foundation
 
 Enterprise Core currently includes the following implemented foundation:
@@ -70,6 +72,8 @@ The cloud network should not store customer operational data by default.
 A future licensing service may validate whether a customer has an active membership or subscription without storing the customer's business records, invoices, inventory, sales, employees, or customers.
 
 A future update network may notify local deployments when new versions are available and provide metadata needed to plan upgrades.
+
+Windows local distribution should follow the same local-first boundary. A future installer or launcher may validate licensing and update eligibility, but customer operational data should remain in the local environment by default.
 
 ## Backups and Recovery Direction
 
