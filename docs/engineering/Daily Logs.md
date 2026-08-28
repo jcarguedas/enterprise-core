@@ -1273,3 +1273,171 @@ The implementation intentionally avoids automatic mutations. The user remains in
 - Add official Costa Rica location catalog import later.
 - Continue evolving Command Center intents safely.
 - Defer automatic Hacienda refresh/update workflows until preview and confirmation UX is designed.
+
+## 2026-08-28
+
+### Summary
+
+Enterprise Core reached a major portability milestone. The project was installed, configured, validated, and manually tested on a second clean Windows computer.
+
+The day focused on making the local-first demo path repeatable: documenting the future Windows installer direction, creating practical Windows demo setup guidance, adding safe startup and preflight helpers, and ensuring a fresh local database can produce a usable demo administrator through seeding.
+
+### Completed
+
+#### Windows local runtime and demo setup
+
+- Added Windows Local Installer Strategy documentation.
+- Added Windows Demo Setup documentation.
+- Added demo startup helper scripts:
+  - `scripts/windows/start-enterprise-core.ps1`
+  - `scripts/windows/Start Enterprise Core.bat`
+- Documented that the helper starts the Laravel backend and Next.js Admin Web in separate PowerShell windows and opens Admin Web in the browser.
+- Clarified that both windows must remain open because closing either window stops that part of the demo runtime.
+- Documented that this behavior is expected for the demo helper, and that a future installer or Windows service runtime should manage services differently.
+
+#### Clean Windows machine validation
+
+- Tested Enterprise Core on a second Windows computer from a clean setup.
+- Installed and validated required tools:
+  - Git
+  - PHP 8.4
+  - Composer
+  - Node/npm
+  - PostgreSQL 17
+  - pgAdmin
+  - 7-Zip
+- Enabled and validated required PHP extensions:
+  - `fileinfo`
+  - `zip`
+  - `pdo_pgsql`
+  - `pgsql`
+  - `pdo_sqlite`
+  - `sqlite3`
+- Created the local PostgreSQL database:
+  - `enterprise_core`
+- Configured backend `.env` and Admin Web `.env.local`.
+- Ran backend migrations and seeders.
+- Ran backend migration status.
+- Ran backend tests successfully on the clean machine before the admin seeder fix:
+  - `106 passed`
+- Ran Admin Web `npm install` and build successfully.
+- Manually validated login and main modules after the admin seeder fix:
+  - Users
+  - Customers
+  - Roles
+  - System Events
+  - Command Palette
+
+#### Admin demo user seeder
+
+- Added `AdminUserSeeder`.
+- Updated `DatabaseSeeder` so `php artisan migrate --seed` creates a fresh local/demo administrator.
+- Demo credentials:
+  - `admin@example.com`
+  - `password123`
+- The seeded user is active and assigned to the `Administrator` role.
+- Updated `PermissionSeeder` so `Administrator` has the expected demo permissions:
+  - `manage-users`
+  - `view-customers`
+  - `manage-customers`
+  - `lookup-taxpayer`
+  - `view-system-events`
+- Added tests for the admin demo seeder and seeder idempotency.
+- Backend validation reached:
+  - `107 passed`
+  - `419 assertions`
+
+#### Windows troubleshooting guide
+
+- Expanded Windows Demo Setup troubleshooting based on the real second-machine setup.
+- Documented:
+  - PHP extensions.
+  - Composer requirements.
+  - `psql` not being on PATH.
+  - PostgreSQL service name `postgresql-x64-17`.
+  - Local PostgreSQL password reset using temporary `pg_hba.conf` `trust`.
+  - Restoring `scram-sha-256` immediately afterward.
+  - Backend `.env`.
+  - Admin Web `.env.local`.
+  - Final clean-machine checklist.
+
+#### Windows preflight checker
+
+- Added:
+  - `scripts/windows/check-enterprise-core-prerequisites.ps1`
+  - `scripts/windows/Check Enterprise Core Prerequisites.bat`
+- The preflight checker validates:
+  - Git
+  - PHP
+  - Composer
+  - Node
+  - npm
+  - PHP extensions
+  - PostgreSQL service status
+  - `psql` availability
+  - Backend/frontend folders
+  - Backend `.env`
+  - Admin Web `.env.local`
+  - Backend `vendor`
+  - Frontend `node_modules`
+- Safety boundaries:
+  - Does not install dependencies.
+  - Does not modify files.
+  - Does not modify databases.
+  - Does not run migrations.
+  - Does not start services.
+  - Does not print secrets.
+- Validated on the main machine:
+  - `21 OK`
+  - `0 WARN`
+  - `0 FAIL`
+- Validated the BAT wrapper as well.
+
+#### Release notes
+
+- Added:
+  - `docs/releases/v1.0.2.md`
+- Updated the README release notes list.
+- v1.0.2 documents:
+  - Windows Demo Setup Foundation.
+  - Future Windows installer direction.
+  - Demo runtime scripts.
+  - Preflight checker.
+  - Fresh demo admin.
+  - Validation.
+  - Not-included items.
+  - Next direction.
+- Documented that password change and forgot-password/password-reset workflows are not implemented yet and should be designed carefully later.
+
+### Validation
+
+Final validation before promotion:
+
+- Backend tests passed:
+  - `107 passed`
+  - `419 assertions`
+- Admin Web build passed after clearing stale `.next` cache.
+- Admin Web lint passed.
+- Git working tree was clean.
+- `develop` was up to date with `origin/develop`.
+
+### Published develop commits
+
+- `80298d7` merge: add Windows local runtime and demo setup
+- `ed60d0f` merge: clarify Windows demo runtime shutdown behavior
+- `12b4356` merge: seed demo administrator user
+- `357489d` merge: expand Windows demo troubleshooting guide
+- `ec482db` merge: add Windows demo preflight checker
+- `fe1f68c` merge: add v1.0.2 release notes
+
+### Decisions
+
+- Do not open another feature before closing the day.
+- Promote `develop` to `main` after the Daily Log is committed and pushed.
+
+### Next
+
+- Promote `develop` to `main` as the current presentable portfolio version.
+- Later: design account security workflows, starting with authenticated password change.
+- Later: design password reset carefully because it requires secure tokens, expiration, email delivery, abuse protection, and a local-first decision for SMTP or cloud-assisted email.
+- Later: continue with backup/restore architecture or first-run setup.
