@@ -51,6 +51,7 @@ apps/
 
 docs/
   architecture/
+  setup/
 ```
 
 Key areas:
@@ -58,6 +59,7 @@ Key areas:
 - `services/enterprise-auth-service`: Laravel backend service for authentication, users, roles, permissions, system events, customers, and protected API behavior.
 - `apps/enterprise-admin-web`: Next.js admin frontend for login, dashboard, user management, roles visibility, system information, system events, customers, theming, localization, command palette workflows, and permission-aware navigation.
 - `docs/architecture`: Architecture documents for platform direction and future system design.
+- `docs/setup`: Technical setup guides for local development and demo workflows.
 
 ## Implemented Foundation
 
@@ -122,8 +124,15 @@ Enterprise Core is being documented as a modular platform with two important arc
 - [Command Registry Standard](docs/architecture/Command%20Registry%20Standard.md): defines command types, permission expectations, confirmation rules, audit expectations, and module design guidance for future command-aware modules.
 - [Costa Rica Taxpayer Lookup](docs/architecture/Costa%20Rica%20Taxpayer%20Lookup.md): describes a future backend-mediated Hacienda taxpayer lookup flow for customer fiscal data prefill, local customer existence checks, caching, and safe Command Center behavior.
 - [Release and Update Strategy](docs/architecture/Release%20and%20Update%20Strategy.md): describes future versioning, release metadata, customer-controlled local updates, migration safety, and the relationship between updates and licensing.
+- [Windows Local Installer Strategy](docs/architecture/Windows%20Local%20Installer%20Strategy.md): describes a future Windows installer, launcher, local runtime, backup, update, and licensing direction for local-first distribution.
 
 These documents describe direction, not completed implementation.
+
+## Windows Demo Setup
+
+- [Windows Demo Setup](docs/setup/Windows%20Demo%20Setup.md): explains how a technical user can clone, configure, and run Enterprise Core on Windows for local development or demos.
+
+The current Windows demo setup is technical and manual. No production Windows installer exists yet. The future installer strategy is documented separately and should automate most local runtime setup when implemented.
 
 ## Release Notes
 
@@ -179,6 +188,7 @@ npm run build
 - Costa Rica electronic invoicing.
 - Backend-mediated Costa Rica taxpayer lookup for customer fiscal data prefill.
 - Docker and deployment packaging.
+- Windows installer and local runtime packaging.
 - Optional update and licensing network.
 - Voice or AI command input layer built on the command registry.
 
