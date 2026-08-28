@@ -82,6 +82,15 @@ Create the PostgreSQL database manually using your preferred PostgreSQL tool, th
 php artisan migrate --seed
 ```
 
+After seeding, the local demo administrator login is:
+
+```text
+Email: admin@example.com
+Password: password123
+```
+
+These are demo credentials for local development and technical demos only. Change them for any non-demo environment.
+
 ## Configure Admin Web
 
 From the repository root, go to the Admin Web app:
