@@ -132,6 +132,8 @@ These documents describe direction, not completed implementation.
 
 - [Windows Demo Setup](docs/setup/Windows%20Demo%20Setup.md): explains how a technical user can clone, configure, and run Enterprise Core on Windows for local development or demos.
 
+The Windows demo setup includes a safe preflight checker for validating local tools, PHP extensions, PostgreSQL service status, environment files, and dependency folders before starting the demo runtime.
+
 The current Windows demo setup is technical and manual. No production Windows installer exists yet. The future installer strategy is documented separately and should automate most local runtime setup when implemented.
 
 ## Release Notes

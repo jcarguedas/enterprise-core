@@ -258,6 +258,28 @@ Then open:
 http://localhost:3000
 ```
 
+## Preflight Check
+
+Before running the launcher helper, use the safe preflight checker to validate the local demo environment.
+
+From PowerShell:
+
+```powershell
+.\scripts\windows\check-enterprise-core-prerequisites.ps1
+```
+
+If local PowerShell policy blocks direct `.ps1` execution, use the BAT wrapper below or run PowerShell with `ExecutionPolicy Bypass` for this script only.
+
+From Command Prompt, quote the BAT filename because it contains spaces:
+
+```cmd
+"scripts\windows\Check Enterprise Core Prerequisites.bat"
+```
+
+The preflight checker validates command-line tools, PHP extensions, PostgreSQL service status, expected environment files, backend `vendor`, and frontend `node_modules`.
+
+It does not install dependencies, modify files, modify databases, run migrations, or start the app.
+
 ## Run With the Windows Helper Script
 
 After dependencies are installed, environment files are configured, and migrations have been run, you can use the demo startup helper:
