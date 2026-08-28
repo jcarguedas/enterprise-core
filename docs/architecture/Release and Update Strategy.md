@@ -14,6 +14,8 @@ Enterprise Core v1.0.1
 
 Real update distribution, update checks, package downloads, licensing enforcement, and automated upgrade workflows are future work.
 
+For the related Windows installer, launcher, and local runtime direction, see [Windows Local Installer Strategy](Windows%20Local%20Installer%20Strategy.md).
+
 ## Current Foundation
 
 Enterprise Core currently includes:
@@ -119,6 +121,8 @@ Potential responsibilities include:
 - Product distribution metadata.
 
 The cloud update network should not store local customer business records by default, including customers, inventory, sales, invoices, reports, employees, or operational documents.
+
+On Windows, a future installer or launcher may use this metadata to guide updates, but the local administrator should still confirm the update and complete backup requirements before migrations run.
 
 ## Release Metadata
 

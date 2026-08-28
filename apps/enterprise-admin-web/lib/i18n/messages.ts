@@ -43,6 +43,8 @@ export type SharedMessages = {
   apiErrorInvalidCredentials: string;
   apiErrorEmailAlreadyTaken: string;
   apiErrorEmailInvalid: string;
+  apiErrorFiscalEmailInvalid: string;
+  apiErrorIdentificationTypeInvalid: string;
   apiErrorInactiveAccount: string;
   apiErrorEmailRequired: string;
   apiErrorPasswordRequired: string;
@@ -65,6 +67,8 @@ export type SharedMessages = {
   editUserFor: string;
   editCustomerCommand: string;
   editCustomerFor: string;
+  commandOpenCustomerByIdentification: string;
+  commandFindOrCreateCustomerByIdentification: string;
   customerSearchFor: string;
   searchUser: string;
   searchUsersFor: string;
@@ -79,6 +83,9 @@ export type SharedMessages = {
   customersLoadError: string;
   customersManageDescription: string;
   customersManageAccessDeniedDescription: string;
+  customerIdentificationIntentMultipleMatches: string;
+  customerIdentificationIntentNoCreatePermission: string;
+  customerIdentificationIntentInvalid: string;
   closeCommandPalette: string;
   dashboard: string;
   dashboardDescription: string;
@@ -190,8 +197,76 @@ export type SharedMessages = {
   saveCustomer: string;
   updateCustomer: string;
   customerDetails: string;
+  basicCustomerDetails: string;
+  fiscalProfile: string;
+  fiscalProfileHelperText: string;
+  locationCatalogHelperText: string;
+  locationCatalogTemporaryHelperText: string;
+  legalName: string;
+  commercialName: string;
+  fiscalEmail: string;
+  economicActivityCode: string;
+  economicActivityName: string;
+  selectIdentificationType: string;
+  identificationTypePhysicalId: string;
+  identificationTypeLegalEntityId: string;
+  identificationTypeDimex: string;
+  identificationTypeNite: string;
+  identificationTypeNonDomiciledForeigner: string;
+  selectProvince: string;
+  selectCanton: string;
+  selectDistrict: string;
+  selectNeighborhood: string;
+  noCantonsAvailable: string;
+  noDistrictsAvailable: string;
+  noNeighborhoodsAvailable: string;
+  addressLocation: string;
   address: string;
+  province: string;
+  provinceCode: string;
+  provinceName: string;
+  canton: string;
+  cantonCode: string;
+  cantonName: string;
+  district: string;
+  districtCode: string;
+  districtName: string;
+  neighborhood: string;
+  neighborhoodCode: string;
+  neighborhoodName: string;
+  otherSigns: string;
   notes: string;
+  internalNotes: string;
+  fiscalNotes: string;
+  customerProvinceRequired: string;
+  customerCantonRequired: string;
+  customerDistrictRequired: string;
+  customerNeighborhoodRequired: string;
+  customerEconomicActivityCodeFormat: string;
+  consultHacienda: string;
+  consultingHacienda: string;
+  applyTaxpayerData: string;
+  taxpayerDataFound: string;
+  taxpayerDataNotFound: string;
+  taxpayerDataFromCache: string;
+  taxpayerDataFromHacienda: string;
+  reviewAndApplyTaxpayerData: string;
+  taxpayerDataApplied: string;
+  taxpayerLookupFailed: string;
+  taxpayerLookupUnavailable: string;
+  taxpayerLookupRateLimited: string;
+  taxpayerLookupIdentificationRequired: string;
+  taxpayerLookupIdentificationNumeric: string;
+  taxpayerLookupIdentificationLength: string;
+  taxpayerLookupLocalCustomerExistsTitle: string;
+  taxpayerLookupLocalCustomerExistsDescription: string;
+  openExistingCustomer: string;
+  taxpayerLookupMultipleLocalCustomersTitle: string;
+  taxpayerLookupMultipleLocalCustomersDescription: string;
+  taxRegime: string;
+  taxStatus: string;
+  fetchedAt: string;
+  selectEconomicActivity: string;
   identificationType: string;
   identificationNumber: string;
   crudComingNext: string;
@@ -321,6 +396,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     apiErrorInvalidCredentials: "Invalid credentials.",
     apiErrorEmailAlreadyTaken: "The email has already been taken.",
     apiErrorEmailInvalid: "The email field must be a valid email address.",
+    apiErrorFiscalEmailInvalid:
+      "The fiscal email field must be a valid email address.",
+    apiErrorIdentificationTypeInvalid:
+      "The selected identification type is invalid.",
     apiErrorInactiveAccount:
       "Your account is inactive. Contact an administrator.",
     apiErrorEmailRequired: "The email field is required.",
@@ -348,6 +427,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUserFor: 'Edit user "{query}"',
     editCustomerCommand: "Edit customer",
     editCustomerFor: 'Edit customer "{query}"',
+    commandOpenCustomerByIdentification:
+      "Open customer by identification {identificationNumber}",
+    commandFindOrCreateCustomerByIdentification:
+      "Find or create customer with identification {identificationNumber}",
     customerSearchFor: 'Search customers for "{query}"',
     searchUser: "Search user",
     searchUsersFor: 'Search users for "{query}"',
@@ -368,6 +451,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Create and edit customer records when the manage-customers permission is available. Delete, export, and bulk actions are not implemented.",
     customersManageAccessDeniedDescription:
       "You do not have permission to manage customers.",
+    customerIdentificationIntentMultipleMatches:
+      "Multiple customers match this identification. Search and select the customer manually before continuing.",
+    customerIdentificationIntentNoCreatePermission:
+      "No customer matches this identification. Creating customers requires manage-customers.",
+    customerIdentificationIntentInvalid:
+      "Enter a numeric identification number with 9 to 12 digits.",
     closeCommandPalette: "Close command palette",
     dashboard: "Dashboard",
     dashboardDescription:
@@ -504,8 +593,91 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     saveCustomer: "Save customer",
     updateCustomer: "Update customer",
     customerDetails: "Customer details",
+    basicCustomerDetails: "Basic customer details",
+    fiscalProfile: "Fiscal profile",
+    fiscalProfileHelperText:
+      "Fiscal profile fields prepare customer data for future Costa Rica electronic invoicing. Electronic invoicing is not implemented yet.",
+    locationCatalogHelperText:
+      "Location catalogs and Hacienda lookup are not implemented yet. Code and name fields prepare future catalog-backed selection.",
+    locationCatalogTemporaryHelperText:
+      "Location selection uses a temporary local catalog. Official Costa Rica location catalogs will be imported in a future feature.",
+    legalName: "Legal name",
+    commercialName: "Commercial name",
+    fiscalEmail: "Fiscal email",
+    economicActivityCode: "Economic activity code",
+    economicActivityName: "Economic activity name",
+    selectIdentificationType: "Select identification type",
+    identificationTypePhysicalId: "01 - Physical ID",
+    identificationTypeLegalEntityId: "02 - Legal entity ID",
+    identificationTypeDimex: "03 - DIMEX",
+    identificationTypeNite: "04 - NITE",
+    identificationTypeNonDomiciledForeigner:
+      "05 - Non-domiciled foreigner",
+    selectProvince: "Select province",
+    selectCanton: "Select canton",
+    selectDistrict: "Select district",
+    selectNeighborhood: "Select neighborhood",
+    noCantonsAvailable: "No cantons available",
+    noDistrictsAvailable: "No districts available",
+    noNeighborhoodsAvailable: "No neighborhoods available",
+    addressLocation: "Address / location",
     address: "Address",
+    province: "Province",
+    provinceCode: "Province code",
+    provinceName: "Province name",
+    canton: "Canton",
+    cantonCode: "Canton code",
+    cantonName: "Canton name",
+    district: "District",
+    districtCode: "District code",
+    districtName: "District name",
+    neighborhood: "Neighborhood",
+    neighborhoodCode: "Neighborhood code",
+    neighborhoodName: "Neighborhood name",
+    otherSigns: "Other signs",
     notes: "Notes",
+    internalNotes: "Internal notes",
+    fiscalNotes: "Fiscal notes",
+    customerProvinceRequired: "Province is required.",
+    customerCantonRequired: "Canton is required.",
+    customerDistrictRequired: "District is required.",
+    customerNeighborhoodRequired: "Neighborhood is required.",
+    customerEconomicActivityCodeFormat:
+      "Economic activity code must use the format XXXX.X.",
+    consultHacienda: "Consult Hacienda",
+    consultingHacienda: "Consulting Hacienda...",
+    applyTaxpayerData: "Apply taxpayer data",
+    taxpayerDataFound: "Taxpayer data found",
+    taxpayerDataNotFound:
+      "No Hacienda taxpayer data was found for this identification.",
+    taxpayerDataFromCache: "Data came from cache",
+    taxpayerDataFromHacienda: "Data came from Hacienda",
+    reviewAndApplyTaxpayerData: "Review and apply the data before saving.",
+    taxpayerDataApplied: "Taxpayer data applied.",
+    taxpayerLookupFailed: "Taxpayer lookup failed.",
+    taxpayerLookupUnavailable:
+      "Hacienda lookup is unavailable right now. You can continue entering the data manually.",
+    taxpayerLookupRateLimited:
+      "Hacienda temporarily rate limited the lookup. Try again later.",
+    taxpayerLookupIdentificationRequired:
+      "Identification number is required before consulting Hacienda.",
+    taxpayerLookupIdentificationNumeric:
+      "Identification number must contain only numbers.",
+    taxpayerLookupIdentificationLength:
+      "Identification number must be between 9 and 12 digits before consulting Hacienda.",
+    taxpayerLookupLocalCustomerExistsTitle:
+      "A customer with this identification already exists.",
+    taxpayerLookupLocalCustomerExistsDescription:
+      "Open the existing customer in edit mode before consulting Hacienda or creating a new one.",
+    openExistingCustomer: "Open existing customer",
+    taxpayerLookupMultipleLocalCustomersTitle:
+      "Multiple customers match this identification.",
+    taxpayerLookupMultipleLocalCustomersDescription:
+      "Search for the customer manually before continuing.",
+    taxRegime: "Tax regime",
+    taxStatus: "Tax status",
+    fetchedAt: "Fetched at",
+    selectEconomicActivity: "Select economic activity",
     identificationType: "Identification type",
     identificationNumber: "Identification number",
     crudComingNext: "CRUD coming next",
@@ -663,8 +835,91 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     saveCustomer: "Guardar cliente",
     updateCustomer: "Actualizar cliente",
     customerDetails: "Detalles del cliente",
+    basicCustomerDetails: "Detalles básicos del cliente",
+    fiscalProfile: "Perfil fiscal",
+    fiscalProfileHelperText:
+      "Los campos de perfil fiscal preparan los datos del cliente para una futura factura electrónica en Costa Rica. La factura electrónica todavía no está implementada.",
+    locationCatalogHelperText:
+      "Los catálogos de ubicación y la consulta a Hacienda todavía no están implementados. Los campos de código y nombre preparan una selección futura basada en catálogos.",
+    locationCatalogTemporaryHelperText:
+      "La selección de ubicación usa un catálogo local temporal. Los catálogos oficiales de ubicación de Costa Rica se importarán en una funcionalidad futura.",
+    legalName: "Razón social",
+    commercialName: "Nombre comercial",
+    fiscalEmail: "Correo fiscal",
+    economicActivityCode: "Código de actividad económica",
+    economicActivityName: "Nombre de actividad económica",
+    selectIdentificationType: "Selecciona el tipo de identificación",
+    identificationTypePhysicalId: "01 - Cédula física",
+    identificationTypeLegalEntityId: "02 - Cédula jurídica",
+    identificationTypeDimex: "03 - DIMEX",
+    identificationTypeNite: "04 - NITE",
+    identificationTypeNonDomiciledForeigner:
+      "05 - Extranjero No Domiciliado",
+    selectProvince: "Selecciona la provincia",
+    selectCanton: "Selecciona el cantón",
+    selectDistrict: "Selecciona el distrito",
+    selectNeighborhood: "Selecciona el barrio",
+    noCantonsAvailable: "No hay cantones disponibles",
+    noDistrictsAvailable: "No hay distritos disponibles",
+    noNeighborhoodsAvailable: "No hay barrios disponibles",
+    addressLocation: "Dirección / ubicación",
     address: "Dirección",
+    province: "Provincia",
+    provinceCode: "Código de provincia",
+    provinceName: "Nombre de provincia",
+    canton: "Cantón",
+    cantonCode: "Código de cantón",
+    cantonName: "Nombre de cantón",
+    district: "Distrito",
+    districtCode: "Código de distrito",
+    districtName: "Nombre de distrito",
+    neighborhood: "Barrio",
+    neighborhoodCode: "Código de barrio",
+    neighborhoodName: "Nombre de barrio",
+    otherSigns: "Otras señas",
     notes: "Notas",
+    internalNotes: "Notas internas",
+    fiscalNotes: "Notas fiscales",
+    customerProvinceRequired: "La provincia es obligatoria.",
+    customerCantonRequired: "El cantón es obligatorio.",
+    customerDistrictRequired: "El distrito es obligatorio.",
+    customerNeighborhoodRequired: "El barrio es obligatorio.",
+    customerEconomicActivityCodeFormat:
+      "El código de actividad económica debe usar el formato XXXX.X.",
+    consultHacienda: "Consultar Hacienda",
+    consultingHacienda: "Consultando Hacienda...",
+    applyTaxpayerData: "Aplicar datos del contribuyente",
+    taxpayerDataFound: "Datos del contribuyente encontrados",
+    taxpayerDataNotFound:
+      "No se encontraron datos en Hacienda para esta identificación.",
+    taxpayerDataFromCache: "Datos obtenidos desde caché",
+    taxpayerDataFromHacienda: "Datos obtenidos desde Hacienda",
+    reviewAndApplyTaxpayerData: "Revisa y aplica los datos antes de guardar.",
+    taxpayerDataApplied: "Datos del contribuyente aplicados.",
+    taxpayerLookupFailed: "No se pudo consultar el contribuyente.",
+    taxpayerLookupUnavailable:
+      "No se pudo consultar Hacienda en este momento. Puedes continuar ingresando los datos manualmente.",
+    taxpayerLookupRateLimited:
+      "Hacienda limitó temporalmente la consulta. Intenta de nuevo más tarde.",
+    taxpayerLookupIdentificationRequired:
+      "El número de identificación es obligatorio antes de consultar Hacienda.",
+    taxpayerLookupIdentificationNumeric:
+      "El número de identificación solo debe contener números.",
+    taxpayerLookupIdentificationLength:
+      "El número de identificación debe tener entre 9 y 12 dígitos antes de consultar Hacienda.",
+    taxpayerLookupLocalCustomerExistsTitle:
+      "Ya existe un cliente con esta identificación.",
+    taxpayerLookupLocalCustomerExistsDescription:
+      "Abre el cliente existente en modo edición antes de consultar Hacienda o crear uno nuevo.",
+    openExistingCustomer: "Abrir cliente existente",
+    taxpayerLookupMultipleLocalCustomersTitle:
+      "Hay varios clientes con esta identificación.",
+    taxpayerLookupMultipleLocalCustomersDescription:
+      "Busca el cliente manualmente antes de continuar.",
+    taxRegime: "Régimen tributario",
+    taxStatus: "Estado tributario",
+    fetchedAt: "Consultado el",
+    selectEconomicActivity: "Selecciona actividad económica",
     identificationType: "Tipo de identificación",
     identificationNumber: "Número de identificación",
     crudComingNext: "CRUD próximamente",
@@ -749,6 +1004,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     apiErrorEmailAlreadyTaken: "El correo electrónico ya está en uso.",
     apiErrorEmailInvalid:
       "El correo electrónico debe ser una dirección válida.",
+    apiErrorFiscalEmailInvalid:
+      "El correo fiscal debe ser una dirección válida.",
+    apiErrorIdentificationTypeInvalid:
+      "El tipo de identificación seleccionado no es válido.",
     apiErrorInactiveAccount:
       "Tu cuenta está inactiva. Contacta a un administrador.",
     apiErrorEmailRequired: "El correo electrónico es obligatorio.",
@@ -776,6 +1035,10 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
     editUserFor: 'Editar usuario "{query}"',
     editCustomerCommand: "Editar cliente",
     editCustomerFor: 'Editar cliente "{query}"',
+    commandOpenCustomerByIdentification:
+      "Abrir cliente por identificación {identificationNumber}",
+    commandFindOrCreateCustomerByIdentification:
+      "Buscar o crear cliente con identificación {identificationNumber}",
     customerSearchFor: 'Buscar clientes por "{query}"',
     searchUser: "Buscar usuario",
     searchUsersFor: 'Buscar usuarios por "{query}"',
@@ -796,6 +1059,12 @@ export const messages: Record<SupportedLanguage, SharedMessages> = {
       "Crea y edita registros de clientes cuando el permiso manage-customers está disponible. Eliminar, exportar y acciones masivas no están implementadas.",
     customersManageAccessDeniedDescription:
       "No tienes permiso para administrar clientes.",
+    customerIdentificationIntentMultipleMatches:
+      "Hay varios clientes con esta identificación. Busca y selecciona el cliente manualmente antes de continuar.",
+    customerIdentificationIntentNoCreatePermission:
+      "No hay clientes con esta identificación. Crear clientes requiere manage-customers.",
+    customerIdentificationIntentInvalid:
+      "Ingresa un número de identificación numérico de 9 a 12 dígitos.",
     closeCommandPalette: "Cerrar paleta de comandos",
     dashboard: "Dashboard",
     dashboardDescription:

@@ -51,6 +51,7 @@ apps/
 
 docs/
   architecture/
+  setup/
 ```
 
 Key areas:
@@ -58,6 +59,7 @@ Key areas:
 - `services/enterprise-auth-service`: Laravel backend service for authentication, users, roles, permissions, system events, customers, and protected API behavior.
 - `apps/enterprise-admin-web`: Next.js admin frontend for login, dashboard, user management, roles visibility, system information, system events, customers, theming, localization, command palette workflows, and permission-aware navigation.
 - `docs/architecture`: Architecture documents for platform direction and future system design.
+- `docs/setup`: Technical setup guides for local development and demo workflows.
 
 ## Implemented Foundation
 
@@ -120,12 +122,23 @@ Enterprise Core is being documented as a modular platform with two important arc
 - [Local-First Enterprise Core](docs/architecture/Local-First%20Enterprise%20Core.md): describes a future local-first deployment model where each customer can run its own local instance and database, with cloud services limited to licensing, subscription status, update metadata, and product distribution.
 - [Enterprise Command Center](docs/architecture/Enterprise%20Command%20Center.md): describes a future command-ready and AI-ready operational dashboard architecture built around safe known commands, permissions, confirmation flows, application services, and audit logs.
 - [Command Registry Standard](docs/architecture/Command%20Registry%20Standard.md): defines command types, permission expectations, confirmation rules, audit expectations, and module design guidance for future command-aware modules.
+- [Costa Rica Taxpayer Lookup](docs/architecture/Costa%20Rica%20Taxpayer%20Lookup.md): describes a future backend-mediated Hacienda taxpayer lookup flow for customer fiscal data prefill, local customer existence checks, caching, and safe Command Center behavior.
 - [Release and Update Strategy](docs/architecture/Release%20and%20Update%20Strategy.md): describes future versioning, release metadata, customer-controlled local updates, migration safety, and the relationship between updates and licensing.
+- [Windows Local Installer Strategy](docs/architecture/Windows%20Local%20Installer%20Strategy.md): describes a future Windows installer, launcher, local runtime, backup, update, and licensing direction for local-first distribution.
 
 These documents describe direction, not completed implementation.
 
+## Windows Demo Setup
+
+- [Windows Demo Setup](docs/setup/Windows%20Demo%20Setup.md): explains how a technical user can clone, configure, and run Enterprise Core on Windows for local development or demos.
+
+The Windows demo setup includes a safe preflight checker for validating local tools, PHP extensions, PostgreSQL service status, environment files, and dependency folders before starting the demo runtime.
+
+The current Windows demo setup is technical and manual. No production Windows installer exists yet. The future installer strategy is documented separately and should automate most local runtime setup when implemented.
+
 ## Release Notes
 
+- [Enterprise Core v1.0.2](docs/releases/v1.0.2.md)
 - [Enterprise Core v1.0.1](docs/releases/v1.0.1.md)
 
 ## Validation
@@ -176,7 +189,9 @@ npm run build
 - Sales and order workflows.
 - Reporting and operational analytics.
 - Costa Rica electronic invoicing.
+- Backend-mediated Costa Rica taxpayer lookup for customer fiscal data prefill.
 - Docker and deployment packaging.
+- Windows installer and local runtime packaging.
 - Optional update and licensing network.
 - Voice or AI command input layer built on the command registry.
 

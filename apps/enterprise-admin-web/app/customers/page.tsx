@@ -22,6 +22,7 @@ import { useI18n } from "@/lib/i18n/use-i18n";
 import { INACTIVE_ACCOUNT_LOGIN_PATH } from "@/lib/inactive-account";
 import {
   hasPermission,
+  LOOKUP_TAXPAYER_PERMISSION,
   MANAGE_CUSTOMERS_PERMISSION,
   VIEW_CUSTOMERS_PERMISSION,
 } from "@/lib/permissions";
@@ -58,8 +59,16 @@ function CustomersContent() {
   const createCustomerFormRef = useRef<HTMLDivElement>(null);
   const hasAppliedCreateCustomerIntentRef = useRef(false);
   const appliedEditCustomerIntentKeyRef = useRef("");
+  const appliedCustomerIdentificationIntentKeyRef = useRef("");
   const [shouldAutoFocusCreateCustomerForm, setShouldAutoFocusCreateCustomerForm] =
     useState(false);
+  const [
+    customerIdentificationIntentMessage,
+    setCustomerIdentificationIntentMessage,
+  ] = useState<{
+    text: string;
+    variant: "info" | "error";
+  } | null>(null);
   const canViewCustomers = hasPermission(
     trustedUser,
     VIEW_CUSTOMERS_PERMISSION,
@@ -67,6 +76,10 @@ function CustomersContent() {
   const canManageCustomers = hasPermission(
     trustedUser,
     MANAGE_CUSTOMERS_PERMISSION,
+  );
+  const canLookupTaxpayer = hasPermission(
+    trustedUser,
+    LOOKUP_TAXPAYER_PERMISSION,
   );
   const handleUnauthorized = useCallback(() => {
     clearStoredAuth();
@@ -91,7 +104,24 @@ function CustomersContent() {
   const refreshCustomerList = useCallback(() => {
     loadCustomers();
   }, [loadCustomers]);
+  const findCustomersByIdentificationNumber = useCallback(
+    (identificationNumber: string) => {
+      const normalizedIdentificationNumber = identificationNumber.trim();
+
+      if (!normalizedIdentificationNumber) {
+        return [];
+      }
+
+      return customers.filter(
+        (customer) =>
+          (customer.identification_number ?? "").trim() ===
+          normalizedIdentificationNumber,
+      );
+    },
+    [customers],
+  );
   const createCustomerFlow = useCreateCustomer({
+    findCustomersByIdentificationNumber,
     onCustomerCreated: refreshCustomerList,
     onInactiveAccount: handleInactiveAccount,
     onUnauthorized: handleUnauthorized,
@@ -118,10 +148,27 @@ function CustomersContent() {
       const searchableText = [
         customer.id.toString(),
         customer.name,
+        customer.legal_name,
+        customer.commercial_name,
         customer.email,
+        customer.fiscal_email,
+        customer.economic_activity_code,
+        customer.economic_activity_name,
         customer.phone,
         customer.identification_type,
         customer.identification_number,
+        customer.province,
+        customer.province_code,
+        customer.province_name,
+        customer.canton,
+        customer.canton_code,
+        customer.canton_name,
+        customer.district,
+        customer.district_code,
+        customer.district_name,
+        customer.neighborhood,
+        customer.neighborhood_code,
+        customer.neighborhood_name,
         statusLabel,
       ]
         .filter(Boolean)
@@ -145,6 +192,7 @@ function CustomersContent() {
 
   const showCreateCustomerForm = useCallback(
     ({ shouldFocus = false }: { shouldFocus?: boolean } = {}) => {
+      setCustomerIdentificationIntentMessage(null);
       cancelEditCustomerForm();
       showCreateCustomerFormPanel();
       setShouldAutoFocusCreateCustomerForm(shouldFocus);
@@ -154,12 +202,23 @@ function CustomersContent() {
 
   const startEditingCustomer = useCallback(
     (customer: Customer) => {
+      setCustomerIdentificationIntentMessage(null);
       cancelCreateCustomerForm();
       setShouldAutoFocusCreateCustomerForm(false);
       startEditingCustomerForm(customer);
     },
     [cancelCreateCustomerForm, startEditingCustomerForm],
   );
+  const openLocalTaxpayerLookupCustomer = useCallback(() => {
+    const localCustomerMatch =
+      createCustomerFlow.taxpayerLookupLocalCustomerMatch;
+
+    if (localCustomerMatch?.status !== "single") {
+      return;
+    }
+
+    startEditingCustomer(localCustomerMatch.customer);
+  }, [createCustomerFlow.taxpayerLookupLocalCustomerMatch, startEditingCustomer]);
 
   useEffect(() => {
     if (status !== "ready" || !canViewCustomers) {
@@ -262,6 +321,96 @@ function CustomersContent() {
     searchParams,
     startEditingCustomer,
     status,
+  ]);
+
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+    const identificationNumber =
+      searchParams.get("identification_number")?.trim() ?? "";
+    const intentKey = `${intent}:${identificationNumber}`;
+
+    if (
+      status !== "ready" ||
+      customersStatus !== "ready" ||
+      !canViewCustomers ||
+      intent !== "customer-identification" ||
+      appliedCustomerIdentificationIntentKeyRef.current === intentKey
+    ) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      appliedCustomerIdentificationIntentKeyRef.current = intentKey;
+      hasAppliedCreateCustomerIntentRef.current = false;
+      appliedEditCustomerIntentKeyRef.current = "";
+
+      if (!/^\d{9,12}$/.test(identificationNumber)) {
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentInvalid,
+          variant: "error",
+        });
+        return;
+      }
+
+      const localMatches =
+        findCustomersByIdentificationNumber(identificationNumber);
+      const [localCustomerMatch] = localMatches;
+
+      if (localMatches.length === 1 && localCustomerMatch) {
+        if (canManageCustomers) {
+          startEditingCustomer(localCustomerMatch);
+          return;
+        }
+
+        setSearchQuery(identificationNumber);
+        return;
+      }
+
+      if (localMatches.length > 1) {
+        setSearchQuery(identificationNumber);
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentMultipleMatches,
+          variant: "info",
+        });
+        return;
+      }
+
+      if (!canManageCustomers) {
+        setSearchQuery(identificationNumber);
+        setCustomerIdentificationIntentMessage({
+          text: t.customerIdentificationIntentNoCreatePermission,
+          variant: "info",
+        });
+        return;
+      }
+
+      showCreateCustomerForm({ shouldFocus: true });
+      createCustomerFlow.setIdentificationNumber(identificationNumber);
+
+      window.setTimeout(() => {
+        createCustomerFormRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 0);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    canManageCustomers,
+    canViewCustomers,
+    createCustomerFlow,
+    customersStatus,
+    findCustomersByIdentificationNumber,
+    searchParams,
+    showCreateCustomerForm,
+    startEditingCustomer,
+    status,
+    t.customerIdentificationIntentInvalid,
+    t.customerIdentificationIntentMultipleMatches,
+    t.customerIdentificationIntentNoCreatePermission,
   ]);
 
   return (
@@ -371,6 +520,15 @@ function CustomersContent() {
                 </StatusMessage>
               ) : null}
 
+              {customerIdentificationIntentMessage ? (
+                <StatusMessage
+                  variant={customerIdentificationIntentMessage.variant}
+                  className="m-5"
+                >
+                  {customerIdentificationIntentMessage.text}
+                </StatusMessage>
+              ) : null}
+
               {customersStatus === "ready" ? (
                 <>
                   {canManageCustomers && createCustomerFlow.isFormVisible ? (
@@ -378,7 +536,16 @@ function CustomersContent() {
                       <CustomerForm
                         mode="create"
                         name={createCustomerFlow.name}
+                        legalName={createCustomerFlow.legalName}
+                        commercialName={createCustomerFlow.commercialName}
                         email={createCustomerFlow.email}
+                        fiscalEmail={createCustomerFlow.fiscalEmail}
+                        economicActivityCode={
+                          createCustomerFlow.economicActivityCode
+                        }
+                        economicActivityName={
+                          createCustomerFlow.economicActivityName
+                        }
                         phone={createCustomerFlow.phone}
                         identificationType={
                           createCustomerFlow.identificationType
@@ -387,13 +554,56 @@ function CustomersContent() {
                           createCustomerFlow.identificationNumber
                         }
                         address={createCustomerFlow.address}
+                        province={createCustomerFlow.province}
+                        provinceCode={createCustomerFlow.provinceCode}
+                        provinceName={createCustomerFlow.provinceName}
+                        canton={createCustomerFlow.canton}
+                        cantonCode={createCustomerFlow.cantonCode}
+                        cantonName={createCustomerFlow.cantonName}
+                        district={createCustomerFlow.district}
+                        districtCode={createCustomerFlow.districtCode}
+                        districtName={createCustomerFlow.districtName}
+                        neighborhood={createCustomerFlow.neighborhood}
+                        neighborhoodCode={createCustomerFlow.neighborhoodCode}
+                        neighborhoodName={createCustomerFlow.neighborhoodName}
+                        otherSigns={createCustomerFlow.otherSigns}
                         notes={createCustomerFlow.notes}
+                        fiscalNotes={createCustomerFlow.fiscalNotes}
                         isActive={createCustomerFlow.isActive}
                         shouldAutoFocusName={shouldAutoFocusCreateCustomerForm}
                         isSubmitting={createCustomerFlow.isSubmitting}
                         errorMessages={createCustomerFlow.errorMessages}
+                        fieldErrors={createCustomerFlow.fieldErrors}
+                        canLookupTaxpayer={canLookupTaxpayer}
+                        isLookingUpTaxpayer={
+                          createCustomerFlow.isLookingUpTaxpayer
+                        }
+                        taxpayerLookupResult={
+                          createCustomerFlow.taxpayerLookupResult
+                        }
+                        taxpayerLookupErrorMessage={
+                          createCustomerFlow.taxpayerLookupErrorMessage
+                        }
+                        taxpayerLookupLocalCustomerMatch={
+                          createCustomerFlow.taxpayerLookupLocalCustomerMatch
+                            ?.status ?? null
+                        }
+                        selectedTaxpayerEconomicActivityCode={
+                          createCustomerFlow.selectedTaxpayerEconomicActivityCode
+                        }
                         onNameChange={createCustomerFlow.setName}
+                        onLegalNameChange={createCustomerFlow.setLegalName}
+                        onCommercialNameChange={
+                          createCustomerFlow.setCommercialName
+                        }
                         onEmailChange={createCustomerFlow.setEmail}
+                        onFiscalEmailChange={createCustomerFlow.setFiscalEmail}
+                        onEconomicActivityCodeChange={
+                          createCustomerFlow.setEconomicActivityCode
+                        }
+                        onEconomicActivityNameChange={
+                          createCustomerFlow.setEconomicActivityName
+                        }
                         onPhoneChange={createCustomerFlow.setPhone}
                         onIdentificationTypeChange={
                           createCustomerFlow.setIdentificationType
@@ -402,12 +612,50 @@ function CustomersContent() {
                           createCustomerFlow.setIdentificationNumber
                         }
                         onAddressChange={createCustomerFlow.setAddress}
+                        onProvinceChange={createCustomerFlow.setProvince}
+                        onProvinceCodeChange={
+                          createCustomerFlow.setProvinceCode
+                        }
+                        onProvinceNameChange={
+                          createCustomerFlow.setProvinceName
+                        }
+                        onCantonChange={createCustomerFlow.setCanton}
+                        onCantonCodeChange={createCustomerFlow.setCantonCode}
+                        onCantonNameChange={createCustomerFlow.setCantonName}
+                        onDistrictChange={createCustomerFlow.setDistrict}
+                        onDistrictCodeChange={
+                          createCustomerFlow.setDistrictCode
+                        }
+                        onDistrictNameChange={
+                          createCustomerFlow.setDistrictName
+                        }
+                        onNeighborhoodChange={
+                          createCustomerFlow.setNeighborhood
+                        }
+                        onNeighborhoodCodeChange={
+                          createCustomerFlow.setNeighborhoodCode
+                        }
+                        onNeighborhoodNameChange={
+                          createCustomerFlow.setNeighborhoodName
+                        }
+                        onOtherSignsChange={createCustomerFlow.setOtherSigns}
                         onNotesChange={createCustomerFlow.setNotes}
+                        onFiscalNotesChange={createCustomerFlow.setFiscalNotes}
                         onIsActiveChange={createCustomerFlow.setIsActive}
                         onSubmit={createCustomerFlow.submit}
                         onCancel={createCustomerFlow.cancelForm}
                         onClearErrorMessages={
                           createCustomerFlow.clearErrorMessages
+                        }
+                        onLookupTaxpayer={createCustomerFlow.lookupTaxpayer}
+                        onApplyTaxpayerData={
+                          createCustomerFlow.applyTaxpayerData
+                        }
+                        onOpenExistingCustomer={
+                          openLocalTaxpayerLookupCustomer
+                        }
+                        onSelectedTaxpayerEconomicActivityCodeChange={
+                          createCustomerFlow.setSelectedTaxpayerEconomicActivityCode
                         }
                       />
                     </div>
@@ -417,19 +665,62 @@ function CustomersContent() {
                     <CustomerForm
                       mode="edit"
                       name={editCustomerFlow.name}
+                      legalName={editCustomerFlow.legalName}
+                      commercialName={editCustomerFlow.commercialName}
                       email={editCustomerFlow.email}
+                      fiscalEmail={editCustomerFlow.fiscalEmail}
+                      economicActivityCode={
+                        editCustomerFlow.economicActivityCode
+                      }
+                      economicActivityName={
+                        editCustomerFlow.economicActivityName
+                      }
                       phone={editCustomerFlow.phone}
                       identificationType={editCustomerFlow.identificationType}
                       identificationNumber={
                         editCustomerFlow.identificationNumber
                       }
                       address={editCustomerFlow.address}
+                      province={editCustomerFlow.province}
+                      provinceCode={editCustomerFlow.provinceCode}
+                      provinceName={editCustomerFlow.provinceName}
+                      canton={editCustomerFlow.canton}
+                      cantonCode={editCustomerFlow.cantonCode}
+                      cantonName={editCustomerFlow.cantonName}
+                      district={editCustomerFlow.district}
+                      districtCode={editCustomerFlow.districtCode}
+                      districtName={editCustomerFlow.districtName}
+                      neighborhood={editCustomerFlow.neighborhood}
+                      neighborhoodCode={editCustomerFlow.neighborhoodCode}
+                      neighborhoodName={editCustomerFlow.neighborhoodName}
+                      otherSigns={editCustomerFlow.otherSigns}
                       notes={editCustomerFlow.notes}
+                      fiscalNotes={editCustomerFlow.fiscalNotes}
                       isActive={editCustomerFlow.isActive}
                       isSubmitting={editCustomerFlow.isSubmitting}
                       errorMessages={editCustomerFlow.errorMessages}
+                      fieldErrors={editCustomerFlow.fieldErrors}
+                      canLookupTaxpayer={canLookupTaxpayer}
+                      isLookingUpTaxpayer={editCustomerFlow.isLookingUpTaxpayer}
+                      taxpayerLookupResult={editCustomerFlow.taxpayerLookupResult}
+                      taxpayerLookupErrorMessage={
+                        editCustomerFlow.taxpayerLookupErrorMessage
+                      }
+                      taxpayerLookupLocalCustomerMatch={null}
+                      selectedTaxpayerEconomicActivityCode={
+                        editCustomerFlow.selectedTaxpayerEconomicActivityCode
+                      }
                       onNameChange={editCustomerFlow.setName}
+                      onLegalNameChange={editCustomerFlow.setLegalName}
+                      onCommercialNameChange={editCustomerFlow.setCommercialName}
                       onEmailChange={editCustomerFlow.setEmail}
+                      onFiscalEmailChange={editCustomerFlow.setFiscalEmail}
+                      onEconomicActivityCodeChange={
+                        editCustomerFlow.setEconomicActivityCode
+                      }
+                      onEconomicActivityNameChange={
+                        editCustomerFlow.setEconomicActivityName
+                      }
                       onPhoneChange={editCustomerFlow.setPhone}
                       onIdentificationTypeChange={
                         editCustomerFlow.setIdentificationType
@@ -438,11 +729,34 @@ function CustomersContent() {
                         editCustomerFlow.setIdentificationNumber
                       }
                       onAddressChange={editCustomerFlow.setAddress}
+                      onProvinceChange={editCustomerFlow.setProvince}
+                      onProvinceCodeChange={editCustomerFlow.setProvinceCode}
+                      onProvinceNameChange={editCustomerFlow.setProvinceName}
+                      onCantonChange={editCustomerFlow.setCanton}
+                      onCantonCodeChange={editCustomerFlow.setCantonCode}
+                      onCantonNameChange={editCustomerFlow.setCantonName}
+                      onDistrictChange={editCustomerFlow.setDistrict}
+                      onDistrictCodeChange={editCustomerFlow.setDistrictCode}
+                      onDistrictNameChange={editCustomerFlow.setDistrictName}
+                      onNeighborhoodChange={editCustomerFlow.setNeighborhood}
+                      onNeighborhoodCodeChange={
+                        editCustomerFlow.setNeighborhoodCode
+                      }
+                      onNeighborhoodNameChange={
+                        editCustomerFlow.setNeighborhoodName
+                      }
+                      onOtherSignsChange={editCustomerFlow.setOtherSigns}
                       onNotesChange={editCustomerFlow.setNotes}
+                      onFiscalNotesChange={editCustomerFlow.setFiscalNotes}
                       onIsActiveChange={editCustomerFlow.setIsActive}
                       onSubmit={editCustomerFlow.submit}
                       onCancel={editCustomerFlow.cancelEditing}
                       onClearErrorMessages={editCustomerFlow.clearErrorMessages}
+                      onLookupTaxpayer={editCustomerFlow.lookupTaxpayer}
+                      onApplyTaxpayerData={editCustomerFlow.applyTaxpayerData}
+                      onSelectedTaxpayerEconomicActivityCodeChange={
+                        editCustomerFlow.setSelectedTaxpayerEconomicActivityCode
+                      }
                     />
                   ) : null}
 

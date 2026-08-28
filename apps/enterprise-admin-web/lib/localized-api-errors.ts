@@ -4,6 +4,18 @@ const knownApiErrorKeys = {
   "Invalid credentials.": "apiErrorInvalidCredentials",
   "The email has already been taken.": "apiErrorEmailAlreadyTaken",
   "The email field must be a valid email address.": "apiErrorEmailInvalid",
+  "The fiscal email field must be a valid email address.":
+    "apiErrorFiscalEmailInvalid",
+  "The selected identification type is invalid.":
+    "apiErrorIdentificationTypeInvalid",
+  "The identification number field is required.":
+    "taxpayerLookupIdentificationRequired",
+  "The identification number field format is invalid.":
+    "taxpayerLookupIdentificationNumeric",
+  "The identification number field must be at least 9 characters.":
+    "taxpayerLookupIdentificationLength",
+  "The identification number field must not be greater than 12 characters.":
+    "taxpayerLookupIdentificationLength",
   "Your account is inactive.": "apiErrorInactiveAccount",
   "The email field is required.": "apiErrorEmailRequired",
   "The password field is required.": "apiErrorPasswordRequired",

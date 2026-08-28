@@ -41,7 +41,7 @@ Validates:
 
 - Initial roles are created.
 - Initial permissions are created.
-- Administrator permissions are assigned, including `view-system-events`, `view-customers`, and `manage-customers`.
+- Administrator permissions are assigned, including `view-system-events`, `view-customers`, `manage-customers`, and `lookup-taxpayer`.
 - Seeders are idempotent and do not duplicate records when executed multiple times.
 
 ### CustomerManagementTest
@@ -55,13 +55,33 @@ Validates:
 - A user without `manage-customers` cannot create or update customers.
 - Customer creation validates required `name`.
 - Customer creation validates `fiscal_email`.
+- Customer creation validates Costa Rica fiscal `identification_type` codes.
 - Customer create and update responses include optional fiscal profile fields.
-- Fiscal profile fields can be created and updated without triggering invoicing behavior.
+- Structured fiscal profile fields can be created and updated without triggering invoicing behavior.
 - New customers default to active.
 - Customer activation and deactivation create system events.
 - Customer creation and update create system events.
-- Customer system event metadata excludes full fiscal profiles, address details, and `fiscal_notes`.
+- Customer system event metadata excludes economic activity, fiscal email, full fiscal profiles, address/location fields, address details, and `fiscal_notes`.
 - Guest and inactive authenticated users cannot access customer routes.
+
+### TaxpayerLookupTest
+
+Validates:
+
+- A guest cannot use `/api/taxpayer-lookup`.
+- An inactive authenticated user cannot use `/api/taxpayer-lookup`.
+- A user without `lookup-taxpayer` cannot use `/api/taxpayer-lookup`.
+- `identification_number` is required.
+- `identification_number` must be numeric.
+- `identification_number` must be 9 to 12 digits.
+- A successful live Hacienda response returns a normalized taxpayer payload.
+- A successful live Hacienda response creates a cache entry.
+- A second request uses a non-expired cache entry without calling Hacienda again.
+- Hacienda `404`, `429`, and `5xx` responses return friendly errors.
+- Connection errors and timeouts return friendly `503` errors.
+- Successful and failed lookups create safe system events without raw Hacienda payloads or full taxpayer data.
+
+The test suite uses `Http::fake` for Hacienda responses. Tests must not call the real Hacienda API.
 
 ### SystemEventsTest
 
@@ -96,4 +116,4 @@ The full suite should pass with `php artisan test`.
 - Authentication endpoints must include tests for successful and failed scenarios.
 - Protected endpoints must include tests for authenticated and unauthenticated access.
 - Seeders must be safe to run multiple times.
-- System event tests must verify that passwords, tokens, raw credentials, full request bodies, customer address details, and fiscal notes are not stored.
+- System event tests must verify that passwords, tokens, raw credentials, full request bodies, customer economic activity, fiscal email, address/location details, fiscal notes, raw Hacienda payloads, and full taxpayer data are not stored.

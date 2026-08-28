@@ -1140,3 +1140,304 @@ Manual validation:
   - Inventory
   - Sales
   - Reports
+
+## 2026-08-27
+
+### Summary
+
+Advanced the customer fiscal workflow from architecture documentation into a working backend and Admin Web flow for Costa Rica taxpayer lookup, while preserving local-first safety, permission checks, user confirmation, and duplicate prevention.
+
+### Completed
+
+- Documented the future Costa Rica taxpayer lookup architecture.
+  - Added `docs/architecture/Costa Rica Taxpayer Lookup.md`.
+  - Documented backend-mediated Hacienda lookup.
+  - Documented local customer existence checks before lookup.
+  - Documented caching, rate limiting, resilience, privacy, audit, and Command Center safety.
+  - Clarified that this does not implement electronic invoicing, XML generation, XAdES signing, invoice keys, consecutive numbers, tax calculation, CABYS, or invoice issuing.
+
+- Added backend taxpayer lookup foundation in Enterprise Auth Service.
+  - Added `GET /api/taxpayer-lookup?identification_number=...`.
+  - Added `lookup-taxpayer` permission.
+  - Assigned `lookup-taxpayer` to Administrator through `PermissionSeeder`.
+  - Added `taxpayer_lookup_caches` migration.
+  - Added `TaxpayerLookupCache` model.
+  - Added `HaciendaTaxpayerLookupService`.
+  - Added `TaxpayerLookupController`.
+  - Added cache-first behavior before calling Hacienda.
+  - Added defensive Hacienda response normalization.
+  - Added friendly handling for 404, 429, 5xx, and connection errors.
+  - Added safe System Events:
+    - `taxpayer_lookup.succeeded`
+    - `taxpayer_lookup.failed`
+  - Avoided logging full Hacienda payloads or full taxpayer data.
+
+- Validated backend implementation.
+  - Applied local migration:
+    - `2026_08_27_020000_create_taxpayer_lookup_caches_table`
+  - Seeded permissions locally.
+  - Ran backend tests successfully:
+    - `106 passed (403 assertions)`
+
+- Added Admin Web taxpayer lookup button to Customer forms.
+  - Added `Consultar Hacienda` / `Consult Hacienda` button.
+  - Button only appears when the user has `lookup-taxpayer`.
+  - Added frontend API helper for `GET /api/taxpayer-lookup`.
+  - Added frontend validation before lookup:
+    - required identification number
+    - numeric only
+    - 9 to 12 digits
+  - Added lookup loading state.
+  - Added localized error handling for not found, rate limited, unavailable, validation, and generic failures.
+  - Added taxpayer data preview.
+  - Added source indicator:
+    - cache
+    - Hacienda/live
+  - Added manual `Aplicar datos del contribuyente` action.
+  - Ensured lookup does not create, update, or save customers automatically.
+
+- Added duplicate guard before Hacienda lookup from the create customer form.
+  - Checks currently loaded customers by exact `identification_number`.
+  - If one local customer exists:
+    - does not call taxpayer lookup
+    - shows local match message
+    - offers opening the existing customer in edit mode
+  - If multiple local customers exist:
+    - does not call taxpayer lookup
+    - asks the user to search/select manually
+  - If no local match exists:
+    - continues normal taxpayer lookup flow.
+  - Edit mode remains allowed to consult Hacienda manually.
+
+- Added safe Command Palette customer identification intent.
+  - Supports command text such as:
+    - `Crear cliente 3101123456`
+    - `Crear cliente cédula 3101123456`
+    - `Consultar Hacienda 3101123456`
+    - `Actualizar cliente 3101123456`
+  - Command Palette detects customer-related text and a 9 to 12 digit identification number.
+  - Navigates to:
+    - `/customers?intent=customer-identification&identification_number=...`
+  - Customers page consumes the intent safely.
+  - If one local customer exists:
+    - opens existing customer in edit mode when the user can manage customers.
+  - If no local customer exists:
+    - opens create customer form and pre-fills `identification_number` when the user can manage customers.
+  - If multiple local matches exist:
+    - routes user to manual search/selection.
+  - Command intent never consults Hacienda, creates, updates, or saves automatically.
+
+- Updated documentation.
+  - Updated root architecture references.
+  - Updated Enterprise Command Center architecture.
+  - Updated Enterprise Auth Service README, API, manual testing, testing docs, and changelog.
+  - Updated Admin Web README with taxpayer lookup, duplicate guard, and customer identification command behavior.
+
+### Published Commits
+
+- `e94e5bf` — merge: add Costa Rica taxpayer lookup design
+- `5f68a31` — merge: add taxpayer lookup foundation
+- `e9add59` — merge: add admin web taxpayer lookup button
+- `0cf34e7` — merge: guard taxpayer lookup against duplicate customers
+- `efa3efb` — merge: add customer identification command intent
+
+### Validation
+
+Backend:
+
+- `php artisan test`
+- Result: `106 passed (403 assertions)`
+
+Admin Web:
+
+- `npm run lint`
+- `npm run build`
+
+Result:
+
+- Lint passed.
+- Build passed.
+- Customers route builds successfully.
+
+### Notes
+
+This was a major customer fiscal workflow milestone. The product now has a safe, permission-aware, backend-mediated Hacienda taxpayer lookup path, with cache support, manual user review, duplicate prevention, and Command Center navigation intents.
+
+The implementation intentionally avoids automatic mutations. The user remains in control of all customer creation and update actions.
+
+### Next
+
+- Add focused frontend tests when a testing framework is introduced for Admin Web.
+- Consider showing a clearer customer-identification intent result message when a read-only user searches by identification.
+- Add official Costa Rica economic activity catalog support later.
+- Add official Costa Rica location catalog import later.
+- Continue evolving Command Center intents safely.
+- Defer automatic Hacienda refresh/update workflows until preview and confirmation UX is designed.
+
+## 2026-08-28
+
+### Summary
+
+Enterprise Core reached a major portability milestone. The project was installed, configured, validated, and manually tested on a second clean Windows computer.
+
+The day focused on making the local-first demo path repeatable: documenting the future Windows installer direction, creating practical Windows demo setup guidance, adding safe startup and preflight helpers, and ensuring a fresh local database can produce a usable demo administrator through seeding.
+
+### Completed
+
+#### Windows local runtime and demo setup
+
+- Added Windows Local Installer Strategy documentation.
+- Added Windows Demo Setup documentation.
+- Added demo startup helper scripts:
+  - `scripts/windows/start-enterprise-core.ps1`
+  - `scripts/windows/Start Enterprise Core.bat`
+- Documented that the helper starts the Laravel backend and Next.js Admin Web in separate PowerShell windows and opens Admin Web in the browser.
+- Clarified that both windows must remain open because closing either window stops that part of the demo runtime.
+- Documented that this behavior is expected for the demo helper, and that a future installer or Windows service runtime should manage services differently.
+
+#### Clean Windows machine validation
+
+- Tested Enterprise Core on a second Windows computer from a clean setup.
+- Installed and validated required tools:
+  - Git
+  - PHP 8.4
+  - Composer
+  - Node/npm
+  - PostgreSQL 17
+  - pgAdmin
+  - 7-Zip
+- Enabled and validated required PHP extensions:
+  - `fileinfo`
+  - `zip`
+  - `pdo_pgsql`
+  - `pgsql`
+  - `pdo_sqlite`
+  - `sqlite3`
+- Created the local PostgreSQL database:
+  - `enterprise_core`
+- Configured backend `.env` and Admin Web `.env.local`.
+- Ran backend migrations and seeders.
+- Ran backend migration status.
+- Ran backend tests successfully on the clean machine before the admin seeder fix:
+  - `106 passed`
+- Ran Admin Web `npm install` and build successfully.
+- Manually validated login and main modules after the admin seeder fix:
+  - Users
+  - Customers
+  - Roles
+  - System Events
+  - Command Palette
+
+#### Admin demo user seeder
+
+- Added `AdminUserSeeder`.
+- Updated `DatabaseSeeder` so `php artisan migrate --seed` creates a fresh local/demo administrator.
+- Demo credentials:
+  - `admin@example.com`
+  - `password123`
+- The seeded user is active and assigned to the `Administrator` role.
+- Updated `PermissionSeeder` so `Administrator` has the expected demo permissions:
+  - `manage-users`
+  - `view-customers`
+  - `manage-customers`
+  - `lookup-taxpayer`
+  - `view-system-events`
+- Added tests for the admin demo seeder and seeder idempotency.
+- Backend validation reached:
+  - `107 passed`
+  - `419 assertions`
+
+#### Windows troubleshooting guide
+
+- Expanded Windows Demo Setup troubleshooting based on the real second-machine setup.
+- Documented:
+  - PHP extensions.
+  - Composer requirements.
+  - `psql` not being on PATH.
+  - PostgreSQL service name `postgresql-x64-17`.
+  - Local PostgreSQL password reset using temporary `pg_hba.conf` `trust`.
+  - Restoring `scram-sha-256` immediately afterward.
+  - Backend `.env`.
+  - Admin Web `.env.local`.
+  - Final clean-machine checklist.
+
+#### Windows preflight checker
+
+- Added:
+  - `scripts/windows/check-enterprise-core-prerequisites.ps1`
+  - `scripts/windows/Check Enterprise Core Prerequisites.bat`
+- The preflight checker validates:
+  - Git
+  - PHP
+  - Composer
+  - Node
+  - npm
+  - PHP extensions
+  - PostgreSQL service status
+  - `psql` availability
+  - Backend/frontend folders
+  - Backend `.env`
+  - Admin Web `.env.local`
+  - Backend `vendor`
+  - Frontend `node_modules`
+- Safety boundaries:
+  - Does not install dependencies.
+  - Does not modify files.
+  - Does not modify databases.
+  - Does not run migrations.
+  - Does not start services.
+  - Does not print secrets.
+- Validated on the main machine:
+  - `21 OK`
+  - `0 WARN`
+  - `0 FAIL`
+- Validated the BAT wrapper as well.
+
+#### Release notes
+
+- Added:
+  - `docs/releases/v1.0.2.md`
+- Updated the README release notes list.
+- v1.0.2 documents:
+  - Windows Demo Setup Foundation.
+  - Future Windows installer direction.
+  - Demo runtime scripts.
+  - Preflight checker.
+  - Fresh demo admin.
+  - Validation.
+  - Not-included items.
+  - Next direction.
+- Documented that password change and forgot-password/password-reset workflows are not implemented yet and should be designed carefully later.
+
+### Validation
+
+Final validation before promotion:
+
+- Backend tests passed:
+  - `107 passed`
+  - `419 assertions`
+- Admin Web build passed after clearing stale `.next` cache.
+- Admin Web lint passed.
+- Git working tree was clean.
+- `develop` was up to date with `origin/develop`.
+
+### Published develop commits
+
+- `80298d7` merge: add Windows local runtime and demo setup
+- `ed60d0f` merge: clarify Windows demo runtime shutdown behavior
+- `12b4356` merge: seed demo administrator user
+- `357489d` merge: expand Windows demo troubleshooting guide
+- `ec482db` merge: add Windows demo preflight checker
+- `fe1f68c` merge: add v1.0.2 release notes
+
+### Decisions
+
+- Do not open another feature before closing the day.
+- Promote `develop` to `main` after the Daily Log is committed and pushed.
+
+### Next
+
+- Promote `develop` to `main` as the current presentable portfolio version.
+- Later: design account security workflows, starting with authenticated password change.
+- Later: design password reset carefully because it requires secure tokens, expiration, email delivery, abuse protection, and a local-first decision for SMTP or cloud-assisted email.
+- Later: continue with backup/restore architecture or first-run setup.

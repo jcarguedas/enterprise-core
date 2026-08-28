@@ -63,6 +63,13 @@ class PermissionSeeder extends Seeder
                 'description' => 'Allows creating and updating customers.',
                 'is_active' => true,
             ],
+            [
+                'name' => 'Lookup Taxpayer',
+                'slug' => 'lookup-taxpayer',
+                'module' => 'customers',
+                'description' => 'Allows consulting taxpayer data through backend-mediated lookup.',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($permissions as $permission) {
@@ -74,9 +81,11 @@ class PermissionSeeder extends Seeder
 
         $administratorRole = Role::where('slug', 'administrator')->first();
         $administratorPermissions = Permission::whereIn('slug', [
+            'manage-users',
             'view-system-events',
             'view-customers',
             'manage-customers',
+            'lookup-taxpayer',
         ])->pluck('id');
 
         if ($administratorRole && $administratorPermissions->isNotEmpty()) {

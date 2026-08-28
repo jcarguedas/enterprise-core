@@ -18,6 +18,15 @@ The product brand is displayed with the current release label:
   Enterprise Auth Service.
 - Protected Customers page backed by `GET /api/customers`, with create/edit
   workflows available to users with `manage-customers`.
+- Customer create/edit forms support optional fiscal profile fields and
+  structured location preparation for future Costa Rica fiscal data needs.
+- Customer location fields use cascading selects backed by a temporary local
+  demo catalog for UX validation.
+- Customer economic activity code input is constrained in the UI to the
+  `XXXX.X` format as preparation for future Costa Rica fiscal workflows.
+- Customer forms can consult Costa Rica Hacienda taxpayer data through the
+  backend-mediated taxpayer lookup endpoint when the user has
+  `lookup-taxpayer`.
 - Protected Settings placeholder page for future workspace, localization,
   appearance, and security preferences.
 - Protected command palette foundation with safe known navigation commands and
@@ -124,6 +133,41 @@ Users with `view-customers` but without `manage-customers` can only view and
 search. Customer delete, export, bulk actions, and quick status toggles are not
 implemented.
 
+Customer create/edit forms include optional fiscal profile fields such as legal
+name, commercial name, fiscal email, economic activity code/name, structured
+province/canton/district/neighborhood code and name values, other signs, and
+fiscal notes. The visible location workflow uses cascading selects for
+province, canton, district, and neighborhood, backed by a temporary local demo
+catalog. Existing province, canton, district, and neighborhood text payload
+fields remain supported for backward compatibility.
+
+`identification_type` is optional and uses Costa Rica fiscal identification code
+options: `01`, `02`, `03`, `04`, and `05`.
+
+The economic activity code field accepts digits and a single dot, and is
+currently constrained in the UI to the `XXXX.X` format when provided, as
+preparation for future Costa Rica electronic invoicing data requirements.
+
+When the authenticated user has `lookup-taxpayer`, customer forms show a
+`Consult Hacienda` button next to the identification fields. The button calls
+the backend `GET /api/taxpayer-lookup` endpoint, shows a taxpayer data preview,
+and lets the user apply selected data to the form. Lookup never creates or
+updates customers automatically; the user must still review the form and press
+Save Customer or Update Customer.
+
+In the create customer form, taxpayer lookup first checks the currently loaded
+customer list for an exact `identification_number` match. A single local match
+opens the existing customer in the edit workflow instead of consulting Hacienda
+immediately, while multiple local matches ask the user to search and select the
+customer manually. This helps avoid accidental duplicates and still requires
+explicit user review and save actions.
+
+These fields only prepare customer records for future Costa Rica fiscal
+workflows. Admin Web does not implement electronic invoicing, call Hacienda
+directly, provide economic activity catalogs, import official location
+catalogs, generate XML, sign documents, manage consecutive numbers, manage
+CABYS, or calculate taxes.
+
 The `/roles` page follows the same pattern for `GET /api/roles` and shows a
 read-only role catalog when the trusted current user has `manage-users`.
 
@@ -195,6 +239,13 @@ this foundation.
 See [Command Palette](docs/Command-Palette.md) for the Admin Web command
 palette manual and [Command Center Roadmap](docs/Command-Center-Roadmap.md)
 for the phased product direction.
+
+Customer identification commands can route safely to the Customers page with an
+intent such as `/customers?intent=customer-identification&identification_number=...`.
+The Customers page checks local records first, opens an existing customer when a
+single exact match exists, or pre-fills the create form when no local match exists
+and the user has `manage-customers`. These commands never consult Hacienda, create,
+update, or save customer records automatically.
 
 ## Roles
 

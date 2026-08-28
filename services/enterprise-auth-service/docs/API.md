@@ -200,6 +200,7 @@ GET   /api/users/{user}
 PATCH /api/users/{user}
 GET   /api/roles
 GET   /api/system-events
+GET   /api/taxpayer-lookup
 GET   /api/customers
 POST  /api/customers
 GET   /api/customers/{customer}
@@ -252,6 +253,14 @@ Customer create and update endpoints are protected with:
 auth:sanctum
 active-user
 permission:manage-customers
+```
+
+Taxpayer lookup endpoints are protected with:
+
+```text
+auth:sanctum
+active-user
+permission:lookup-taxpayer
 ```
 
 ---
@@ -963,7 +972,19 @@ Customers are the first business-domain module foundation in Enterprise Auth Ser
 
 The module is intentionally small and API-first. It supports listing, detail, creation, partial updates, and optional fiscal profile data for customer records.
 
-The fiscal profile fields prepare customer data for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet: the service does not call Hacienda APIs, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, or calculate taxes.
+The fiscal profile fields prepare customer data for a future Costa Rica electronic invoicing module. Electronic invoicing is not implemented yet: the service does not call Hacienda APIs, perform Hacienda lookups, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
+
+Location catalogs and economic activity selection/catalogs are not implemented yet. Existing `province`, `canton`, `district`, and `neighborhood` text fields remain for backward compatibility. The newer code/name fields are intended for a future catalog-backed UI.
+
+`identification_type` is optional. When provided, it must use one of the Costa Rica fiscal identification codes:
+
+| Code | Meaning |
+|---|---|
+| `01` | Cedula fisica |
+| `02` | Cedula juridica |
+| `03` | DIMEX |
+| `04` | NITE |
+| `05` | Extranjero No Domiciliado |
 
 ### List Customers
 
@@ -985,14 +1006,24 @@ Example response:
       "commercial_name": "Acme",
       "email": "billing@acme.test",
       "fiscal_email": "invoices@acme.test",
+      "economic_activity_code": "620100",
+      "economic_activity_name": "Software development services",
       "phone": "+506 2222 3333",
-      "identification_type": "tax_id",
+      "identification_type": "02",
       "identification_number": "123456789",
       "address": "San Jose",
       "province": "San Jose",
+      "province_code": "1",
+      "province_name": "San Jose",
       "canton": "Central",
+      "canton_code": "01",
+      "canton_name": "Central",
       "district": "Carmen",
+      "district_code": "01",
+      "district_name": "Carmen",
       "neighborhood": "Amon",
+      "neighborhood_code": "01",
+      "neighborhood_name": "Amon",
       "other_signs": "North side of the central park.",
       "notes": "Preferred billing contact.",
       "fiscal_notes": "Optional fiscal profile notes.",
@@ -1025,14 +1056,24 @@ Example response:
     "commercial_name": "Acme",
     "email": "billing@acme.test",
     "fiscal_email": "invoices@acme.test",
+    "economic_activity_code": "620100",
+    "economic_activity_name": "Software development services",
     "phone": "+506 2222 3333",
-    "identification_type": "tax_id",
+    "identification_type": "02",
     "identification_number": "123456789",
     "address": "San Jose",
     "province": "San Jose",
+    "province_code": "1",
+    "province_name": "San Jose",
     "canton": "Central",
+    "canton_code": "01",
+    "canton_name": "Central",
     "district": "Carmen",
+    "district_code": "01",
+    "district_name": "Carmen",
     "neighborhood": "Amon",
+    "neighborhood_code": "01",
+    "neighborhood_name": "Amon",
     "other_signs": "North side of the central park.",
     "notes": "Preferred billing contact.",
     "fiscal_notes": "Optional fiscal profile notes.",
@@ -1062,14 +1103,24 @@ Example request:
   "commercial_name": "Acme",
   "email": "billing@acme.test",
   "fiscal_email": "invoices@acme.test",
+  "economic_activity_code": "620100",
+  "economic_activity_name": "Software development services",
   "phone": "+506 2222 3333",
-  "identification_type": "tax_id",
+  "identification_type": "02",
   "identification_number": "123456789",
   "address": "San Jose",
   "province": "San Jose",
+  "province_code": "1",
+  "province_name": "San Jose",
   "canton": "Central",
+  "canton_code": "01",
+  "canton_name": "Central",
   "district": "Carmen",
+  "district_code": "01",
+  "district_name": "Carmen",
   "neighborhood": "Amon",
+  "neighborhood_code": "01",
+  "neighborhood_name": "Amon",
   "other_signs": "North side of the central park.",
   "notes": "Preferred billing contact.",
   "fiscal_notes": "Optional fiscal profile notes.",
@@ -1086,14 +1137,24 @@ Validation rules:
 | `commercial_name` | nullable, string, max 255 |
 | `email` | nullable, email, max 255 |
 | `fiscal_email` | nullable, email, max 255 |
+| `economic_activity_code` | nullable, string, max 20 |
+| `economic_activity_name` | nullable, string, max 255 |
 | `phone` | nullable, string, max 50 |
-| `identification_type` | nullable, string, max 50 |
+| `identification_type` | nullable, string, one of `01`, `02`, `03`, `04`, `05` |
 | `identification_number` | nullable, string, max 100 |
 | `address` | nullable, string, max 500 |
 | `province` | nullable, string, max 100 |
+| `province_code` | nullable, string, max 2 |
+| `province_name` | nullable, string, max 100 |
 | `canton` | nullable, string, max 100 |
+| `canton_code` | nullable, string, max 2 |
+| `canton_name` | nullable, string, max 100 |
 | `district` | nullable, string, max 100 |
+| `district_code` | nullable, string, max 2 |
+| `district_name` | nullable, string, max 100 |
 | `neighborhood` | nullable, string, max 100 |
+| `neighborhood_code` | nullable, string, max 2 |
+| `neighborhood_name` | nullable, string, max 100 |
 | `other_signs` | nullable, string, max 500 |
 | `notes` | nullable, string, max 2000 |
 | `fiscal_notes` | nullable, string, max 2000 |
@@ -1145,7 +1206,105 @@ customers.deactivated
 
 Customer event metadata stores safe summaries such as `target_name` and `target_email`. It does not store full request bodies or customer notes.
 
-Customer event metadata must not store full fiscal profiles, address details, or `fiscal_notes`.
+Customer event metadata must not store full fiscal profiles, economic activity, fiscal email, address/location code or name details, address details, or `fiscal_notes`.
+
+---
+
+## Costa Rica Taxpayer Lookup
+
+The taxpayer lookup endpoint provides a backend-mediated foundation for future customer fiscal data prefill using the Hacienda public taxpayer API.
+
+This endpoint is data lookup only. It does not implement electronic invoicing, generate invoices, generate XML, sign documents, generate invoice keys, generate consecutive numbers, manage branches or terminals, calculate taxes, manage CABYS, or emit invoices.
+
+```http
+GET /api/taxpayer-lookup?identification_number=3101123456
+```
+
+Requires `lookup-taxpayer`.
+
+The backend validates the identification number, checks the local cache first, calls Hacienda only when needed, normalizes the response, and returns a safe DTO. Raw Hacienda payloads are not returned directly to Admin Web.
+
+### Query Parameters
+
+| Parameter | Type | Required | Rules |
+|---|---|---:|---|
+| `identification_number` | string | yes | numeric, 9 to 12 digits |
+
+### Successful Response
+
+```json
+{
+  "taxpayer": {
+    "identification_number": "3101123456",
+    "name": "ACME SOCIEDAD ANONIMA",
+    "identification_type": "02",
+    "tax_regime": "Traditional",
+    "tax_status": "Active",
+    "economic_activities": [
+      {
+        "code": "6201.0",
+        "name": "Software development",
+        "status": "Active"
+      }
+    ]
+  },
+  "source": "live",
+  "fetched_at": "2026-08-27T15:30:00.000000Z"
+}
+```
+
+`source` is either `live` or `cache`.
+
+### Error Responses
+
+Missing or invalid identification number:
+
+```http
+422 Validation Error
+```
+
+Hacienda rejected the lookup request:
+
+```http
+422 Unprocessable Entity
+```
+
+No taxpayer record was found:
+
+```http
+404 Not Found
+```
+
+Hacienda rate limiting:
+
+```http
+429 Too Many Requests
+```
+
+Hacienda unavailable or connection timeout:
+
+```http
+503 Service Unavailable
+```
+
+Error responses use friendly messages and do not include raw Hacienda payloads.
+
+### Cache Behavior
+
+Successful live lookups are stored in `taxpayer_lookup_caches` with the raw payload, normalized payload, status, HTTP status, `fetched_at`, and `expires_at`.
+
+The endpoint checks non-expired cache entries before calling Hacienda. The default TTL is 24 hours and can be configured with `HACIENDA_TAXPAYER_LOOKUP_CACHE_TTL_HOURS`.
+
+### System Events
+
+Taxpayer lookup writes safe system events:
+
+```text
+taxpayer_lookup.succeeded
+taxpayer_lookup.failed
+```
+
+Metadata is limited to `source`, `http_status`, and a masked identification number such as `******3456`. Full Hacienda payloads and full taxpayer data must not be stored in system events.
 
 ---
 
@@ -1227,6 +1386,8 @@ customers.created
 customers.updated
 customers.activated
 customers.deactivated
+taxpayer_lookup.succeeded
+taxpayer_lookup.failed
 ```
 
 ### Safety Boundary
